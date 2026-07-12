@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Keep data folder tracked (seed file), but ignore uploaded files
+public/uploads/

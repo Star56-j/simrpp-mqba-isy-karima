@@ -19,7 +19,7 @@ import {
 } from './src/server/db.ts';
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Setup limits for file upload support (Base64)
 app.use(express.json({ limit: '20mb' }));

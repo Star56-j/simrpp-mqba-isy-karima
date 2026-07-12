@@ -1,0 +1,187 @@
+import React from 'react';
+import { 
+  LayoutDashboard, 
+  Users, 
+  BookOpen, 
+  GraduationCap, 
+  Calendar, 
+  FileText, 
+  History, 
+  User, 
+  Lock, 
+  LogOut, 
+  Menu, 
+  X, 
+  Moon, 
+  Sun,
+  Activity,
+  FileSpreadsheet
+} from 'lucide-react';
+import { User as UserType } from '../types';
+
+interface SidebarProps {
+  user: UserType;
+  currentView: string;
+  setView: (view: string) => void;
+  onLogout: () => void;
+  darkMode: boolean;
+  setDarkMode: (dark: boolean) => void;
+}
+
+export default function Sidebar({ 
+  user, 
+  currentView, 
+  setView, 
+  onLogout, 
+  darkMode, 
+  setDarkMode 
+}: SidebarProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const menuItems = user.role === 'Admin' ? [
+    { id: 'admin-dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'master-teachers', label: 'Data Guru', icon: Users },
+    { id: 'master-subjects', label: 'Mata Pelajaran', icon: BookOpen },
+    { id: 'master-classes', label: 'Data Kelas', icon: GraduationCap },
+    { id: 'master-schedules', label: 'Jadwal KBM', icon: Calendar },
+    { id: 'manage-rpps', label: 'Persetujuan RPP', icon: FileText },
+    { id: 'activity-logs', label: 'Activity Log', icon: Activity },
+    { id: 'profile-settings', label: 'Profil Saya', icon: User },
+  ] : [
+    { id: 'guru-dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'my-rpps', label: 'RPP Saya', icon: FileText },
+    { id: 'profile-settings', label: 'Profil Saya', icon: User },
+  ];
+
+  return (
+    <>
+      {/* Mobile Top Header */}
+      <header className="lg:hidden bg-emerald-800 text-white flex items-center justify-between px-4 py-3 sticky top-0 z-50 shadow-md">
+        <div className="flex items-center space-x-2">
+          <div className="bg-white p-1.5 rounded-lg">
+            <span className="text-emerald-800 font-bold text-sm tracking-wider">MQBA</span>
+          </div>
+          <div>
+            <h1 className="text-xs font-bold leading-tight uppercase tracking-wider">SIMRPP MQBA</h1>
+            <p className="text-[9px] text-emerald-100 font-medium">Isy Karima</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button 
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-1.5 rounded-lg hover:bg-emerald-700 transition"
+            title="Toggle Tema"
+          >
+            {darkMode ? <Sun className="w-5 h-5 text-amber-300" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-1.5 rounded-lg hover:bg-emerald-700 transition"
+          >
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </header>
+
+      {/* Sidebar Overlay for Mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Main Sidebar */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-40 w-64 bg-emerald-900 text-slate-100 flex flex-col justify-between shadow-xl transition-transform duration-300 transform 
+        lg:translate-x-0 lg:static lg:h-screen
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Logo Section */}
+        <div className="p-6 border-b border-emerald-800/60">
+          <div className="flex items-center space-x-3">
+            <div className="bg-white p-2 rounded-xl shadow-inner flex-shrink-0">
+              <span className="text-emerald-900 font-extrabold text-xl tracking-wider">MQBA</span>
+            </div>
+            <div>
+              <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-none">SIMRPP MQBA</h2>
+              <p className="text-[10px] text-emerald-300 font-semibold tracking-wider mt-1 uppercase">Isy Karima</p>
+            </div>
+          </div>
+        </div>
+
+        {/* User Info Card */}
+        <div className="px-6 py-4 border-b border-emerald-800/40 bg-emerald-950/30">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white shadow-sm border border-emerald-500">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+              <span className="inline-flex items-center px-2 py-0.5 mt-0.5 rounded-full text-[10px] font-bold bg-emerald-700 text-emerald-100 uppercase tracking-wide border border-emerald-600">
+                {user.role}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Menu */}
+        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentView === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setView(item.id);
+                  setIsOpen(false);
+                }}
+                className={`
+                  w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200
+                  ${isActive 
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/20 font-semibold' 
+                    : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white'
+                  }
+                `}
+              >
+                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-emerald-300'}`} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-emerald-800/60 bg-emerald-950/40 space-y-2">
+          {/* Desktop Theme Toggle */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="hidden lg:flex w-full items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-100 hover:bg-emerald-800/40 hover:text-white transition"
+          >
+            <div className="flex items-center space-x-3">
+              {darkMode ? <Sun className="w-5 h-5 text-amber-300" /> : <Moon className="w-5 h-5 text-emerald-300" />}
+              <span>{darkMode ? 'Mode Terang' : 'Mode Gelap'}</span>
+            </div>
+            <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800">
+              {darkMode ? 'Dark' : 'Light'}
+            </span>
+          </button>
+
+          {/* Logout Button */}
+          <button
+            onClick={() => {
+              if (window.confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                onLogout();
+              }
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-rose-200 hover:bg-rose-950/40 hover:text-rose-100 transition-all duration-200"
+          >
+            <LogOut className="w-5 h-5 text-rose-300 flex-shrink-0" />
+            <span>Keluar Sistem</span>
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}

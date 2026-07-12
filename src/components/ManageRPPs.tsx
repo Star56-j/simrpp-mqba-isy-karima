@@ -14,7 +14,8 @@ import {
   RotateCcw,
   Check,
   Eye,
-  Filter
+  Filter,
+  Trash2
 } from 'lucide-react';
 import { RPP } from '../types';
 import { api } from '../api';
@@ -35,6 +36,10 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
   const [revisionNotes, setRevisionNotes] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
+
+  // Delete confirmation
+  const [deleteConfirmRpp, setDeleteConfirmRpp] = React.useState<RPP | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const filteredRpps = rpps.filter(r => {
     const teacherName = r.teacher?.name || '';
@@ -77,6 +82,21 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
       }, 1200);
     } catch (err: any) {
       setErrorMessage(err.message || 'Gagal menyimpan hasil review.');
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirmRpp) return;
+    setIsDeleting(true);
+    try {
+      await api.deleteRPP(deleteConfirmRpp.id);
+      setDeleteConfirmRpp(null);
+      setSelectedRpp(null);
+      onRefresh();
+    } catch (err: any) {
+      alert(err.message || 'Gagal menghapus RPP.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -310,6 +330,13 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
                           <Eye className="w-3.5 h-3.5" />
                           <span>Review</span>
                         </button>
+                        <button
+                          onClick={() => setDeleteConfirmRpp(rpp)}
+                          className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 transition"
+                          title="Hapus RPP"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -464,14 +491,24 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
                     </span>
                   </div>
 
-                  {selectedRpp.status === 'Menunggu Persetujuan' && (
+                  <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => setIsReviewMode(true)}
-                      className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition"
+                      onClick={() => setDeleteConfirmRpp(selectedRpp)}
+                      className="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition"
                     >
-                      Mulai Penilaian (Review)
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus RPP</span>
                     </button>
-                  )}
+
+                    {selectedRpp.status === 'Menunggu Persetujuan' && (
+                      <button
+                        onClick={() => setIsReviewMode(true)}
+                        className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition"
+                      >
+                        Mulai Penilaian (Review)
+                      </button>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleReviewSubmit} className="space-y-4">
@@ -547,6 +584,52 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
                   </div>
                 </form>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmRpp && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md border border-slate-100 dark:border-slate-800 shadow-2xl animate-scale-up p-6 space-y-5">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/30 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">Hapus RPP?</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tindakan ini tidak dapat dibatalkan.</p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1 text-xs">
+              <p className="text-slate-500">Guru: <span className="font-bold text-slate-700 dark:text-slate-200">{deleteConfirmRpp.teacher?.name}</span></p>
+              <p className="text-slate-500">Mata Pelajaran: <span className="font-bold text-slate-700 dark:text-slate-200">{deleteConfirmRpp.subject?.name}</span></p>
+              <p className="text-slate-500">Kelas: <span className="font-bold text-slate-700 dark:text-slate-200">Kelas {deleteConfirmRpp.class?.name}</span></p>
+              <p className="text-slate-500">Pertemuan Ke-: <span className="font-bold text-slate-700 dark:text-slate-200">{deleteConfirmRpp.meetingNo}</span></p>
+              <p className="text-slate-500">Status: <span className={`font-bold ${
+                deleteConfirmRpp.status === 'Disetujui' ? 'text-emerald-600' :
+                deleteConfirmRpp.status === 'Menunggu Persetujuan' ? 'text-amber-600' :
+                deleteConfirmRpp.status === 'Revisi' ? 'text-rose-600' : 'text-slate-500'
+              }`}>{deleteConfirmRpp.status}</span></p>
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-1">
+              <button
+                onClick={() => setDeleteConfirmRpp(null)}
+                disabled={isDeleting}
+                className="px-4 py-2.5 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 disabled:opacity-60"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isDeleting ? 'Menghapus...' : 'Ya, Hapus'}</span>
+              </button>
             </div>
           </div>
         </div>

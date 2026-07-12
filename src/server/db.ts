@@ -120,7 +120,15 @@ export function getDatabase(): DatabaseSchema {
   }
   try {
     const data = fs.readFileSync(DB_PATH, 'utf-8');
-    return JSON.parse(data);
+    const parsed = JSON.parse(data) as DatabaseSchema;
+    // If users array is empty, the database was never seeded properly — seed now
+    if (!parsed.users || parsed.users.length === 0) {
+      console.log("Database exists but has no users, seeding...");
+      const db = seedDatabase();
+      saveDatabase(db);
+      return db;
+    }
+    return parsed;
   } catch (error) {
     console.error("Error reading database file, reseeding...", error);
     const db = seedDatabase();

@@ -7,5 +7,8 @@ coverage/
 .env*
 !.env.example
 
-# Keep data folder tracked (seed file), but ignore uploaded files
+# Keep uploads folder structure but ignore actual files
 public/uploads/
+
+# Database is generated at runtime, do not commit
+data/

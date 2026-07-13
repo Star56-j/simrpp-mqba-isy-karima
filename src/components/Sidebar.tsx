@@ -110,10 +110,10 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* User Info Card */}
+        {/* User Info Card + Actions */}
         <div className="px-6 py-4 border-b border-emerald-800/40 bg-emerald-950/30">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white shadow-sm border border-emerald-500">
+            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white shadow-sm border border-emerald-500 flex-shrink-0">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
@@ -122,6 +122,22 @@ export default function Sidebar({
                 {user.role}
               </span>
             </div>
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-lg hover:bg-emerald-800/50 transition flex-shrink-0"
+              title={darkMode ? 'Mode Terang' : 'Mode Gelap'}
+            >
+              {darkMode ? <Sun className="w-4.5 h-4.5 text-amber-300" /> : <Moon className="w-4.5 h-4.5 text-emerald-300" />}
+            </button>
+            {/* Logout */}
+            <button
+              onClick={() => { if (window.confirm('Apakah Anda yakin ingin keluar dari sistem?')) onLogout(); }}
+              className="p-2 rounded-lg hover:bg-rose-950/40 transition flex-shrink-0"
+              title="Keluar Sistem"
+            >
+              <LogOut className="w-4.5 h-4.5 text-rose-300" />
+            </button>
           </div>
         </div>
 
@@ -153,33 +169,8 @@ export default function Sidebar({
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-emerald-800/60 bg-emerald-950/40 space-y-2">
-          {/* Desktop Theme Toggle */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="hidden lg:flex w-full items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-100 hover:bg-emerald-800/40 hover:text-white transition"
-          >
-            <div className="flex items-center space-x-3">
-              {darkMode ? <Sun className="w-5 h-5 text-amber-300" /> : <Moon className="w-5 h-5 text-emerald-300" />}
-              <span>{darkMode ? 'Mode Terang' : 'Mode Gelap'}</span>
-            </div>
-            <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800">
-              {darkMode ? 'Dark' : 'Light'}
-            </span>
-          </button>
-
-          {/* Logout Button */}
-          <button
-            onClick={() => {
-              if (window.confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                onLogout();
-              }
-            }}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-rose-200 hover:bg-rose-950/40 hover:text-rose-100 transition-all duration-200"
-          >
-            <LogOut className="w-5 h-5 text-rose-300 flex-shrink-0" />
-            <span>Keluar Sistem</span>
-          </button>
+        <div className="p-4 border-t border-emerald-800/60 bg-emerald-950/40">
+          <p className="text-[10px] text-emerald-600 text-center font-semibold uppercase tracking-wider">SIMRPP MQBA © 2026</p>
         </div>
       </aside>
     </>

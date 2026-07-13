@@ -962,6 +962,56 @@ app.get('/api/attendances', requireAuth(), (req, res) => {
   res.json(decorated);
 });
 
+// POST guru mengisi absensi diri sendiri
+app.post('/api/attendances/self', requireAuth('Guru'), (req, res) => {
+  const guru = (req as any).user as User;
+  if (!guru.teacherId) {
+    res.status(400).json({ error: 'Akun guru tidak terhubung ke data pengajar' });
+    return;
+  }
+
+  const { date, status, notes, academicYearId, semesterId } = req.body;
+
+  if (!date || !status || !academicYearId || !semesterId) {
+    res.status(400).json({ error: 'date, status, academicYearId, dan semesterId wajib diisi' });
+    return;
+  }
+
+  const validStatus = ['Hadir', 'Izin', 'Sakit'];
+  if (!validStatus.includes(status)) {
+    res.status(400).json({ error: 'Guru hanya dapat mengisi status Hadir, Izin, atau Sakit' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.attendances) db.attendances = [];
+
+  // Cek duplikat — 1 absensi per hari
+  const dup = db.attendances.find(a => a.teacherId === guru.teacherId && a.date === date);
+  if (dup) {
+    res.status(400).json({ error: 'Absensi untuk tanggal ini sudah diisi. Hubungi Admin untuk mengubahnya.' });
+    return;
+  }
+
+  const teacher = db.teachers.find(t => t.id === guru.teacherId);
+
+  const newAtt: Attendance = {
+    id: `att-${Date.now()}`,
+    teacherId: guru.teacherId,
+    date, status, notes: notes || '',
+    academicYearId, semesterId,
+    recordedBy: guru.id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  db.attendances.push(newAtt);
+  saveDatabase(db);
+  logActivity(guru.id, guru.name, 'Guru', 'Isi Absensi Mandiri',
+    `${teacher?.name} mengisi absensi tanggal ${date}: ${status}`);
+  res.status(201).json(newAtt);
+});
+
 // POST buat catatan absensi (Admin only)
 app.post('/api/attendances', requireAuth('Admin'), (req, res) => {
   const admin = (req as any).user as User;

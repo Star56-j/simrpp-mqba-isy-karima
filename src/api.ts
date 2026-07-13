@@ -284,6 +284,14 @@ export const api = {
     });
   },
 
+  // Guru mengisi absensi diri sendiri (hanya Hadir/Izin/Sakit, tidak bisa Alpha)
+  async selfAttendance(data: { date: string; status: 'Hadir' | 'Izin' | 'Sakit'; notes?: string; academicYearId: string; semesterId: string }): Promise<Attendance> {
+    return fetchJson<Attendance>('/api/attendances/self', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   async updateAttendance(id: string, data: Partial<Attendance>): Promise<Attendance> {
     return fetchJson<Attendance>(`/api/attendances/${id}`, {
       method: 'PUT',

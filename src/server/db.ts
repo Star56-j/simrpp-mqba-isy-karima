@@ -90,6 +90,21 @@ export interface RPP {
   createdAt: string;
 }
 
+export type AttendanceStatus = 'Hadir' | 'Izin' | 'Sakit' | 'Alpha';
+
+export interface Attendance {
+  id: string;
+  teacherId: string;
+  date: string;
+  status: AttendanceStatus;
+  notes: string;
+  academicYearId: string;
+  semesterId: string;
+  recordedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ActivityLog {
   id: string;
   userId: string;
@@ -109,6 +124,7 @@ export interface DatabaseSchema {
   semesters: Semester[];
   teachingSchedules: TeachingSchedule[];
   rpps: RPP[];
+  attendances: Attendance[];
   activityLogs: ActivityLog[];
 }
 
@@ -142,6 +158,11 @@ export function getDatabase(): DatabaseSchema {
       const db = seedDatabase();
       saveDatabase(db);
       return db;
+    }
+    // Migrate: tambah attendances jika belum ada
+    if (!parsed.attendances) {
+      parsed.attendances = [];
+      saveDatabase(parsed);
     }
     return parsed;
   } catch (error) {
@@ -426,6 +447,7 @@ function seedDatabase(): DatabaseSchema {
     semesters,
     teachingSchedules,
     rpps,
+    attendances: [],
     activityLogs
   };
 }

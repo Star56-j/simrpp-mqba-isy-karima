@@ -45,11 +45,13 @@ export default function Sidebar({
     { id: 'master-classes', label: 'Data Kelas', icon: GraduationCap },
     { id: 'master-schedules', label: 'Jadwal KBM', icon: Calendar },
     { id: 'manage-rpps', label: 'Persetujuan RPP', icon: FileText },
+    { id: 'attendance', label: 'Absensi Guru', icon: FileSpreadsheet },
     { id: 'activity-logs', label: 'Activity Log', icon: Activity },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ] : [
     { id: 'guru-dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'my-rpps', label: 'RPP Saya', icon: FileText },
+    { id: 'my-attendance', label: 'Absensi Saya', icon: FileSpreadsheet },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ];
 

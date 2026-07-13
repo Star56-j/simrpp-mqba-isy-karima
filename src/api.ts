@@ -8,6 +8,8 @@ import {
   TeachingSchedule,
   RPP,
   ActivityLog,
+  Attendance,
+  AttendanceSummary,
   AdminStats,
   GuruStats
 } from './types';
@@ -261,6 +263,46 @@ export const api = {
   // Activity Logs
   async getActivityLogs(): Promise<ActivityLog[]> {
     return fetchJson<ActivityLog[]>('/api/activity-logs');
+  },
+
+  // Attendance
+  async getAttendances(params?: {
+    teacherId?: string;
+    month?: string;
+    year?: string;
+    semesterId?: string;
+    academicYearId?: string;
+  }): Promise<Attendance[]> {
+    const q = new URLSearchParams(params as Record<string, string> || {}).toString();
+    return fetchJson<Attendance[]>(`/api/attendances${q ? '?' + q : ''}`);
+  },
+
+  async createAttendance(data: Omit<Attendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<Attendance> {
+    return fetchJson<Attendance>('/api/attendances', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateAttendance(id: string, data: Partial<Attendance>): Promise<Attendance> {
+    return fetchJson<Attendance>(`/api/attendances/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteAttendance(id: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`/api/attendances/${id}`, { method: 'DELETE' });
+  },
+
+  async getAttendanceSummary(params?: {
+    month?: string;
+    year?: string;
+    semesterId?: string;
+    academicYearId?: string;
+  }): Promise<AttendanceSummary[]> {
+    const q = new URLSearchParams(params as Record<string, string> || {}).toString();
+    return fetchJson<AttendanceSummary[]>(`/api/attendances/summary${q ? '?' + q : ''}`);
   },
 
   // Upload File Attachment (converts File to base64, uploads via JSON api)

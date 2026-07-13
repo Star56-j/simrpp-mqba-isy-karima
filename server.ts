@@ -15,6 +15,7 @@ import {
   Semester,
   TeachingSchedule,
   RPP,
+  Attendance,
   ActivityLog
 } from './src/server/db.ts';
 
@@ -929,7 +930,178 @@ app.delete('/api/rpps/:id', requireAuth(), (req, res) => {
 });
 
 
-// 9. Activity Logs API
+// 9. Attendance API
+// GET semua absensi (Admin: semua, Guru: milik sendiri)
+app.get('/api/attendances', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  const { month, year, semesterId, academicYearId, teacherId } = req.query as Record<string, string>;
+
+  let list = db.attendances || [];
+
+  if (user.role === 'Guru') {
+    list = list.filter(a => a.teacherId === user.teacherId);
+  } else if (teacherId) {
+    list = list.filter(a => a.teacherId === teacherId);
+  }
+
+  if (academicYearId) list = list.filter(a => a.academicYearId === academicYearId);
+  if (semesterId)     list = list.filter(a => a.semesterId === semesterId);
+  if (year)           list = list.filter(a => a.date.startsWith(year));
+  if (month && year)  list = list.filter(a => a.date.startsWith(`${year}-${month.padStart(2,'0')}`));
+
+  // Decorate
+  const decorated = list.map(a => ({
+    ...a,
+    teacher: db.teachers.find(t => t.id === a.teacherId),
+    academicYear: db.academicYears.find(y => y.id === a.academicYearId),
+    semester: db.semesters.find(s => s.id === a.semesterId),
+  }));
+
+  decorated.sort((a, b) => b.date.localeCompare(a.date));
+  res.json(decorated);
+});
+
+// POST buat catatan absensi (Admin only)
+app.post('/api/attendances', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const { teacherId, date, status, notes, academicYearId, semesterId } = req.body;
+
+  if (!teacherId || !date || !status || !academicYearId || !semesterId) {
+    res.status(400).json({ error: 'teacherId, date, status, academicYearId, dan semesterId wajib diisi' });
+    return;
+  }
+
+  const validStatus = ['Hadir', 'Izin', 'Sakit', 'Alpha'];
+  if (!validStatus.includes(status)) {
+    res.status(400).json({ error: 'Status tidak valid' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.attendances) db.attendances = [];
+
+  // Cek duplikat: 1 catatan per guru per tanggal
+  const dup = db.attendances.find(a => a.teacherId === teacherId && a.date === date);
+  if (dup) {
+    res.status(400).json({ error: 'Absensi untuk guru ini pada tanggal tersebut sudah ada. Gunakan edit untuk mengubah.' });
+    return;
+  }
+
+  const teacher = db.teachers.find(t => t.id === teacherId);
+  if (!teacher) { res.status(404).json({ error: 'Guru tidak ditemukan' }); return; }
+
+  const newAtt: Attendance = {
+    id: `att-${Date.now()}`,
+    teacherId, date, status, notes: notes || '',
+    academicYearId, semesterId,
+    recordedBy: admin.id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  db.attendances.push(newAtt);
+  saveDatabase(db);
+  logActivity(admin.id, admin.name, 'Admin', 'Catat Absensi',
+    `Mencatat absensi ${teacher.name} pada ${date}: ${status}`);
+  res.status(201).json(newAtt);
+});
+
+// PUT update absensi (Admin only)
+app.put('/api/attendances/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.attendances) db.attendances = [];
+
+  const att = db.attendances.find(a => a.id === req.params.id);
+  if (!att) { res.status(404).json({ error: 'Data absensi tidak ditemukan' }); return; }
+
+  const { status, notes, date, academicYearId, semesterId } = req.body;
+  const validStatus = ['Hadir', 'Izin', 'Sakit', 'Alpha'];
+  if (status && !validStatus.includes(status)) {
+    res.status(400).json({ error: 'Status tidak valid' }); return;
+  }
+
+  if (status) att.status = status;
+  if (notes !== undefined) att.notes = notes;
+  if (date) att.date = date;
+  if (academicYearId) att.academicYearId = academicYearId;
+  if (semesterId) att.semesterId = semesterId;
+  att.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  const teacher = db.teachers.find(t => t.id === att.teacherId);
+  logActivity(admin.id, admin.name, 'Admin', 'Ubah Absensi',
+    `Mengubah absensi ${teacher?.name} pada ${att.date}: ${att.status}`);
+  res.json(att);
+});
+
+// DELETE absensi (Admin only)
+app.delete('/api/attendances/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.attendances) db.attendances = [];
+
+  const idx = db.attendances.findIndex(a => a.id === req.params.id);
+  if (idx === -1) { res.status(404).json({ error: 'Data absensi tidak ditemukan' }); return; }
+
+  const att = db.attendances[idx];
+  db.attendances.splice(idx, 1);
+  saveDatabase(db);
+
+  const teacher = db.teachers.find(t => t.id === att.teacherId);
+  logActivity(admin.id, admin.name, 'Admin', 'Hapus Absensi',
+    `Menghapus absensi ${teacher?.name} pada ${att.date}`);
+  res.json({ message: 'Absensi berhasil dihapus' });
+});
+
+// GET rekap absensi — summary per guru untuk filter tertentu
+app.get('/api/attendances/summary', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  const { month, year, semesterId, academicYearId } = req.query as Record<string, string>;
+
+  let list = db.attendances || [];
+
+  // Guru hanya bisa lihat milik sendiri
+  if (user.role === 'Guru') {
+    list = list.filter(a => a.teacherId === user.teacherId);
+  }
+
+  if (academicYearId) list = list.filter(a => a.academicYearId === academicYearId);
+  if (semesterId)     list = list.filter(a => a.semesterId === semesterId);
+  if (year)           list = list.filter(a => a.date.startsWith(year));
+  if (month && year)  list = list.filter(a => a.date.startsWith(`${year}-${month.padStart(2,'0')}`));
+
+  // Hitung per guru
+  const map = new Map<string, { hadir:number; izin:number; sakit:number; alpha:number }>();
+  for (const a of list) {
+    if (!map.has(a.teacherId)) map.set(a.teacherId, { hadir:0, izin:0, sakit:0, alpha:0 });
+    const s = map.get(a.teacherId)!;
+    if (a.status === 'Hadir') s.hadir++;
+    else if (a.status === 'Izin') s.izin++;
+    else if (a.status === 'Sakit') s.sakit++;
+    else if (a.status === 'Alpha') s.alpha++;
+  }
+
+  const summary = Array.from(map.entries()).map(([tid, counts]) => {
+    const teacher = db.teachers.find(t => t.id === tid);
+    const total = counts.hadir + counts.izin + counts.sakit + counts.alpha;
+    return {
+      teacherId: tid,
+      teacherName: teacher?.name || tid,
+      ...counts,
+      total,
+      persentaseHadir: total > 0 ? Math.round((counts.hadir / total) * 100) : 0,
+    };
+  });
+
+  summary.sort((a, b) => a.teacherName.localeCompare(b.teacherName));
+  res.json(summary);
+});
+
+
+// 10. Activity Logs API
 app.get('/api/activity-logs', requireAuth('Admin'), (req, res) => {
   res.json(getDatabase().activityLogs);
 });

@@ -10,6 +10,7 @@ import {
   TeachingSchedule, 
   RPP, 
   ActivityLog,
+  Attendance,
   AdminStats,
   GuruStats
 } from './types';
@@ -28,6 +29,8 @@ import ManageRPPs from './components/ManageRPPs';
 import MyRPPs from './components/MyRPPs';
 import ActivityLogs from './components/ActivityLogs';
 import ProfileSettings from './components/ProfileSettings';
+import AttendanceAdmin from './components/AttendanceAdmin';
+import AttendanceGuru from './components/AttendanceGuru';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -58,6 +61,7 @@ export default function App() {
   const [semesters, setSemesters] = React.useState<Semester[]>([]);
   const [schedules, setSchedules] = React.useState<TeachingSchedule[]>([]);
   const [rpps, setRpps] = React.useState<RPP[]>([]);
+  const [attendances, setAttendances] = React.useState<Attendance[]>([]);
   const [activityLogs, setActivityLogs] = React.useState<ActivityLog[]>([]);
 
   // Statistics
@@ -91,14 +95,15 @@ export default function App() {
     if (!currentUser) return;
     try {
       setLoading(true);
-      const [tch, sbj, cls, ay, sem, sch, r] = await Promise.all([
+      const [tch, sbj, cls, ay, sem, sch, r, att] = await Promise.all([
         api.getTeachers().catch(() => []),
         api.getSubjects().catch(() => []),
         api.getClasses().catch(() => []),
         api.getAcademicYears().catch(() => []),
         api.getSemesters().catch(() => []),
         api.getSchedules().catch(() => []),
-        api.getRPPs().catch(() => [])
+        api.getRPPs().catch(() => []),
+        api.getAttendances().catch(() => [])
       ]);
 
       setTeachers(tch);
@@ -108,6 +113,7 @@ export default function App() {
       setSemesters(sem);
       setSchedules(sch);
       setRpps(r);
+      setAttendances(att);
 
       // Fetch Stats
       const statRes = await api.getDashboardStats().catch(() => null);
@@ -230,6 +236,23 @@ export default function App() {
       case 'activity-logs':
         return <ActivityLogs logs={activityLogs} onRefresh={fetchData} />;
 
+      case 'attendance':
+        return (
+          <AttendanceAdmin
+            teachers={teachers}
+            academicYears={academicYears}
+            semesters={semesters}
+          />
+        );
+
+      case 'my-attendance':
+        return (
+          <AttendanceGuru
+            academicYears={academicYears}
+            semesters={semesters}
+          />
+        );
+
       case 'profile-settings':
         return <ProfileSettings onRefresh={fetchData} />;
 
@@ -253,6 +276,8 @@ export default function App() {
       case 'manage-rpps': return 'Persetujuan RPP';
       case 'my-rpps': return 'Rencana Pelaksanaan Pembelajaran (RPP)';
       case 'activity-logs': return 'Log Aktivitas';
+      case 'attendance': return 'Absensi Guru';
+      case 'my-attendance': return 'Absensi Saya';
       case 'profile-settings': return 'Pengaturan Profil';
       default: return 'SIMRPP MQBA';
     }

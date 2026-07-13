@@ -103,6 +103,36 @@ export interface RPP {
   academicYear?: AcademicYear;
 }
 
+export type AttendanceStatus = 'Hadir' | 'Izin' | 'Sakit' | 'Alpha';
+
+export interface Attendance {
+  id: string;
+  teacherId: string;
+  date: string;           // ISO date string YYYY-MM-DD
+  status: AttendanceStatus;
+  notes: string;
+  academicYearId: string;
+  semesterId: string;
+  recordedBy: string;     // userId admin yang mencatat
+  createdAt: string;
+  updatedAt: string;
+  // Decorated
+  teacher?: Teacher;
+  academicYear?: AcademicYear;
+  semester?: Semester;
+}
+
+export interface AttendanceSummary {
+  teacherId: string;
+  teacherName: string;
+  hadir: number;
+  izin: number;
+  sakit: number;
+  alpha: number;
+  total: number;
+  persentaseHadir: number;
+}
+
 export interface ActivityLog {
   id: string;
   userId: string;

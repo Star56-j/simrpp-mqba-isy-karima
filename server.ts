@@ -1007,6 +1007,50 @@ app.post('/api/attendances', requireAuth('Admin'), (req, res) => {
   res.status(201).json(newAtt);
 });
 
+// GET rekap absensi — summary per guru untuk filter tertentu
+// PENTING: route ini harus di atas /:id agar tidak ditangkap sebagai parameter
+app.get('/api/attendances/summary', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  const { month, year, semesterId, academicYearId } = req.query as Record<string, string>;
+
+  let list = db.attendances || [];
+
+  if (user.role === 'Guru') {
+    list = list.filter(a => a.teacherId === user.teacherId);
+  }
+
+  if (academicYearId) list = list.filter(a => a.academicYearId === academicYearId);
+  if (semesterId)     list = list.filter(a => a.semesterId === semesterId);
+  if (year)           list = list.filter(a => a.date.startsWith(year));
+  if (month && year)  list = list.filter(a => a.date.startsWith(`${year}-${month.padStart(2,'0')}`));
+
+  const map = new Map<string, { hadir:number; izin:number; sakit:number; alpha:number }>();
+  for (const a of list) {
+    if (!map.has(a.teacherId)) map.set(a.teacherId, { hadir:0, izin:0, sakit:0, alpha:0 });
+    const s = map.get(a.teacherId)!;
+    if (a.status === 'Hadir') s.hadir++;
+    else if (a.status === 'Izin') s.izin++;
+    else if (a.status === 'Sakit') s.sakit++;
+    else if (a.status === 'Alpha') s.alpha++;
+  }
+
+  const summary = Array.from(map.entries()).map(([tid, counts]) => {
+    const teacher = db.teachers.find(t => t.id === tid);
+    const total = counts.hadir + counts.izin + counts.sakit + counts.alpha;
+    return {
+      teacherId: tid,
+      teacherName: teacher?.name || tid,
+      ...counts,
+      total,
+      persentaseHadir: total > 0 ? Math.round((counts.hadir / total) * 100) : 0,
+    };
+  });
+
+  summary.sort((a, b) => a.teacherName.localeCompare(b.teacherName));
+  res.json(summary);
+});
+
 // PUT update absensi (Admin only)
 app.put('/api/attendances/:id', requireAuth('Admin'), (req, res) => {
   const admin = (req as any).user as User;
@@ -1055,50 +1099,6 @@ app.delete('/api/attendances/:id', requireAuth('Admin'), (req, res) => {
   res.json({ message: 'Absensi berhasil dihapus' });
 });
 
-// GET rekap absensi — summary per guru untuk filter tertentu
-app.get('/api/attendances/summary', requireAuth(), (req, res) => {
-  const user = (req as any).user as User;
-  const db = getDatabase();
-  const { month, year, semesterId, academicYearId } = req.query as Record<string, string>;
-
-  let list = db.attendances || [];
-
-  // Guru hanya bisa lihat milik sendiri
-  if (user.role === 'Guru') {
-    list = list.filter(a => a.teacherId === user.teacherId);
-  }
-
-  if (academicYearId) list = list.filter(a => a.academicYearId === academicYearId);
-  if (semesterId)     list = list.filter(a => a.semesterId === semesterId);
-  if (year)           list = list.filter(a => a.date.startsWith(year));
-  if (month && year)  list = list.filter(a => a.date.startsWith(`${year}-${month.padStart(2,'0')}`));
-
-  // Hitung per guru
-  const map = new Map<string, { hadir:number; izin:number; sakit:number; alpha:number }>();
-  for (const a of list) {
-    if (!map.has(a.teacherId)) map.set(a.teacherId, { hadir:0, izin:0, sakit:0, alpha:0 });
-    const s = map.get(a.teacherId)!;
-    if (a.status === 'Hadir') s.hadir++;
-    else if (a.status === 'Izin') s.izin++;
-    else if (a.status === 'Sakit') s.sakit++;
-    else if (a.status === 'Alpha') s.alpha++;
-  }
-
-  const summary = Array.from(map.entries()).map(([tid, counts]) => {
-    const teacher = db.teachers.find(t => t.id === tid);
-    const total = counts.hadir + counts.izin + counts.sakit + counts.alpha;
-    return {
-      teacherId: tid,
-      teacherName: teacher?.name || tid,
-      ...counts,
-      total,
-      persentaseHadir: total > 0 ? Math.round((counts.hadir / total) * 100) : 0,
-    };
-  });
-
-  summary.sort((a, b) => a.teacherName.localeCompare(b.teacherName));
-  res.json(summary);
-});
 
 
 // 10. Activity Logs API

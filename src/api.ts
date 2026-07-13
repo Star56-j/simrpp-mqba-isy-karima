@@ -273,7 +273,7 @@ export const api = {
     semesterId?: string;
     academicYearId?: string;
   }): Promise<Attendance[]> {
-    const q = new URLSearchParams(params as Record<string, string> || {}).toString();
+    const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
     return fetchJson<Attendance[]>(`/api/attendances${q ? '?' + q : ''}`);
   },
 
@@ -301,7 +301,7 @@ export const api = {
     semesterId?: string;
     academicYearId?: string;
   }): Promise<AttendanceSummary[]> {
-    const q = new URLSearchParams(params as Record<string, string> || {}).toString();
+    const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
     return fetchJson<AttendanceSummary[]>(`/api/attendances/summary${q ? '?' + q : ''}`);
   },
 

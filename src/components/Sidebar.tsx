@@ -60,9 +60,7 @@ export default function Sidebar({
       {/* Mobile Top Header */}
       <header className="lg:hidden bg-emerald-800 text-white flex items-center justify-between px-4 py-3 sticky top-0 z-50 shadow-md">
         <div className="flex items-center space-x-2">
-          <div className="bg-white p-1.5 rounded-lg">
-            <span className="text-emerald-800 font-bold text-sm tracking-wider">MQBA</span>
-          </div>
+          <img src="/logo-mqba.png" alt="Logo MQBA" className="w-8 h-8 object-contain" />
           <div>
             <h1 className="text-xs font-bold leading-tight uppercase tracking-wider">SIMRPP MQBA</h1>
             <p className="text-[9px] text-emerald-100 font-medium">Isy Karima</p>
@@ -100,14 +98,16 @@ export default function Sidebar({
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Logo Section */}
-        <div className="p-6 border-b border-emerald-800/60">
-          <div className="flex items-center space-x-3">
-            <div className="bg-white p-2 rounded-xl shadow-inner flex-shrink-0">
-              <span className="text-emerald-900 font-extrabold text-xl tracking-wider">MQBA</span>
-            </div>
+        <div className="px-4 pt-5 pb-4 border-b border-emerald-800/60">
+          <div className="flex flex-col items-center text-center space-y-2">
+            <img
+              src="/logo-mqba.png"
+              alt="Logo MQBA Isy Karima"
+              className="w-20 h-20 object-contain drop-shadow-lg"
+            />
             <div>
-              <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-none">SIMRPP MQBA</h2>
-              <p className="text-[10px] text-emerald-300 font-semibold tracking-wider mt-1 uppercase">Isy Karima</p>
+              <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-tight">SIMRPP MQBA</h2>
+              <p className="text-[10px] text-emerald-300 font-semibold tracking-wider mt-0.5 uppercase">Isy Karima</p>
             </div>
           </div>
         </div>

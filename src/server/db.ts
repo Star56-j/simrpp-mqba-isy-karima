@@ -50,23 +50,38 @@ export interface TeachingSchedule {
   semesterId: string;
 }
 
+export interface SyllabusItem {
+  meetingNo: number;
+  semester: 'Ganjil' | 'Genap';
+  topic: string;
+  date?: string;
+}
+
 export interface RPP {
   id: string;
-  scheduleId: string;
   teacherId: string;
-  date: string;
-  meetingNo: string;
   subjectId: string;
   classId: string;
   academicYearId: string;
-  semesterId: string;
-  learningObjectives: string;
-  materials: string;
+
+  kompetensiInti: string;
+  kompetensiDasar: string;
+
+  objectivesGanjil: string;
+  totalMeetingsGanjil: number;
+  materialsGanjil: string;
+
+  objectivesGenap: string;
+  totalMeetingsGenap: number;
+  materialsGenap: string;
+
   method: string;
   media: string;
-  learningSteps: string;
   assessment: string;
   notes: string;
+
+  syllabusItems: SyllabusItem[];
+
   attachmentUrl?: string;
   attachmentName?: string;
   status: 'Draft' | 'Menunggu Persetujuan' | 'Disetujui' | 'Revisi';
@@ -323,43 +338,67 @@ function seedDatabase(): DatabaseSchema {
   const rpps: RPP[] = [
     {
       id: "rpp-demo-1",
-      scheduleId: "sch-1",
       teacherId: "teacher-1",
-      date: "2026-07-13",
-      meetingNo: "1",
       subjectId: "sub-1",
       classId: "cls-3",
       academicYearId: "ay-1",
-      semesterId: "sem-1",
-      learningObjectives: "Mampu membaca dan menyetorkan hafalan surat Al-Mulk ayat 1-5 dengan tajwid yang benar.",
-      materials: "Hafalan Surat Al-Mulk ayat 1-5",
-      method: "Talaqqi dan Tikrar",
-      media: "Mushaf Al-Qur'an Al-Karim dan Papan Tulis",
-      learningSteps: "1. Pengajar mencontohkan bacaan Surat Al-Mulk 1-5.\n2. Santri mengikuti bacaan pengajar sebanyak 3x.\n3. Santri menghafal secara mandiri menggunakan metode tikrar (pengulangan).\n4. Santri menyetorkan hafalan satu per satu kepada pengajar.",
-      assessment: "Setoran kelancaran hafalan dan ketepatan makharijul huruf.",
-      notes: "Pembukaan semester ganjil, fokus motivasi menghafal.",
-      status: "Menunggu Persetujuan",
+      kompetensiInti: "Menguasai bacaan Al-Qur'an dengan tajwid yang benar dan mampu menghafal juz-juz pilihan secara tartil.",
+      kompetensiDasar: "Membaca dan menghafal Surat-surat dalam Al-Qur'an dengan makhraj dan tajwid yang tepat sesuai kaidah ilmu tajwid.",
+      objectivesGanjil: "Santri mampu menyetorkan hafalan Juz 30 (Juz 'Amma) secara lancar dengan makhraj dan tajwid yang benar.",
+      totalMeetingsGanjil: 18,
+      materialsGanjil: "Hafalan Juz 30: An-Naba' s.d. Al-Fajr, Muroja'ah harian, Evaluasi Tajwid",
+      objectivesGenap: "Santri mampu menyetorkan hafalan Juz 29 (Al-Mulk s.d. Al-Mursalat) secara lancar.",
+      totalMeetingsGenap: 18,
+      materialsGenap: "Hafalan Juz 29: Al-Mulk s.d. Al-Mursalat, Muroja'ah gabungan Juz 29-30",
+      method: "Talaqqi, Tikrar (Pengulangan Mandiri), Sima'i (Menyimak), Setoran Individual",
+      media: "Mushaf Al-Qur'an Pojok, Lembar Monitor Hafalan Santri, Papan Tulis",
+      assessment: "Setoran kelancaran hafalan, ketepatan makharijul huruf, sifatul huruf, dan tajwid.",
+      notes: "Santri yang belum lancar Juz 30 didahulukan muroja'ah sebelum menambah hafalan baru.",
+      syllabusItems: [
+        { meetingNo: 1, semester: 'Ganjil', topic: "Orientasi & Tes Awal Hafalan Juz 30", date: "2026-07-14" },
+        { meetingNo: 2, semester: 'Ganjil', topic: "Hafalan An-Naba' (78:1-20)", date: "2026-07-21" },
+        { meetingNo: 3, semester: 'Ganjil', topic: "Hafalan An-Naba' (78:21-40) + Muroja'ah", date: "2026-07-28" },
+        { meetingNo: 4, semester: 'Ganjil', topic: "Hafalan An-Nazi'at (79:1-46)", date: "2026-08-04" },
+        { meetingNo: 5, semester: 'Ganjil', topic: "'Abasa & At-Takwir", date: "2026-08-11" },
+        { meetingNo: 6, semester: 'Ganjil', topic: "Al-Infitar, Al-Mutaffifin", date: "2026-08-18" },
+        { meetingNo: 1, semester: 'Genap', topic: "Muroja'ah Juz 30 + Orientasi Juz 29", date: "2027-01-13" },
+        { meetingNo: 2, semester: 'Genap', topic: "Hafalan Al-Mulk (67:1-30)", date: "2027-01-20" },
+        { meetingNo: 3, semester: 'Genap', topic: "Hafalan Al-Qalam (68:1-52)", date: "2027-01-27" },
+      ],
+      status: "Disetujui",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     },
     {
       id: "rpp-demo-2",
-      scheduleId: "sch-3",
       teacherId: "teacher-2",
-      date: "2026-07-14",
-      meetingNo: "2",
       subjectId: "sub-5",
       classId: "cls-5",
       academicYearId: "ay-1",
-      semesterId: "sem-1",
-      learningObjectives: "Memahami makna rukun iman dan implementasinya dalam kehidupan sehari-hari.",
-      materials: "Rukun Iman dan Pembagiannya",
-      method: "Ceramah Interaktif dan Diskusi",
-      media: "Buku Aqidah, Slide Presentasi",
-      learningSteps: "1. Brainstorming tentang arti iman.\n2. Penjelasan rinci 6 rukun iman.\n3. Tanya jawab interaktif dengan santri.\n4. Kesimpulan dan tugas merangkum di buku catatan.",
-      assessment: "Keaktifan dalam tanya jawab dan hasil rangkuman santri.",
-      notes: "Gunakan analogi sederhana agar mudah dipahami.",
-      status: "Disetujui",
+      kompetensiInti: "Memahami, menghayati, dan mengamalkan ajaran Islam berdasarkan dalil-dalil Qur'an dan Sunnah yang shahih.",
+      kompetensiDasar: "Menjelaskan rukun iman, asmaul husna, serta akidah ahlus sunnah wal jama'ah secara sistematis.",
+      objectivesGanjil: "Santri memahami dan mampu menjelaskan 6 rukun iman beserta dalil-dalilnya dari Al-Qur'an dan Hadits shahih.",
+      totalMeetingsGanjil: 16,
+      materialsGanjil: "Rukun Iman (6 Rukun), Iman kepada Allah & Asmaul Husna, Iman kepada Malaikat, Iman kepada Kitab-kitab",
+      objectivesGenap: "Santri memahami Iman kepada Rasul, Hari Kiamat, dan Qadha-Qadar serta implementasinya dalam kehidupan.",
+      totalMeetingsGenap: 16,
+      materialsGenap: "Iman kepada Rasul, Hari Akhir (tanda-tanda kiamat, surga-neraka), Qadha dan Qadar",
+      method: "Ceramah Interaktif, Halaqah Diskusi, Tanya Jawab, Pembacaan Kitab",
+      media: "Kitab Aqidah (Ushul Tsalatsah), Slide Presentasi, Papan Tulis, Video Edukasi",
+      assessment: "Kuis lisan, keaktifan diskusi, hafalan dalil-dalil aqidah, tugas rangkuman tertulis.",
+      notes: "Tekankan aqidah ahlus sunnah wal jama'ah, hindari pembahasan khilafiyah yang tidak produktif.",
+      syllabusItems: [
+        { meetingNo: 1, semester: 'Ganjil', topic: "Pengantar Aqidah Islam & Urgensinya", date: "2026-07-14" },
+        { meetingNo: 2, semester: 'Ganjil', topic: "Rukun Iman: Pengertian & Dalil Global", date: "2026-07-21" },
+        { meetingNo: 3, semester: 'Ganjil', topic: "Iman kepada Allah: Tauhid Rububiyyah", date: "2026-07-28" },
+        { meetingNo: 4, semester: 'Ganjil', topic: "Iman kepada Allah: Tauhid Uluhiyyah", date: "2026-08-04" },
+        { meetingNo: 5, semester: 'Ganjil', topic: "Asmaul Husna (1-20)", date: "2026-08-11" },
+        { meetingNo: 6, semester: 'Ganjil', topic: "Asmaul Husna (21-40) + Kuis", date: "2026-08-18" },
+        { meetingNo: 1, semester: 'Genap', topic: "Iman kepada Rasul: Sifat Wajib & Mustahil", date: "2027-01-13" },
+        { meetingNo: 2, semester: 'Genap', topic: "Iman kepada Hari Kiamat", date: "2027-01-20" },
+        { meetingNo: 3, semester: 'Genap', topic: "Qadha dan Qadar", date: "2027-01-27" },
+      ],
+      status: "Menunggu Persetujuan",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }

@@ -52,7 +52,6 @@ export default function App() {
   const [guruStats, setGuruStats] = React.useState<GuruStats | null>(null);
 
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [initialCreateSchedule, setInitialCreateSchedule] = React.useState<TeachingSchedule | null>(null);
 
   // Sync dark mode class
   React.useEffect(() => {
@@ -138,11 +137,6 @@ export default function App() {
     setGuruStats(null);
   };
 
-  const handlePrepareCreateRPP = (sch: TeachingSchedule) => {
-    setInitialCreateSchedule(sch);
-    setView('my-rpps');
-  };
-
   if (!user) {
     return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
@@ -170,12 +164,11 @@ export default function App() {
 
       case 'guru-dashboard':
         return guruStats ? (
-          <GuruDashboard 
+          <GuruDashboard
             stats={guruStats}
             schedules={schedules}
             rpps={rpps}
             onNavigate={(view) => setView(view)}
-            onPrepareCreateRPP={handlePrepareCreateRPP}
           />
         ) : null;
 
@@ -212,12 +205,12 @@ export default function App() {
 
       case 'my-rpps':
         return (
-          <MyRPPs 
-            rpps={rpps} 
-            schedules={schedules} 
+          <MyRPPs
+            rpps={rpps}
+            subjects={subjects}
+            classes={classes}
+            academicYears={academicYears}
             onRefresh={fetchData}
-            initialCreateSchedule={initialCreateSchedule}
-            clearInitialCreateSchedule={() => setInitialCreateSchedule(null)}
           />
         );
 

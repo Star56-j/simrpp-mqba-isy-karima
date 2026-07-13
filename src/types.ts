@@ -51,35 +51,56 @@ export interface TeachingSchedule {
   semester?: Semester;
 }
 
+// Satu item silabus per pertemuan dalam RPP tahunan
+export interface SyllabusItem {
+  meetingNo: number;
+  semester: 'Ganjil' | 'Genap';
+  topic: string;         // Pokok bahasan / materi
+  date?: string;         // Tanggal rencana pelaksanaan (opsional)
+}
+
 export interface RPP {
   id: string;
-  scheduleId: string;
   teacherId: string;
-  date: string;
-  meetingNo: string;
   subjectId: string;
   classId: string;
   academicYearId: string;
-  semesterId: string;
-  learningObjectives: string;
-  materials: string;
-  method: string;
-  media: string;
-  learningSteps: string;
-  assessment: string;
-  notes: string;
+
+  // Identitas RPP Tahunan
+  kompetensiInti: string;          // Kompetensi Inti / KI
+  kompetensiDasar: string;         // Kompetensi Dasar / KD
+
+  // Semester Ganjil
+  objectivesGanjil: string;        // Tujuan pembelajaran semester ganjil
+  totalMeetingsGanjil: number;     // Jumlah pertemuan semester ganjil
+  materialsGanjil: string;         // Ringkasan materi semester ganjil
+
+  // Semester Genap
+  objectivesGenap: string;         // Tujuan pembelajaran semester genap
+  totalMeetingsGenap: number;      // Jumlah pertemuan semester genap
+  materialsGenap: string;          // Ringkasan materi semester genap
+
+  // Komponen umum (berlaku kedua semester)
+  method: string;                  // Metode pembelajaran
+  media: string;                   // Media & alat pembelajaran
+  assessment: string;              // Penilaian / asesmen
+  notes: string;                   // Catatan tambahan
+
+  // Silabus rinci (daftar materi per pertemuan)
+  syllabusItems: SyllabusItem[];
+
   attachmentUrl?: string;
   attachmentName?: string;
   status: 'Draft' | 'Menunggu Persetujuan' | 'Disetujui' | 'Revisi';
   revisionNotes?: string;
   updatedAt: string;
   createdAt: string;
+
+  // Decorated (dari join)
   class?: SchoolClass;
   subject?: Subject;
   teacher?: Teacher;
   academicYear?: AcademicYear;
-  semester?: Semester;
-  schedule?: TeachingSchedule;
 }
 
 export interface ActivityLog {

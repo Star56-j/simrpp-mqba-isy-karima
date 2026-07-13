@@ -17,7 +17,6 @@ interface GuruDashboardProps {
   schedules: TeachingSchedule[];
   rpps: RPP[];
   onNavigate: (view: string, targetTab?: string) => void;
-  onPrepareCreateRPP: (schedule: TeachingSchedule) => void;
 }
 
 export default function GuruDashboard({ 

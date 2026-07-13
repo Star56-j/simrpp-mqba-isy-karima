@@ -720,92 +720,73 @@ app.get('/api/rpps', requireAuth(), (req, res) => {
 
   let filteredRpps = db.rpps;
 
-  // Gurus can only view their own RPPs
+  // Guru hanya bisa melihat RPP miliknya sendiri
   if (user.role === 'Guru') {
     filteredRpps = db.rpps.filter(r => r.teacherId === user.teacherId);
   }
 
-  // Decorate RPP records with context data
+  // Decorate dengan data relasi
   const decorated = filteredRpps.map(r => {
     const cls = db.classes.find(c => c.id === r.classId);
     const sub = db.subjects.find(s => s.id === r.subjectId);
     const tch = db.teachers.find(t => t.id === r.teacherId);
     const ay = db.academicYears.find(y => y.id === r.academicYearId);
-    const sem = db.semesters.find(s => s.id === r.semesterId);
-    const sch = db.teachingSchedules.find(s => s.id === r.scheduleId);
-
-    return {
-      ...r,
-      class: cls,
-      subject: sub,
-      teacher: tch,
-      academicYear: ay,
-      semester: sem,
-      schedule: sch
-    };
+    return { ...r, class: cls, subject: sub, teacher: tch, academicYear: ay };
   });
 
-  // Sort by updatedAt descending
   decorated.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-
   res.json(decorated);
 });
 
 app.post('/api/rpps', requireAuth('Guru'), (req, res) => {
   const user = (req as any).user as User;
   const {
-    scheduleId,
-    date,
-    meetingNo,
-    learningObjectives,
-    materials,
-    method,
-    media,
-    learningSteps,
-    assessment,
-    notes,
-    attachmentUrl,
-    attachmentName,
-    status // 'Draft' | 'Menunggu Persetujuan'
+    subjectId, classId, academicYearId,
+    kompetensiInti, kompetensiDasar,
+    objectivesGanjil, totalMeetingsGanjil, materialsGanjil,
+    objectivesGenap, totalMeetingsGenap, materialsGenap,
+    method, media, assessment, notes,
+    syllabusItems,
+    attachmentUrl, attachmentName,
+    status
   } = req.body;
 
-  if (!scheduleId || !date || !meetingNo) {
-    res.status(400).json({ error: 'Jadwal, tanggal, dan pertemuan ke- harus diisi' });
+  if (!subjectId || !classId || !academicYearId) {
+    res.status(400).json({ error: 'Mata pelajaran, kelas, dan tahun ajaran harus diisi' });
     return;
   }
 
   const db = getDatabase();
-  const schedule = db.teachingSchedules.find(s => s.id === scheduleId);
 
-  if (!schedule) {
-    res.status(400).json({ error: 'Jadwal KBM tidak valid' });
+  // Cek duplikat: 1 RPP per mapel+kelas+tahun ajaran per guru
+  const duplicate = db.rpps.find(r =>
+    r.teacherId === user.teacherId &&
+    r.subjectId === subjectId &&
+    r.classId === classId &&
+    r.academicYearId === academicYearId
+  );
+  if (duplicate) {
+    res.status(400).json({ error: 'RPP untuk mata pelajaran, kelas, dan tahun ajaran ini sudah ada. Silakan edit RPP yang ada.' });
     return;
   }
 
-  // Double check that the schedule belongs to the logged-in teacher
-  if (schedule.teacherId !== user.teacherId) {
-    res.status(403).json({ error: 'Anda hanya dapat membuat RPP untuk jadwal mengajar Anda sendiri' });
-    return;
-  }
-
-  const newRppId = `rpp-${Date.now()}`;
   const newRpp: RPP = {
-    id: newRppId,
-    scheduleId,
+    id: `rpp-${Date.now()}`,
     teacherId: user.teacherId!,
-    date,
-    meetingNo,
-    subjectId: schedule.subjectId,
-    classId: schedule.classId,
-    academicYearId: schedule.academicYearId,
-    semesterId: schedule.semesterId,
-    learningObjectives: learningObjectives || '',
-    materials: materials || '',
+    subjectId, classId, academicYearId,
+    kompetensiInti: kompetensiInti || '',
+    kompetensiDasar: kompetensiDasar || '',
+    objectivesGanjil: objectivesGanjil || '',
+    totalMeetingsGanjil: totalMeetingsGanjil || 0,
+    materialsGanjil: materialsGanjil || '',
+    objectivesGenap: objectivesGenap || '',
+    totalMeetingsGenap: totalMeetingsGenap || 0,
+    materialsGenap: materialsGenap || '',
     method: method || '',
     media: media || '',
-    learningSteps: learningSteps || '',
     assessment: assessment || '',
     notes: notes || '',
+    syllabusItems: syllabusItems || [],
     attachmentUrl: attachmentUrl || '',
     attachmentName: attachmentName || '',
     status: status || 'Draft',
@@ -816,16 +797,12 @@ app.post('/api/rpps', requireAuth('Guru'), (req, res) => {
   db.rpps.push(newRpp);
   saveDatabase(db);
 
-  const mapel = db.subjects.find(s => s.id === schedule.subjectId)?.name || '';
-  const kelas = db.classes.find(c => c.id === schedule.classId)?.name || '';
+  const mapel = db.subjects.find(s => s.id === subjectId)?.name || '';
+  const kelas = db.classes.find(c => c.id === classId)?.name || '';
+  const tahun = db.academicYears.find(y => y.id === academicYearId)?.name || '';
 
-  logActivity(
-    user.id,
-    user.name,
-    'Guru',
-    'Buat RPP',
-    `Membuat RPP (${status}) baru untuk ${mapel} di Kelas ${kelas}, Pertemuan ke-${meetingNo}`
-  );
+  logActivity(user.id, user.name, 'Guru', 'Buat RPP',
+    `Membuat RPP Tahunan (${status || 'Draft'}) untuk ${mapel} - Kelas ${kelas} - TA ${tahun}`);
 
   res.status(201).json(newRpp);
 });
@@ -840,46 +817,37 @@ app.put('/api/rpps/:id', requireAuth(), (req, res) => {
     return;
   }
 
-  // Gurus can only edit their own RPPs, and only when draft, pending approval, or revision
   if (user.role === 'Guru' && rpp.teacherId !== user.teacherId) {
     res.status(403).json({ error: 'Anda hanya dapat mengedit RPP milik Anda sendiri' });
     return;
   }
 
   const {
-    date,
-    meetingNo,
-    learningObjectives,
-    materials,
-    method,
-    media,
-    learningSteps,
-    assessment,
-    notes,
-    attachmentUrl,
-    attachmentName,
-    status // Can submit Draft or update existing
+    kompetensiInti, kompetensiDasar,
+    objectivesGanjil, totalMeetingsGanjil, materialsGanjil,
+    objectivesGenap, totalMeetingsGenap, materialsGenap,
+    method, media, assessment, notes,
+    syllabusItems,
+    attachmentUrl, attachmentName,
+    status
   } = req.body;
 
-  if (date) rpp.date = date;
-  if (meetingNo) rpp.meetingNo = meetingNo;
-  if (learningObjectives !== undefined) rpp.learningObjectives = learningObjectives;
-  if (materials !== undefined) rpp.materials = materials;
+  if (kompetensiInti !== undefined) rpp.kompetensiInti = kompetensiInti;
+  if (kompetensiDasar !== undefined) rpp.kompetensiDasar = kompetensiDasar;
+  if (objectivesGanjil !== undefined) rpp.objectivesGanjil = objectivesGanjil;
+  if (totalMeetingsGanjil !== undefined) rpp.totalMeetingsGanjil = totalMeetingsGanjil;
+  if (materialsGanjil !== undefined) rpp.materialsGanjil = materialsGanjil;
+  if (objectivesGenap !== undefined) rpp.objectivesGenap = objectivesGenap;
+  if (totalMeetingsGenap !== undefined) rpp.totalMeetingsGenap = totalMeetingsGenap;
+  if (materialsGenap !== undefined) rpp.materialsGenap = materialsGenap;
   if (method !== undefined) rpp.method = method;
   if (media !== undefined) rpp.media = media;
-  if (learningSteps !== undefined) rpp.learningSteps = learningSteps;
   if (assessment !== undefined) rpp.assessment = assessment;
   if (notes !== undefined) rpp.notes = notes;
+  if (syllabusItems !== undefined) rpp.syllabusItems = syllabusItems;
   if (attachmentUrl !== undefined) rpp.attachmentUrl = attachmentUrl;
   if (attachmentName !== undefined) rpp.attachmentName = attachmentName;
-  if (status) {
-    // If transitioning from Draft / Revisi to Pending Approval
-    if (status === 'Menunggu Persetujuan' && rpp.status !== 'Menunggu Persetujuan') {
-      rpp.status = 'Menunggu Persetujuan';
-    } else {
-      rpp.status = status;
-    }
-  }
+  if (status) rpp.status = status;
 
   rpp.updatedAt = new Date().toISOString();
   saveDatabase(db);
@@ -887,21 +855,16 @@ app.put('/api/rpps/:id', requireAuth(), (req, res) => {
   const mapel = db.subjects.find(s => s.id === rpp.subjectId)?.name || '';
   const kelas = db.classes.find(c => c.id === rpp.classId)?.name || '';
 
-  logActivity(
-    user.id,
-    user.name,
-    user.role,
-    'Ubah RPP',
-    `Memperbarui RPP untuk mapel ${mapel} di Kelas ${kelas}, Pertemuan ke-${rpp.meetingNo} (Status: ${rpp.status})`
-  );
+  logActivity(user.id, user.name, user.role, 'Ubah RPP',
+    `Memperbarui RPP Tahunan ${mapel} - Kelas ${kelas} (Status: ${rpp.status})`);
 
   res.json(rpp);
 });
 
-// Admin Review Workflow (Approval & Revisi)
+// Admin Review Workflow
 app.post('/api/rpps/:id/review', requireAuth('Admin'), (req, res) => {
   const user = (req as any).user as User;
-  const { status, revisionNotes } = req.body; // status: 'Disetujui' | 'Revisi'
+  const { status, revisionNotes } = req.body;
 
   if (!status || !['Disetujui', 'Revisi'].includes(status)) {
     res.status(400).json({ error: 'Status review harus ditentukan (Disetujui atau Revisi)' });
@@ -924,13 +887,8 @@ app.post('/api/rpps/:id/review', requireAuth('Admin'), (req, res) => {
   const teacherName = db.teachers.find(t => t.id === rpp.teacherId)?.name || '';
   const mapel = db.subjects.find(s => s.id === rpp.subjectId)?.name || '';
 
-  logActivity(
-    user.id,
-    user.name,
-    'Admin',
-    'Review RPP',
-    `Admin merespon RPP ${teacherName} (${mapel}) dengan hasil: ${status}. Catatan: ${rpp.revisionNotes}`
-  );
+  logActivity(user.id, user.name, 'Admin', 'Review RPP',
+    `Review RPP Tahunan ${teacherName} (${mapel}): ${status}. Catatan: ${rpp.revisionNotes}`);
 
   res.json(rpp);
 });
@@ -947,7 +905,6 @@ app.delete('/api/rpps/:id', requireAuth(), (req, res) => {
 
   const rpp = db.rpps[rppIdx];
 
-  // Access validation: Guru can only delete their own DRAFT RPPs
   if (user.role === 'Guru') {
     if (rpp.teacherId !== user.teacherId) {
       res.status(403).json({ error: 'Akses ditolak.' });
@@ -962,13 +919,11 @@ app.delete('/api/rpps/:id', requireAuth(), (req, res) => {
   db.rpps.splice(rppIdx, 1);
   saveDatabase(db);
 
-  logActivity(
-    user.id,
-    user.name,
-    user.role,
-    'Hapus RPP',
-    `Menghapus RPP ID: ${rpp.id} (Pertemuan ke-${rpp.meetingNo})`
-  );
+  const mapel = db.subjects.find(s => s.id === rpp.subjectId)?.name || '';
+  const kelas = db.classes.find(c => c.id === rpp.classId)?.name || '';
+
+  logActivity(user.id, user.name, user.role, 'Hapus RPP',
+    `Menghapus RPP Tahunan: ${mapel} - Kelas ${kelas}`);
 
   res.json({ message: 'RPP berhasil dihapus' });
 });

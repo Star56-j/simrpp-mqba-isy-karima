@@ -10,14 +10,21 @@ import {
   EyeOff
 } from 'lucide-react';
 import { api } from '../api';
+import UnsavedBar from './UnsavedBar';
 
 interface ProfileSettingsProps {
   onRefresh: () => void;
 }
 
 export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
+  const currentUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+
+  const [name, setName] = React.useState(currentUser.name || '');
+  const [email, setEmail] = React.useState(currentUser.email || '');
+
+  // Track original values to detect changes
+  const [origName, setOrigName] = React.useState(currentUser.name || '');
+  const [origEmail, setOrigEmail] = React.useState(currentUser.email || '');
   
   // Password Change
   const [oldPassword, setOldPassword] = React.useState('');
@@ -32,67 +39,48 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
   const [successProfile, setSuccessProfile] = React.useState('');
   const [errorPass, setErrorPass] = React.useState('');
   const [successPass, setSuccessPass] = React.useState('');
+  const [savingProfile, setSavingProfile] = React.useState(false);
 
-  const currentUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+  // Dirty detection
+  const isProfileDirty = name !== origName || email !== origEmail;
 
-  React.useEffect(() => {
-    if (currentUser) {
-      setName(currentUser.name || '');
-      setEmail(currentUser.email || '');
-    }
-  }, []);
-
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleProfileUpdate = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setErrorProfile('');
     setSuccessProfile('');
-
-    if (!name || !email) {
-      setErrorProfile('Nama dan Email tidak boleh kosong.');
-      return;
-    }
-
+    if (!name || !email) { setErrorProfile('Nama dan Email tidak boleh kosong.'); return; }
+    setSavingProfile(true);
     try {
       await api.updateProfile(name, email);
       setSuccessProfile('Profil pribadi berhasil diperbarui.');
-      
-      // Update local storage
       const updatedUser = { ...currentUser, name, email };
       localStorage.setItem('simrpp_user', JSON.stringify(updatedUser));
-      
-      // Refresh state
+      setOrigName(name);
+      setOrigEmail(email);
       onRefresh();
     } catch (err: any) {
       setErrorProfile(err.message || 'Gagal memperbarui profil.');
+    } finally {
+      setSavingProfile(false);
     }
+  };
+
+  const handleDiscardProfile = () => {
+    setName(origName);
+    setEmail(origEmail);
+    setErrorProfile('');
   };
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorPass('');
-    setSuccessPass('');
-
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setErrorPass('Seluruh kolom kata sandi wajib diisi.');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setErrorPass('Kata sandi baru dan konfirmasi tidak cocok.');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setErrorPass('Kata sandi baru minimal harus terdiri dari 6 karakter.');
-      return;
-    }
-
+    setErrorPass(''); setSuccessPass('');
+    if (!oldPassword || !newPassword || !confirmPassword) { setErrorPass('Seluruh kolom kata sandi wajib diisi.'); return; }
+    if (newPassword !== confirmPassword) { setErrorPass('Kata sandi baru dan konfirmasi tidak cocok.'); return; }
+    if (newPassword.length < 6) { setErrorPass('Kata sandi baru minimal harus terdiri dari 6 karakter.'); return; }
     try {
       await api.changePassword(oldPassword, newPassword);
       setSuccessPass('Kata sandi berhasil diubah.');
-      setOldPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      setOldPassword(''); setNewPassword(''); setConfirmPassword('');
     } catch (err: any) {
       setErrorPass(err.message || 'Gagal mengubah kata sandi.');
     }
@@ -162,13 +150,25 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-              <button
-                type="submit"
-                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition"
-              >
-                Simpan Perubahan
-              </button>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span className={`text-xs font-semibold transition ${isProfileDirty ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600'}`}>
+                {isProfileDirty ? '● Ada perubahan belum disimpan' : '● Tersimpan'}
+              </span>
+              <div className="flex items-center space-x-2">
+                {isProfileDirty && (
+                  <button type="button" onClick={handleDiscardProfile}
+                    className="px-4 py-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition">
+                    Batalkan
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={savingProfile || !isProfileDirty}
+                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition"
+                >
+                  {savingProfile ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -268,6 +268,15 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
           </form>
         </div>
       </div>
+
+      {/* Floating unsaved bar untuk profil */}
+      <UnsavedBar
+        isDirty={isProfileDirty}
+        onSave={() => handleProfileUpdate()}
+        onDiscard={handleDiscardProfile}
+        saving={savingProfile}
+        label="Simpan Profil"
+      />
     </div>
   );
 }

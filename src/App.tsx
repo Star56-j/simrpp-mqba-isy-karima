@@ -36,6 +36,19 @@ export default function App() {
     return localStorage.getItem('simrpp_theme') === 'dark' || 
       (!('simrpp_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
+  const [showNotif, setShowNotif] = React.useState(false);
+  const notifRef = React.useRef<HTMLDivElement>(null);
+
+  // Tutup notif kalau klik di luar
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotif(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   // App Master States
   const [teachers, setTeachers] = React.useState<Teacher[]>([]);
@@ -284,9 +297,58 @@ export default function App() {
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden md:block"></div>
 
             {/* Notification bell */}
-            <div className="relative group cursor-pointer" title="Notifikasi">
-              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
-              <Bell className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" />
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setShowNotif(v => !v)}
+                className="relative p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                title="Notifikasi"
+              >
+                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                <Bell className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
+              </button>
+
+              {showNotif && (
+                <div className="absolute right-0 top-10 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Notifikasi</span>
+                    <span className="text-[10px] bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400 px-2 py-0.5 rounded-full font-bold">
+                      {rpps.filter(r => r.status === 'Menunggu Persetujuan').length} baru
+                    </span>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800">
+                    {rpps.filter(r => r.status === 'Menunggu Persetujuan').length === 0 ? (
+                      <div className="px-4 py-6 text-center text-xs text-slate-400">
+                        Tidak ada notifikasi baru
+                      </div>
+                    ) : (
+                      rpps.filter(r => r.status === 'Menunggu Persetujuan').slice(0, 8).map(r => (
+                        <button
+                          key={r.id}
+                          onClick={() => { setView(user?.role === 'Admin' ? 'manage-rpps' : 'my-rpps'); setShowNotif(false); }}
+                          className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition"
+                        >
+                          <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
+                            RPP: {r.subject?.name || r.subjectId}
+                          </p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">
+                            {r.teacher?.name} • Kelas {r.class?.name} • Menunggu Review
+                          </p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                  {rpps.filter(r => r.status === 'Menunggu Persetujuan').length > 0 && (
+                    <div className="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800">
+                      <button
+                        onClick={() => { setView(user?.role === 'Admin' ? 'manage-rpps' : 'my-rpps'); setShowNotif(false); }}
+                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline w-full text-center"
+                      >
+                        Lihat semua RPP →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>

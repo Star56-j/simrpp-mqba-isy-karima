@@ -39,14 +39,15 @@ export default function GuruDashboard({
     <div className="space-y-8 animate-fade-in">
       {/* Title Header with Islamic Ornament & Clock */}
       <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl p-6 lg:p-8 shadow-lg border border-indigo-700/50">
-        {/* Ornament SVG Background */}
-        <div className="absolute -right-20 -top-20 opacity-10 pointer-events-none text-white">
-          <svg width="350" height="350" viewBox="0 0 100 100" className="animate-[spin_60s_linear_infinite]">
-            <path fill="currentColor" d="M50 0 L60 30 L100 20 L75 50 L100 80 L60 70 L50 100 L40 70 L0 80 L25 50 L0 20 L40 30 Z" />
-            <path fill="currentColor" d="M50 10 L55 35 L90 25 L70 50 L90 75 L55 65 L50 90 L45 65 L10 75 L30 50 L10 25 L45 35 Z" opacity="0.6" />
-            <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.8" />
-            <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" opacity="0.5" />
-          </svg>
+        {/* Ornament Background: The 3 Holy Mosques */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-2xl">
+          <img 
+            src="/mosques-bg.png" 
+            alt="Masjidil Haram, Nabawi, Baitul Maqdis" 
+            className="w-full h-full object-cover object-center opacity-40 mix-blend-screen"
+          />
+          {/* Gradient overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-transparent"></div>
         </div>
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">

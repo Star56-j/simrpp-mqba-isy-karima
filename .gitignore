@@ -10,5 +10,6 @@ coverage/
 # Keep uploads folder structure but ignore actual files
 public/uploads/
 
-# Database is generated at runtime, do not commit
-data/
+# Hanya ignore file upload user, bukan database
+public/uploads/*
+!public/uploads/.gitkeep

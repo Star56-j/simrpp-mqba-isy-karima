@@ -128,7 +128,10 @@ export interface DatabaseSchema {
   activityLogs: ActivityLog[];
 }
 
-const DB_PATH = path.join(process.cwd(), 'data', 'database.json');
+// Gunakan DATA_PATH dari environment variable (Railway persistent volume)
+// atau fallback ke folder data/ lokal
+const DATA_DIR = process.env.DATA_PATH || path.join(process.cwd(), 'data');
+const DB_PATH = path.join(DATA_DIR, 'database.json');
 
 // Ensure database directory exists
 function ensureDbDir() {

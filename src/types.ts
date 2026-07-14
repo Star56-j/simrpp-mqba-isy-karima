@@ -66,25 +66,41 @@ export interface RPP {
   classId: string;
   academicYearId: string;
 
-  // Identitas RPP Tahunan
-  kompetensiInti: string;          // Kompetensi Inti / KI
-  kompetensiDasar: string;         // Kompetensi Dasar / KD
+  // === FORMAT KURIKULUM MERDEKA ===
 
-  // Semester Ganjil
-  objectivesGanjil: string;        // Tujuan pembelajaran semester ganjil
-  totalMeetingsGanjil: number;     // Jumlah pertemuan semester ganjil
-  materialsGanjil: string;         // Ringkasan materi semester ganjil
+  // A. Informasi Umum
+  profilPelajar: string;        // Dimensi Profil Pelajar yang relevan
+  sarana: string;               // Sarana & prasarana
 
-  // Semester Genap
-  objectivesGenap: string;         // Tujuan pembelajaran semester genap
-  totalMeetingsGenap: number;      // Jumlah pertemuan semester genap
-  materialsGenap: string;          // Ringkasan materi semester genap
+  // B. Capaian & Tujuan
+  capaiPembelajaran: string;    // Capaian Pembelajaran (CP) — per fase
+  tujuanPembelajaran: string;   // Tujuan Pembelajaran (TP) per tahun
+  alurTP: string;               // Alur Tujuan Pembelajaran (ATP)
 
-  // Komponen umum (berlaku kedua semester)
-  method: string;                  // Metode pembelajaran
-  media: string;                   // Media & alat pembelajaran
-  assessment: string;              // Penilaian / asesmen
-  notes: string;                   // Catatan tambahan
+  // C. Materi per Semester
+  materiGanjil: string;         // Pokok materi semester ganjil
+  materiGenap: string;          // Pokok materi semester genap
+  totalMeetingsGanjil: number;
+  totalMeetingsGenap: number;
+
+  // D. Pembelajaran
+  pendahuluan: string;          // Kegiatan pembuka (apersepsi, motivasi)
+  kegiatanInti: string;         // Kegiatan inti (eksplorasi, kolaborasi, refleksi)
+  penutup: string;              // Kegiatan penutup & refleksi
+  metode: string;               // Metode / model pembelajaran
+  media: string;                // Media & alat
+
+  // E. Asesmen
+  asesmenDiagnostik: string;    // Asesmen awal / diagnostik
+  asesmenFormatif: string;      // Asesmen formatif (proses)
+  asesmenSumatif: string;       // Asesmen sumatif (akhir)
+
+  // F. Diferensiasi & Pengayaan
+  diferensiasi: string;         // Pembelajaran berdiferensiasi
+  pengayaan: string;            // Pengayaan & remedial
+
+  // G. Catatan
+  catatan: string;
 
   // Silabus rinci (daftar materi per pertemuan)
   syllabusItems: SyllabusItem[];

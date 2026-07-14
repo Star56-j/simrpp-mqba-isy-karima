@@ -743,13 +743,13 @@ app.post('/api/rpps', requireAuth('Guru'), (req, res) => {
   const user = (req as any).user as User;
   const {
     subjectId, classId, academicYearId,
-    kompetensiInti, kompetensiDasar,
-    objectivesGanjil, totalMeetingsGanjil, materialsGanjil,
-    objectivesGenap, totalMeetingsGenap, materialsGenap,
-    method, media, assessment, notes,
-    syllabusItems,
-    attachmentUrl, attachmentName,
-    status
+    profilPelajar, sarana,
+    capaiPembelajaran, tujuanPembelajaran, alurTP,
+    materiGanjil, materiGenap, totalMeetingsGanjil, totalMeetingsGenap,
+    pendahuluan, kegiatanInti, penutup, metode, media,
+    asesmenDiagnostik, asesmenFormatif, asesmenSumatif,
+    diferensiasi, pengayaan, catatan,
+    syllabusItems, attachmentUrl, attachmentName, status
   } = req.body;
 
   if (!subjectId || !classId || !academicYearId) {
@@ -775,18 +775,26 @@ app.post('/api/rpps', requireAuth('Guru'), (req, res) => {
     id: `rpp-${Date.now()}`,
     teacherId: user.teacherId!,
     subjectId, classId, academicYearId,
-    kompetensiInti: kompetensiInti || '',
-    kompetensiDasar: kompetensiDasar || '',
-    objectivesGanjil: objectivesGanjil || '',
+    profilPelajar: profilPelajar || '',
+    sarana: sarana || '',
+    capaiPembelajaran: capaiPembelajaran || '',
+    tujuanPembelajaran: tujuanPembelajaran || '',
+    alurTP: alurTP || '',
+    materiGanjil: materiGanjil || '',
+    materiGenap: materiGenap || '',
     totalMeetingsGanjil: totalMeetingsGanjil || 0,
-    materialsGanjil: materialsGanjil || '',
-    objectivesGenap: objectivesGenap || '',
     totalMeetingsGenap: totalMeetingsGenap || 0,
-    materialsGenap: materialsGenap || '',
-    method: method || '',
+    pendahuluan: pendahuluan || '',
+    kegiatanInti: kegiatanInti || '',
+    penutup: penutup || '',
+    metode: metode || '',
     media: media || '',
-    assessment: assessment || '',
-    notes: notes || '',
+    asesmenDiagnostik: asesmenDiagnostik || '',
+    asesmenFormatif: asesmenFormatif || '',
+    asesmenSumatif: asesmenSumatif || '',
+    diferensiasi: diferensiasi || '',
+    pengayaan: pengayaan || '',
+    catatan: catatan || '',
     syllabusItems: syllabusItems || [],
     attachmentUrl: attachmentUrl || '',
     attachmentName: attachmentName || '',
@@ -803,7 +811,7 @@ app.post('/api/rpps', requireAuth('Guru'), (req, res) => {
   const tahun = db.academicYears.find(y => y.id === academicYearId)?.name || '';
 
   logActivity(user.id, user.name, 'Guru', 'Buat RPP',
-    `Membuat RPP Tahunan (${status || 'Draft'}) untuk ${mapel} - Kelas ${kelas} - TA ${tahun}`);
+    `Membuat RPP Kurikulum Merdeka (${status || 'Draft'}) untuk ${mapel} - Kelas ${kelas} - TA ${tahun}`);
 
   res.status(201).json(newRpp);
 });
@@ -813,51 +821,30 @@ app.put('/api/rpps/:id', requireAuth(), (req, res) => {
   const db = getDatabase();
   const rpp = db.rpps.find(r => r.id === req.params.id);
 
-  if (!rpp) {
-    res.status(404).json({ error: 'RPP tidak ditemukan' });
-    return;
-  }
-
+  if (!rpp) { res.status(404).json({ error: 'RPP tidak ditemukan' }); return; }
   if (user.role === 'Guru' && rpp.teacherId !== user.teacherId) {
-    res.status(403).json({ error: 'Anda hanya dapat mengedit RPP milik Anda sendiri' });
-    return;
+    res.status(403).json({ error: 'Anda hanya dapat mengedit RPP milik Anda sendiri' }); return;
   }
 
-  const {
-    kompetensiInti, kompetensiDasar,
-    objectivesGanjil, totalMeetingsGanjil, materialsGanjil,
-    objectivesGenap, totalMeetingsGenap, materialsGenap,
-    method, media, assessment, notes,
-    syllabusItems,
-    attachmentUrl, attachmentName,
-    status
-  } = req.body;
-
-  if (kompetensiInti !== undefined) rpp.kompetensiInti = kompetensiInti;
-  if (kompetensiDasar !== undefined) rpp.kompetensiDasar = kompetensiDasar;
-  if (objectivesGanjil !== undefined) rpp.objectivesGanjil = objectivesGanjil;
-  if (totalMeetingsGanjil !== undefined) rpp.totalMeetingsGanjil = totalMeetingsGanjil;
-  if (materialsGanjil !== undefined) rpp.materialsGanjil = materialsGanjil;
-  if (objectivesGenap !== undefined) rpp.objectivesGenap = objectivesGenap;
-  if (totalMeetingsGenap !== undefined) rpp.totalMeetingsGenap = totalMeetingsGenap;
-  if (materialsGenap !== undefined) rpp.materialsGenap = materialsGenap;
-  if (method !== undefined) rpp.method = method;
-  if (media !== undefined) rpp.media = media;
-  if (assessment !== undefined) rpp.assessment = assessment;
-  if (notes !== undefined) rpp.notes = notes;
-  if (syllabusItems !== undefined) rpp.syllabusItems = syllabusItems;
-  if (attachmentUrl !== undefined) rpp.attachmentUrl = attachmentUrl;
-  if (attachmentName !== undefined) rpp.attachmentName = attachmentName;
-  if (status) rpp.status = status;
+  const fields = [
+    'profilPelajar','sarana','capaiPembelajaran','tujuanPembelajaran','alurTP',
+    'materiGanjil','materiGenap','totalMeetingsGanjil','totalMeetingsGenap',
+    'pendahuluan','kegiatanInti','penutup','metode','media',
+    'asesmenDiagnostik','asesmenFormatif','asesmenSumatif',
+    'diferensiasi','pengayaan','catatan',
+    'syllabusItems','attachmentUrl','attachmentName','status'
+  ];
+  for (const f of fields) {
+    if (req.body[f] !== undefined) (rpp as any)[f] = req.body[f];
+  }
 
   rpp.updatedAt = new Date().toISOString();
   saveDatabase(db);
 
   const mapel = db.subjects.find(s => s.id === rpp.subjectId)?.name || '';
   const kelas = db.classes.find(c => c.id === rpp.classId)?.name || '';
-
   logActivity(user.id, user.name, user.role, 'Ubah RPP',
-    `Memperbarui RPP Tahunan ${mapel} - Kelas ${kelas} (Status: ${rpp.status})`);
+    `Memperbarui RPP ${mapel} - Kelas ${kelas} (Status: ${rpp.status})`);
 
   res.json(rpp);
 });

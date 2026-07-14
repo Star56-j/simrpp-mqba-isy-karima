@@ -81,7 +81,7 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
     const genapRows = (rpp.syllabusItems || []).filter(s => s.semester === 'Genap')
       .map(s => `<tr><td style="text-align:center;padding:4px 8px;border:1px solid #ccc;">${s.meetingNo}</td><td style="padding:4px 8px;border:1px solid #ccc;">${s.topic}</td><td style="text-align:center;padding:4px 8px;border:1px solid #ccc;">${s.date || '-'}</td></tr>`).join('');
 
-    w.document.write(`<!DOCTYPE html><html><head><title>RPP Tahunan - ${rpp.subject?.name}</title>
+    w.document.write(`<!DOCTYPE html><html><head><title>RPP - ${rpp.subject?.name}</title>
     <style>
       body{font-family:'Times New Roman',serif;line-height:1.7;padding:40px;color:#111;font-size:13px;}
       .header{text-align:center;border-bottom:3px double #000;padding-bottom:14px;margin-bottom:22px;}
@@ -95,6 +95,14 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
       table.id td.col{width:16px;text-align:center;}
       .sec{font-weight:bold;font-size:12px;text-transform:uppercase;margin-top:16px;margin-bottom:6px;border-bottom:1px solid #000;padding-bottom:2px;letter-spacing:.5px;}
       .cnt{font-size:13px;margin-left:12px;white-space:pre-wrap;text-align:justify;margin-bottom:12px;}
+      .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+      .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+      .box{border:1px solid #bbb;border-radius:4px;padding:10px;}
+      .box-title{font-weight:bold;font-size:11px;text-transform:uppercase;margin-bottom:6px;}
+      .box-blue .box-title{color:#1d4ed8;}
+      .box-violet .box-title{color:#7c3aed;}
+      .box-amber .box-title{color:#b45309;}
+      .box-emerald .box-title{color:#065f46;}
       .sem-box{border:1px solid #bbb;border-radius:4px;padding:12px;margin-bottom:14px;}
       .sem-title{font-weight:bold;font-size:12px;margin-bottom:8px;text-transform:uppercase;}
       table.syl{width:100%;border-collapse:collapse;font-size:12px;}
@@ -108,28 +116,47 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
       <h2>Yayasan Sosial dan Pendidikan Isy Karima</h2>
       <p>Karanganyar, Jawa Tengah, Indonesia &nbsp;|&nbsp; info@isykarima.id</p>
     </div>
-    <div class="title">Rencana Pelaksanaan Pembelajaran (RPP) Tahunan</div>
+    <div class="title">Rencana Pelaksanaan Pembelajaran (RPP) Kurikulum Merdeka</div>
     <table class="id">
       <tr><td class="lbl">Mata Pelajaran</td><td class="col">:</td><td><strong>${rpp.subject?.name} (${rpp.subject?.category})</strong></td></tr>
       <tr><td class="lbl">Kelas / Jenjang</td><td class="col">:</td><td>Kelas ${rpp.class?.name} (${rpp.class?.level})</td></tr>
       <tr><td class="lbl">Nama Pengajar</td><td class="col">:</td><td>${rpp.teacher?.name}</td></tr>
       <tr><td class="lbl">Tahun Ajaran</td><td class="col">:</td><td>Tahun Pelajaran ${rpp.academicYear?.name}</td></tr>
-      <tr><td class="lbl">Jumlah Pertemuan</td><td class="col">:</td><td>Ganjil: ${rpp.totalMeetingsGanjil} pertemuan &nbsp;|&nbsp; Genap: ${rpp.totalMeetingsGenap} pertemuan</td></tr>
+      <tr><td class="lbl">Jumlah Pertemuan</td><td class="col">:</td><td>Ganjil: ${rpp.totalMeetingsGanjil} &nbsp;|&nbsp; Genap: ${rpp.totalMeetingsGenap} pertemuan</td></tr>
+      <tr><td class="lbl">Profil Pelajar</td><td class="col">:</td><td>${rpp.profilPelajar || '-'}</td></tr>
+      <tr><td class="lbl">Sarana & Prasarana</td><td class="col">:</td><td>${rpp.sarana || '-'}</td></tr>
     </table>
-    <div class="sec">I. Kompetensi Inti (KI)</div><div class="cnt">${rpp.kompetensiInti || '-'}</div>
-    <div class="sec">II. Kompetensi Dasar (KD)</div><div class="cnt">${rpp.kompetensiDasar || '-'}</div>
-    <div class="sec">III. Tujuan Pembelajaran</div>
-    <div class="sem-box"><div class="sem-title">A. Semester Ganjil</div><div class="cnt" style="margin-left:0">${rpp.objectivesGanjil || '-'}</div></div>
-    <div class="sem-box"><div class="sem-title">B. Semester Genap</div><div class="cnt" style="margin-left:0">${rpp.objectivesGenap || '-'}</div></div>
+    <div class="sec">I. Capaian Pembelajaran (CP)</div><div class="cnt">${rpp.capaiPembelajaran || '-'}</div>
+    <div class="sec">II. Tujuan Pembelajaran (TP)</div><div class="cnt">${rpp.tujuanPembelajaran || '-'}</div>
+    <div class="sec">III. Alur Tujuan Pembelajaran (ATP)</div><div class="cnt">${rpp.alurTP || '-'}</div>
     <div class="sec">IV. Materi Pembelajaran</div>
-    <div class="sem-box"><div class="sem-title">A. Semester Ganjil</div><div class="cnt" style="margin-left:0">${rpp.materialsGanjil || '-'}</div></div>
-    <div class="sem-box"><div class="sem-title">B. Semester Genap</div><div class="cnt" style="margin-left:0">${rpp.materialsGenap || '-'}</div></div>
-    <div class="sec">V. Metode Pembelajaran</div><div class="cnt">${rpp.method || '-'}</div>
-    <div class="sec">VI. Media dan Alat Pembelajaran</div><div class="cnt">${rpp.media || '-'}</div>
-    <div class="sec">VII. Penilaian (Asesmen)</div><div class="cnt">${rpp.assessment || '-'}</div>
-    ${rpp.notes ? `<div class="sec">Catatan</div><div class="cnt">${rpp.notes}</div>` : ''}
+    <div class="grid2">
+      <div class="box box-blue"><div class="box-title">Semester Ganjil (${rpp.totalMeetingsGanjil} pertemuan)</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.materiGanjil || '-'}</div></div>
+      <div class="box box-violet"><div class="box-title">Semester Genap (${rpp.totalMeetingsGenap} pertemuan)</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.materiGenap || '-'}</div></div>
+    </div>
+    <div class="sec">V. Kegiatan Pembelajaran</div>
+    <div class="box box-amber" style="margin-bottom:8px;"><div class="box-title">Pendahuluan</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.pendahuluan || '-'}</div></div>
+    <div class="box box-emerald" style="margin-bottom:8px;"><div class="box-title">Kegiatan Inti</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.kegiatanInti || '-'}</div></div>
+    <div class="box" style="margin-bottom:14px;"><div class="box-title" style="color:#1d4ed8;">Penutup</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.penutup || '-'}</div></div>
+    <div class="sec">VI. Metode & Media</div>
+    <div class="grid2">
+      <div class="box"><div class="box-title">Metode / Model Pembelajaran</div><div style="font-size:12px;">${rpp.metode || '-'}</div></div>
+      <div class="box"><div class="box-title">Media & Alat</div><div style="font-size:12px;">${rpp.media || '-'}</div></div>
+    </div>
+    <div class="sec">VII. Asesmen</div>
+    <div class="grid3">
+      <div class="box"><div class="box-title">Diagnostik</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.asesmenDiagnostik || '-'}</div></div>
+      <div class="box box-blue"><div class="box-title">Formatif</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.asesmenFormatif || '-'}</div></div>
+      <div class="box box-emerald"><div class="box-title">Sumatif</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.asesmenSumatif || '-'}</div></div>
+    </div>
+    <div class="sec">VIII. Diferensiasi & Pengayaan</div>
+    <div class="grid2">
+      <div class="box"><div class="box-title">Pembelajaran Berdiferensiasi</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.diferensiasi || '-'}</div></div>
+      <div class="box"><div class="box-title">Pengayaan & Remedial</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.pengayaan || '-'}</div></div>
+    </div>
+    ${rpp.catatan ? `<div class="sec">Catatan Guru</div><div class="cnt">${rpp.catatan}</div>` : ''}
     ${ganjilRows || genapRows ? `
-    <div class="sec">VIII. Silabus Rincian Per Pertemuan</div>
+    <div class="sec">IX. Silabus Rincian Per Pertemuan</div>
     ${ganjilRows ? `<div class="sem-box"><div class="sem-title">Semester Ganjil</div>
     <table class="syl"><tr><th style="width:40px;">No</th><th>Pokok Bahasan / Materi</th><th style="width:90px;">Tgl Rencana</th></tr>${ganjilRows}</table></div>` : ''}
     ${genapRows ? `<div class="sem-box"><div class="sem-title">Semester Genap</div>
@@ -157,7 +184,7 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
       {/* Title */}
       <div>
         <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Persetujuan RPP Tahunan</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review dan setujui RPP per mata pelajaran yang diajukan oleh guru.</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review dan setujui RPP Kurikulum Merdeka yang diajukan oleh guru.</p>
       </div>
 
       {/* Filter */}
@@ -204,8 +231,8 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
                     <span className="text-xs text-slate-400 font-mono">TA {rpp.academicYear?.name}</span>
                   </div>
                   <div className="flex items-center gap-3 mt-1 text-[11px] text-slate-400">
-                    <span>Ganjil: <strong>{rpp.totalMeetingsGanjil}</strong> pertemuan</span>
-                    <span>Genap: <strong>{rpp.totalMeetingsGenap}</strong> pertemuan</span>
+                    <span>Ganjil: <strong>{rpp.totalMeetingsGanjil}</strong> ptm</span>
+                    <span>Genap: <strong>{rpp.totalMeetingsGenap}</strong> ptm</span>
                     <span>Silabus: <strong>{(rpp.syllabusItems || []).length}</strong> entri</span>
                   </div>
                 </div>
@@ -226,23 +253,24 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
                 </button>
               </div>
             </div>
-            {/* Quick expand preview */}
+
+            {/* Quick expand preview — format Kurikulum Merdeka */}
             {expandedRppId === rpp.id && (
               <div className="border-t border-slate-100 dark:border-slate-800 p-5 text-xs text-slate-600 dark:text-slate-400 space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div><p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Kompetensi Inti</p><p className="whitespace-pre-wrap">{rpp.kompetensiInti || '-'}</p></div>
-                  <div><p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Kompetensi Dasar</p><p className="whitespace-pre-wrap">{rpp.kompetensiDasar || '-'}</p></div>
-                </div>
+                {rpp.capaiPembelajaran && (
+                  <div>
+                    <p className="font-bold text-emerald-700 dark:text-emerald-400 mb-1">Capaian Pembelajaran</p>
+                    <p className="whitespace-pre-wrap">{rpp.capaiPembelajaran}</p>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20">
-                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Semester Ganjil ({rpp.totalMeetingsGanjil} pertemuan)</p>
-                    <p className="font-semibold mb-0.5">Tujuan:</p><p className="whitespace-pre-wrap mb-1">{rpp.objectivesGanjil || '-'}</p>
-                    <p className="font-semibold mb-0.5">Materi:</p><p className="whitespace-pre-wrap">{rpp.materialsGanjil || '-'}</p>
+                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Materi Ganjil ({rpp.totalMeetingsGanjil} pertemuan)</p>
+                    <p className="whitespace-pre-wrap">{rpp.materiGanjil || '-'}</p>
                   </div>
                   <div className="p-3 rounded-xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/20">
-                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Semester Genap ({rpp.totalMeetingsGenap} pertemuan)</p>
-                    <p className="font-semibold mb-0.5">Tujuan:</p><p className="whitespace-pre-wrap mb-1">{rpp.objectivesGenap || '-'}</p>
-                    <p className="font-semibold mb-0.5">Materi:</p><p className="whitespace-pre-wrap">{rpp.materialsGenap || '-'}</p>
+                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Materi Genap ({rpp.totalMeetingsGenap} pertemuan)</p>
+                    <p className="whitespace-pre-wrap">{rpp.materiGenap || '-'}</p>
                   </div>
                 </div>
               </div>
@@ -276,62 +304,120 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
 
             {/* Modal body */}
             <div className="p-6 overflow-y-auto flex-1 space-y-5 text-xs">
-              {/* Identitas */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-950/20">
+
+              {/* A. Identitas */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-950/20">
                 <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mata Pelajaran</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">{selectedRpp.subject?.name}</p></div>
                 <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Kelas</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">Kelas {selectedRpp.class?.name}</p></div>
                 <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tahun Ajaran</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">TA {selectedRpp.academicYear?.name}</p></div>
-                <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Pertemuan</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">G: {selectedRpp.totalMeetingsGanjil} &bull; G: {selectedRpp.totalMeetingsGenap}</p></div>
+                <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pertemuan</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">G: {selectedRpp.totalMeetingsGanjil} &bull; Gnp: {selectedRpp.totalMeetingsGenap}</p></div>
+                <div className="md:col-span-2"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Profil Pelajar</span><p className="text-slate-700 dark:text-slate-300 mt-0.5">{selectedRpp.profilPelajar || '-'}</p></div>
+                <div className="col-span-2 md:col-span-3"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sarana & Prasarana</span><p className="text-slate-700 dark:text-slate-300 mt-0.5">{selectedRpp.sarana || '-'}</p></div>
               </div>
 
-              {/* KI & KD */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-2">I. Kompetensi Inti</h4><p className="pl-2 whitespace-pre-wrap leading-relaxed text-slate-700 dark:text-slate-300">{selectedRpp.kompetensiInti || '-'}</p></div>
-                <div><h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-2">II. Kompetensi Dasar</h4><p className="pl-2 whitespace-pre-wrap leading-relaxed text-slate-700 dark:text-slate-300">{selectedRpp.kompetensiDasar || '-'}</p></div>
-              </div>
-
-              {/* Tujuan per semester */}
+              {/* B. CP & TP */}
               <div>
-                <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">III. Tujuan Pembelajaran</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20 space-y-1.5">
-                    <p className="font-extrabold text-blue-700 dark:text-blue-400">Semester Ganjil ({selectedRpp.totalMeetingsGanjil} pertemuan)</p>
-                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.objectivesGanjil || '-'}</p>
+                <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">I. Capaian & Tujuan Pembelajaran</h4>
+                <div className="space-y-3">
+                  <div className="p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/10">
+                    <p className="font-extrabold text-emerald-700 dark:text-emerald-400 mb-1">Capaian Pembelajaran (CP)</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.capaiPembelajaran || '-'}</p>
                   </div>
-                  <div className="p-3 rounded-xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/20 space-y-1.5">
-                    <p className="font-extrabold text-violet-700 dark:text-violet-400">Semester Genap ({selectedRpp.totalMeetingsGenap} pertemuan)</p>
-                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.objectivesGenap || '-'}</p>
+                  <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/10">
+                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Tujuan Pembelajaran (TP)</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.tujuanPembelajaran || '-'}</p>
+                  </div>
+                  <div className="p-3 rounded-xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/10">
+                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Alur Tujuan Pembelajaran (ATP)</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.alurTP || '-'}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Materi per semester */}
+              {/* C. Materi per Semester */}
               <div>
-                <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">IV. Materi Pembelajaran</h4>
+                <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">II. Materi Pembelajaran</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20">
-                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Semester Ganjil</p>
-                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.materialsGanjil || '-'}</p>
+                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Semester Ganjil ({selectedRpp.totalMeetingsGanjil} pertemuan)</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.materiGanjil || '-'}</p>
                   </div>
                   <div className="p-3 rounded-xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/20">
-                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Semester Genap</p>
-                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.materialsGenap || '-'}</p>
+                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Semester Genap ({selectedRpp.totalMeetingsGenap} pertemuan)</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.materiGenap || '-'}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Metode, Media, Asesmen */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-2">V. Metode</h4><p className="pl-2 text-slate-700 dark:text-slate-300">{selectedRpp.method || '-'}</p></div>
-                <div><h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-2">VI. Media & Alat</h4><p className="pl-2 text-slate-700 dark:text-slate-300">{selectedRpp.media || '-'}</p></div>
+              {/* D. Kegiatan Pembelajaran */}
+              <div>
+                <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">III. Kegiatan Pembelajaran</h4>
+                <div className="space-y-2">
+                  <div className="p-3 rounded-xl border border-amber-100 dark:border-amber-900/30 bg-amber-50/10">
+                    <p className="font-extrabold text-amber-700 dark:text-amber-400 mb-1">Pendahuluan</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.pendahuluan || '-'}</p>
+                  </div>
+                  <div className="p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/10">
+                    <p className="font-extrabold text-emerald-700 dark:text-emerald-400 mb-1">Kegiatan Inti</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.kegiatanInti || '-'}</p>
+                  </div>
+                  <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/10">
+                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Penutup</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.penutup || '-'}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                  <div><p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Metode / Model</p><p className="text-slate-600 dark:text-slate-400">{selectedRpp.metode || '-'}</p></div>
+                  <div><p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Media & Alat</p><p className="text-slate-600 dark:text-slate-400">{selectedRpp.media || '-'}</p></div>
+                </div>
               </div>
-              <div><h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-2">VII. Penilaian</h4><p className="pl-2 whitespace-pre-wrap text-slate-700 dark:text-slate-300">{selectedRpp.assessment || '-'}</p></div>
-              {selectedRpp.notes && <div><h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-2">Catatan</h4><p className="pl-2 whitespace-pre-wrap text-slate-700 dark:text-slate-300">{selectedRpp.notes}</p></div>}
 
-              {/* Silabus */}
+              {/* E. Asesmen */}
+              <div>
+                <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">IV. Asesmen</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20">
+                    <p className="font-extrabold text-slate-600 dark:text-slate-300 mb-1">Diagnostik</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.asesmenDiagnostik || '-'}</p>
+                  </div>
+                  <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/10">
+                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Formatif</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.asesmenFormatif || '-'}</p>
+                  </div>
+                  <div className="p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/10">
+                    <p className="font-extrabold text-emerald-700 dark:text-emerald-400 mb-1">Sumatif</p>
+                    <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.asesmenSumatif || '-'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* F. Diferensiasi & Pengayaan */}
+              <div>
+                <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">V. Diferensiasi & Pengayaan</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20">
+                    <p className="font-extrabold text-slate-700 dark:text-slate-300 mb-1">Pembelajaran Berdiferensiasi</p>
+                    <p className="whitespace-pre-wrap text-slate-600 dark:text-slate-400 leading-relaxed">{selectedRpp.diferensiasi || '-'}</p>
+                  </div>
+                  <div className="p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20">
+                    <p className="font-extrabold text-slate-700 dark:text-slate-300 mb-1">Pengayaan & Remedial</p>
+                    <p className="whitespace-pre-wrap text-slate-600 dark:text-slate-400 leading-relaxed">{selectedRpp.pengayaan || '-'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* G. Catatan */}
+              {selectedRpp.catatan && (
+                <div>
+                  <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-2">Catatan Guru</h4>
+                  <p className="pl-2 whitespace-pre-wrap text-slate-700 dark:text-slate-300">{selectedRpp.catatan}</p>
+                </div>
+              )}
+
+              {/* H. Silabus */}
               {selectedRpp.syllabusItems && selectedRpp.syllabusItems.length > 0 && (
                 <div>
-                  <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">VIII. Silabus Rincian Per Pertemuan</h4>
+                  <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">VI. Silabus Rincian Per Pertemuan</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {(['Ganjil','Genap'] as const).map(sem => {
                       const items = selectedRpp.syllabusItems!.filter(s => s.semester === sem);

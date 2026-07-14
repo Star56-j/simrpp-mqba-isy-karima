@@ -94,7 +94,7 @@ export default function Sidebar({
       {/* Main Sidebar */}
       <aside className={`
         fixed inset-y-0 left-0 z-40 w-64 bg-emerald-900 text-slate-100 flex flex-col justify-between shadow-xl transition-transform duration-300 transform 
-        lg:translate-x-0 lg:static lg:h-screen
+        lg:translate-x-0 lg:static lg:h-full
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Logo Section */}

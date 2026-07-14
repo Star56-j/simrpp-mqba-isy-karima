@@ -284,7 +284,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row font-sans text-slate-800 dark:text-slate-200">
+    <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row font-sans text-slate-800 dark:text-slate-200">
       {/* Sidebar Navigation */}
       <Sidebar 
         user={user}
@@ -296,7 +296,7 @@ export default function App() {
       />
 
       {/* Main Panel Content with Header & Footer */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden bg-slate-50 dark:bg-slate-950">
         {/* Dynamic Polished Header */}
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 flex items-center justify-between px-6 lg:px-8 shrink-0">
           <div className="flex items-center space-x-3 min-w-0">

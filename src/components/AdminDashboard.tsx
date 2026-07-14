@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { AdminStats, RPP } from '../types';
 import { api } from '../api';
+import RealTimeClock from './RealTimeClock';
 
 interface AdminDashboardProps {
   stats: AdminStats;
@@ -28,14 +29,34 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Title Header */}
-      <div>
-        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-          Dashboard Administrasi
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-          Selamat datang di SIMRPP MQBA Isy Karima. Berikut adalah ringkasan data akademik dan status rencana pembelajaran.
-        </p>
+      {/* Title Header with Islamic Ornament & Clock */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl p-6 lg:p-8 shadow-lg border border-indigo-700/50">
+        {/* Ornament SVG Background */}
+        <div className="absolute -right-20 -top-20 opacity-10 pointer-events-none text-white">
+          <svg width="350" height="350" viewBox="0 0 100 100" className="animate-[spin_60s_linear_infinite]">
+            <path fill="currentColor" d="M50 0 L60 30 L100 20 L75 50 L100 80 L60 70 L50 100 L40 70 L0 80 L25 50 L0 20 L40 30 Z" />
+            <path fill="currentColor" d="M50 10 L55 35 L90 25 L70 50 L90 75 L55 65 L50 90 L45 65 L10 75 L30 50 L10 25 L45 35 Z" opacity="0.6" />
+            <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.8" />
+            <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" opacity="0.5" />
+          </svg>
+        </div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="w-8 h-1 bg-amber-400 rounded-full"></span>
+              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">SIMRPP MQBA Isy Karima</span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+              Dashboard Administrasi
+            </h1>
+            <p className="text-indigo-200 text-sm mt-2 max-w-lg">
+              Berikut adalah ringkasan data akademik dan status rencana pembelajaran.
+            </p>
+          </div>
+          
+          <RealTimeClock />
+        </div>
       </div>
 
       {/* Stats Grid */}

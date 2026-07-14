@@ -31,7 +31,7 @@ export default function UnsavedBar({ isDirty, onSave, onDiscard, saving = false,
         <button
           onClick={onSave}
           disabled={saving}
-          className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition text-xs font-extrabold uppercase tracking-wide disabled:opacity-60"
+          className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition text-xs font-extrabold uppercase tracking-wide disabled:opacity-60"
         >
           <Save className="w-3.5 h-3.5" />
           <span>{saving ? 'Menyimpan...' : label}</span>

@@ -13,7 +13,7 @@ interface AttendanceAdminProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  Hadir:  'bg-emerald-50 text-emerald-800 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30',
+  Hadir:  'bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30',
   Izin:   'bg-blue-50 text-blue-800 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30',
   Sakit:  'bg-amber-50 text-amber-800 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30',
   Alpha:  'bg-rose-50 text-rose-800 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30',
@@ -137,7 +137,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Catat dan pantau kehadiran seluruh pengajar MQBA Isy Karima.</p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true); }}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition">
+          className="flex items-center space-x-2 px-4 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition">
           <Plus className="w-4 h-4"/><span>Catat Absensi</span>
         </button>
       </div>
@@ -157,21 +157,21 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
         <div className="space-y-1 flex-1 min-w-[140px]">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tahun Ajaran</label>
           <select value={filterAY} onChange={e=>setFilterAY(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
             {academicYears.map(y=><option key={y.id} value={y.id}>TA {y.name}</option>)}
           </select>
         </div>
         <div className="space-y-1 min-w-[120px]">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Semester</label>
           <select value={filterSem} onChange={e=>setFilterSem(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
             {semesters.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </div>
         <div className="space-y-1 min-w-[100px]">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Rentang</label>
           <select value={rekapMode} onChange={e=>setRekapMode(e.target.value as any)}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="bulan">Per Bulan</option>
             <option value="semester">Per Semester</option>
             <option value="tahun">Per Tahun</option>
@@ -181,7 +181,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
           <div className="space-y-1 min-w-[130px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bulan</label>
             <select value={filterMonth} onChange={e=>setFilterMonth(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
               {MONTHS.map((m,i)=><option key={i} value={String(i+1)}>{m}</option>)}
             </select>
           </div>
@@ -189,13 +189,13 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
         <div className="space-y-1 min-w-[80px]">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tahun</label>
           <input type="number" value={filterYear} onChange={e=>setFilterYear(e.target.value)} min={2020} max={2035}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
         </div>
         {activeTab === 'input' && (
           <div className="space-y-1 flex-1 min-w-[150px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Filter Guru</label>
             <select value={filterTeacher} onChange={e=>setFilterTeacher(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="">Semua Guru</option>
               {teachers.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
@@ -280,7 +280,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
             return (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  {label:'Total Hadir',val:totHadir,cls:'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400'},
+                  {label:'Total Hadir',val:totHadir,cls:'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30 text-indigo-700 dark:text-indigo-400'},
                   {label:'Izin',val:totIzin,cls:'bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-700 dark:text-blue-400'},
                   {label:'Sakit',val:totSakit,cls:'bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400'},
                   {label:'Alpha',val:totAlpha,cls:'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-700 dark:text-rose-400'},
@@ -322,7 +322,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                     {summary.map(r => (
                       <tr key={r.teacherId} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
                         <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">{r.teacherName}</td>
-                        <td className="px-4 py-3 text-center font-mono font-bold text-emerald-600">{r.hadir}</td>
+                        <td className="px-4 py-3 text-center font-mono font-bold text-indigo-600">{r.hadir}</td>
                         <td className="px-4 py-3 text-center font-mono font-bold text-blue-600">{r.izin}</td>
                         <td className="px-4 py-3 text-center font-mono font-bold text-amber-600">{r.sakit}</td>
                         <td className="px-4 py-3 text-center font-mono font-bold text-rose-600">{r.alpha}</td>
@@ -330,9 +330,9 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                         <td className="px-4 py-3 text-center">
                           <div className="flex items-center justify-center space-x-2">
                             <div className="w-20 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                              <div className="bg-emerald-500 h-full rounded-full" style={{width:`${r.persentaseHadir}%`}}/>
+                              <div className="bg-indigo-500 h-full rounded-full" style={{width:`${r.persentaseHadir}%`}}/>
                             </div>
-                            <span className={`text-xs font-extrabold ${r.persentaseHadir>=80?'text-emerald-600':r.persentaseHadir>=60?'text-amber-600':'text-rose-600'}`}>
+                            <span className={`text-xs font-extrabold ${r.persentaseHadir>=80?'text-indigo-600':r.persentaseHadir>=60?'text-amber-600':'text-rose-600'}`}>
                               {r.persentaseHadir}%
                             </span>
                           </div>
@@ -360,12 +360,12 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
               </button>
             </div>
             {formError && <div className="p-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 text-xs flex items-center space-x-2"><AlertCircle className="w-4 h-4"/><span>{formError}</span></div>}
-            {formSuccess && <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs flex items-center space-x-2"><CheckCircle className="w-4 h-4"/><span>{formSuccess}</span></div>}
+            {formSuccess && <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs flex items-center space-x-2"><CheckCircle className="w-4 h-4"/><span>{formSuccess}</span></div>}
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Guru</label>
                 <select required value={fTeacher} onChange={e=>setFTeacher(e.target.value)} disabled={!!editId}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-slate-50 dark:disabled:bg-slate-800">
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50 dark:disabled:bg-slate-800">
                   <option value="" disabled>Pilih guru...</option>
                   {teachers.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
@@ -374,12 +374,12 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal</label>
                   <input type="date" required value={fDate} onChange={e=>setFDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Status</label>
                   <select required value={fStatus} onChange={e=>setFStatus(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     {['Hadir','Izin','Sakit','Alpha'].map(s=><option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
@@ -388,14 +388,14 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tahun Ajaran</label>
                   <select required value={fAY} onChange={e=>setFAY(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     {academicYears.map(y=><option key={y.id} value={y.id}>TA {y.name}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Semester</label>
                   <select required value={fSem} onChange={e=>setFSem(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     {semesters.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
@@ -403,13 +403,13 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Keterangan (opsional)</label>
                 <input type="text" placeholder="Contoh: Izin keperluan keluarga" value={fNotes} onChange={e=>setFNotes(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
               </div>
               <div className="flex justify-end space-x-2 pt-2">
                 <button type="button" onClick={() => { setShowForm(false); resetForm(); }}
                   className="px-4 py-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase">Batal</button>
                 <button type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase shadow-sm transition">
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase shadow-sm transition">
                   {editId ? 'Simpan Perubahan' : 'Catat Absensi'}
                 </button>
               </div>

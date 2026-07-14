@@ -116,7 +116,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
         </div>
         <button
           onClick={openAddModal}
-          className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs uppercase tracking-wider shadow-sm transition self-start sm:self-auto"
+          className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold text-xs uppercase tracking-wider shadow-sm transition self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Guru Baru</span>
@@ -134,7 +134,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
               placeholder="Cari guru berdasarkan nama atau email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -158,7 +158,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                     <td className="p-4 text-center text-slate-400 font-semibold">{index + 1}</td>
                     <td className="p-4 font-extrabold text-slate-800 dark:text-slate-100">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 font-bold text-xs flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-400 font-bold text-xs flex items-center justify-center">
                           {teacher.name.replace(/Ust\.\s*|Usth\.\s*/g, '').charAt(0)}
                         </div>
                         <span>{teacher.name}</span>
@@ -168,7 +168,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                       {teacher.email}
                     </td>
                     <td className="p-4 text-center">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 uppercase tracking-wider border border-emerald-100 dark:border-emerald-900/30">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 uppercase tracking-wider border border-indigo-100 dark:border-indigo-900/30">
                         Aktif
                       </span>
                     </td>
@@ -208,16 +208,16 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-up">
-            <div className="bg-emerald-800 px-6 py-4 flex items-center justify-between text-white">
+            <div className="bg-indigo-800 px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-emerald-200" />
+                <Users className="w-5 h-5 text-indigo-200" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wider">
                   {selectedTeacher ? 'Edit Informasi Guru' : 'Tambah Guru Baru'}
                 </h3>
               </div>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-emerald-700/85 transition"
+                className="p-1 rounded-lg hover:bg-indigo-700/85 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -232,7 +232,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
               )}
 
               {successMessage && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{successMessage}</span>
                 </div>
@@ -248,7 +248,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                     placeholder="Contoh: Ust. Abdurrahman"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                     placeholder="Contoh: abdurrahman@mqba.sch.id"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -279,7 +279,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                     placeholder={selectedTeacher ? 'Minimal 6 karakter' : 'Default: guru123'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 {!selectedTeacher && (
@@ -297,7 +297,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
                 >
                   {selectedTeacher ? 'Simpan Perubahan' : 'Simpan Guru'}
                 </button>

@@ -58,25 +58,25 @@ export default function Sidebar({
   return (
     <>
       {/* Mobile Top Header */}
-      <header className="lg:hidden bg-emerald-800 text-white flex items-center justify-between px-4 py-3 sticky top-0 z-50 shadow-md">
+      <header className="lg:hidden bg-indigo-800 text-white flex items-center justify-between px-4 py-3 sticky top-0 z-50 shadow-md">
         <div className="flex items-center space-x-2">
           <img src="/logo-mqba.png" alt="Logo MQBA" className="w-8 h-8 object-contain" />
           <div>
             <h1 className="text-xs font-bold leading-tight uppercase tracking-wider">SIMRPP MQBA</h1>
-            <p className="text-[9px] text-emerald-100 font-medium">Isy Karima</p>
+            <p className="text-[9px] text-indigo-100 font-medium">Isy Karima</p>
           </div>
         </div>
         <div className="flex items-center space-x-3">
           <button 
             onClick={() => setDarkMode(!darkMode)}
-            className="p-1.5 rounded-lg hover:bg-emerald-700 transition"
+            className="p-1.5 rounded-lg hover:bg-indigo-700 transition"
             title="Toggle Tema"
           >
             {darkMode ? <Sun className="w-5 h-5 text-amber-300" /> : <Moon className="w-5 h-5" />}
           </button>
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="p-1.5 rounded-lg hover:bg-emerald-700 transition"
+            className="p-1.5 rounded-lg hover:bg-indigo-700 transition"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -93,12 +93,12 @@ export default function Sidebar({
 
       {/* Main Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-emerald-900 text-slate-100 flex flex-col justify-between shadow-xl transition-transform duration-300 transform 
+        fixed inset-y-0 left-0 z-40 w-64 bg-indigo-900 text-slate-100 flex flex-col justify-between shadow-xl transition-transform duration-300 transform 
         lg:translate-x-0 lg:static lg:h-full
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Logo Section */}
-        <div className="px-4 pt-5 pb-4 border-b border-emerald-800/60">
+        <div className="px-4 pt-5 pb-4 border-b border-indigo-800/60">
           <div className="flex flex-col items-center text-center space-y-2">
             <img
               src="/logo-mqba.png"
@@ -107,30 +107,30 @@ export default function Sidebar({
             />
             <div>
               <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-tight">SIMRPP MQBA</h2>
-              <p className="text-[10px] text-emerald-300 font-semibold tracking-wider mt-0.5 uppercase">Isy Karima</p>
+              <p className="text-[10px] text-indigo-300 font-semibold tracking-wider mt-0.5 uppercase">Isy Karima</p>
             </div>
           </div>
         </div>
 
         {/* User Info Card + Actions */}
-        <div className="px-6 py-4 border-b border-emerald-800/40 bg-emerald-950/30">
+        <div className="px-6 py-4 border-b border-indigo-800/40 bg-indigo-950/30">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white shadow-sm border border-emerald-500 flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white shadow-sm border border-indigo-500 flex-shrink-0">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-              <span className="inline-flex items-center px-2 py-0.5 mt-0.5 rounded-full text-[10px] font-bold bg-emerald-700 text-emerald-100 uppercase tracking-wide border border-emerald-600">
+              <span className="inline-flex items-center px-2 py-0.5 mt-0.5 rounded-full text-[10px] font-bold bg-indigo-700 text-indigo-100 uppercase tracking-wide border border-indigo-600">
                 {user.role}
               </span>
             </div>
             {/* Dark mode toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-lg hover:bg-emerald-800/50 transition flex-shrink-0"
+              className="p-2 rounded-lg hover:bg-indigo-800/50 transition flex-shrink-0"
               title={darkMode ? 'Mode Terang' : 'Mode Gelap'}
             >
-              {darkMode ? <Sun className="w-4.5 h-4.5 text-amber-300" /> : <Moon className="w-4.5 h-4.5 text-emerald-300" />}
+              {darkMode ? <Sun className="w-4.5 h-4.5 text-amber-300" /> : <Moon className="w-4.5 h-4.5 text-indigo-300" />}
             </button>
             {/* Logout */}
             <button
@@ -158,12 +158,12 @@ export default function Sidebar({
                 className={`
                   w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200
                   ${isActive 
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/20 font-semibold' 
-                    : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white'
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/20 font-semibold' 
+                    : 'text-indigo-100 hover:bg-indigo-800/50 hover:text-white'
                   }
                 `}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-emerald-300'}`} />
+                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-indigo-300'}`} />
                 <span>{item.label}</span>
               </button>
             );
@@ -171,8 +171,8 @@ export default function Sidebar({
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-emerald-800/60 bg-emerald-950/40">
-          <p className="text-[10px] text-emerald-600 text-center font-semibold uppercase tracking-wider">SIMRPP MQBA © 2026</p>
+        <div className="p-4 border-t border-indigo-800/60 bg-indigo-950/40">
+          <p className="text-[10px] text-indigo-600 text-center font-semibold uppercase tracking-wider">SIMRPP MQBA © 2026</p>
         </div>
       </aside>
     </>

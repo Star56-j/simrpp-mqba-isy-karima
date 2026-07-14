@@ -111,7 +111,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
         </div>
         <button
           onClick={openAddModal}
-          className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs uppercase tracking-wider shadow-sm transition self-start sm:self-auto"
+          className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold text-xs uppercase tracking-wider shadow-sm transition self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Mapel Baru</span>
@@ -127,7 +127,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
             className={`
               px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 whitespace-nowrap
               ${activeTab === cat 
-                ? 'bg-emerald-700 text-white shadow-md' 
+                ? 'bg-indigo-700 text-white shadow-md' 
                 : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-800 hover:bg-slate-50'
               }
             `}
@@ -148,7 +148,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
               placeholder="Cari mata pelajaran..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
                     </td>
                     <td className="p-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border
-                        ${subject.category === 'Al-Qur\'an' ? 'bg-emerald-50 text-emerald-800 border-emerald-100 dark:bg-emerald-950/25 dark:text-emerald-400 dark:border-emerald-900/30' : ''}
+                        ${subject.category === 'Al-Qur\'an' ? 'bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/25 dark:text-indigo-400 dark:border-indigo-900/30' : ''}
                         ${subject.category === 'Diniyah' ? 'bg-teal-50 text-teal-800 border-teal-100 dark:bg-teal-950/25 dark:text-teal-400 dark:border-teal-900/30' : ''}
                         ${subject.category === 'Bahasa' ? 'bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/25 dark:text-indigo-400 dark:border-indigo-900/30' : ''}
                         ${subject.category === 'Umum' ? 'bg-slate-50 text-slate-700 border-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700' : ''}
@@ -218,16 +218,16 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-up">
-            <div className="bg-emerald-800 px-6 py-4 flex items-center justify-between text-white">
+            <div className="bg-indigo-800 px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center space-x-2">
-                <BookOpen className="w-5 h-5 text-emerald-200" />
+                <BookOpen className="w-5 h-5 text-indigo-200" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wider">
                   {selectedSubject ? 'Edit Mata Pelajaran' : 'Tambah Mapel Baru'}
                 </h3>
               </div>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-emerald-700/85 transition"
+                className="p-1 rounded-lg hover:bg-indigo-700/85 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -242,7 +242,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
               )}
 
               {successMessage && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{successMessage}</span>
                 </div>
@@ -256,7 +256,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
                   placeholder="Contoh: Aqidah / Fiqih / Muroja'ah"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -268,7 +268,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
                     required
                     value={category}
                     onChange={(e) => setCategory(e.target.value as CategoryType)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
                   >
                     <option value="Al-Qur'an">Al-Qur'an</option>
                     <option value="Diniyah">Diniyah</option>
@@ -288,7 +288,7 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
                 >
                   {selectedSubject ? 'Simpan Perubahan' : 'Simpan Mapel'}
                 </button>

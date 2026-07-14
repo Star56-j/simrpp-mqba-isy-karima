@@ -307,14 +307,14 @@ export default function MasterSchedules({
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setIsCopyModalOpen(true)}
-            className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border border-emerald-700/30 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50 font-bold text-xs uppercase tracking-wider transition"
+            className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border border-indigo-700/30 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/50 font-bold text-xs uppercase tracking-wider transition"
           >
             <Copy className="w-4 h-4" />
             <span>Copy Semester</span>
           </button>
           <button
             onClick={openAddModal}
-            className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs uppercase tracking-wider shadow-sm transition"
+            className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold text-xs uppercase tracking-wider shadow-sm transition"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah Jadwal</span>
@@ -332,7 +332,7 @@ export default function MasterSchedules({
               placeholder="Cari berdasarkan guru, kelas, atau mata pelajaran..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-11 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           
@@ -387,7 +387,7 @@ export default function MasterSchedules({
           <div className="flex items-center space-x-2">
             <button
               onClick={exportToExcel}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[11px] font-extrabold uppercase tracking-wider transition"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[11px] font-extrabold uppercase tracking-wider transition"
               title="Download Excel"
             >
               <FileSpreadsheet className="w-4 h-4" />
@@ -395,7 +395,7 @@ export default function MasterSchedules({
             </button>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold uppercase tracking-wider transition"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-extrabold uppercase tracking-wider transition"
               title="Print PDF"
             >
               <Printer className="w-4 h-4" />
@@ -439,7 +439,7 @@ export default function MasterSchedules({
                     <td className="p-4 font-extrabold text-slate-800 dark:text-slate-100">
                       {sch.teacher?.name}
                     </td>
-                    <td className="p-4 text-emerald-800 dark:text-emerald-400 font-bold">
+                    <td className="p-4 text-indigo-800 dark:text-indigo-400 font-bold">
                       {sch.subject?.name}
                     </td>
                     <td className="p-4 text-center no-print">
@@ -476,14 +476,14 @@ export default function MasterSchedules({
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-up">
-            <div className="bg-emerald-800 px-6 py-4 flex items-center justify-between text-white">
+            <div className="bg-indigo-800 px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center space-x-2">
-                <Calendar className="w-5 h-5 text-emerald-200" />
+                <Calendar className="w-5 h-5 text-indigo-200" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wider">
                   {selectedSchedule ? 'Edit Jadwal Mengajar' : 'Tambah Jadwal KBM'}
                 </h3>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="p-1 rounded-lg hover:bg-emerald-700/85 transition">
+              <button onClick={() => setIsModalOpen(false)} className="p-1 rounded-lg hover:bg-indigo-700/85 transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -497,7 +497,7 @@ export default function MasterSchedules({
               )}
 
               {successMessage && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{successMessage}</span>
                 </div>
@@ -509,7 +509,7 @@ export default function MasterSchedules({
                   <select
                     value={day}
                     onChange={(e) => setDay(e.target.value as any)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {daysList.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
@@ -523,7 +523,7 @@ export default function MasterSchedules({
                     placeholder="Contoh: 07:30 - 09:00"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
                   />
                 </div>
               </div>
@@ -534,7 +534,7 @@ export default function MasterSchedules({
                   required
                   value={teacherId}
                   onChange={(e) => setTeacherId(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="" disabled>Pilih guru...</option>
                   {teachers.map(t => <option key={t.id} value={t.id}>{t.name} ({t.email})</option>)}
@@ -547,7 +547,7 @@ export default function MasterSchedules({
                   required
                   value={subjectId}
                   onChange={(e) => setSubjectId(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="" disabled>Pilih mapel...</option>
                   {subjects.map(s => <option key={s.id} value={s.id}>[{s.category}] {s.name}</option>)}
@@ -560,7 +560,7 @@ export default function MasterSchedules({
                   required
                   value={classId}
                   onChange={(e) => setClassId(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="" disabled>Pilih kelas...</option>
                   {classes.map(c => <option key={c.id} value={c.id}>Kelas {c.name} ({c.level})</option>)}
@@ -574,7 +574,7 @@ export default function MasterSchedules({
                     required
                     value={academicYearId}
                     onChange={(e) => setAcademicYearId(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {academicYears.map(ay => <option key={ay.id} value={ay.id}>{ay.name}</option>)}
                   </select>
@@ -586,7 +586,7 @@ export default function MasterSchedules({
                     required
                     value={semesterId}
                     onChange={(e) => setSemesterId(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
@@ -603,7 +603,7 @@ export default function MasterSchedules({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
                 >
                   {selectedSchedule ? 'Simpan Perubahan' : 'Simpan Jadwal'}
                 </button>
@@ -617,20 +617,20 @@ export default function MasterSchedules({
       {isCopyModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-up">
-            <div className="bg-emerald-800 px-6 py-4 flex items-center justify-between text-white">
+            <div className="bg-indigo-800 px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center space-x-2">
-                <Copy className="w-5 h-5 text-emerald-200" />
+                <Copy className="w-5 h-5 text-indigo-200" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wider">
                   Salin Seluruh Jadwal Semester
                 </h3>
               </div>
-              <button onClick={() => setIsCopyModalOpen(false)} className="p-1 rounded-lg hover:bg-emerald-700/85 transition">
+              <button onClick={() => setIsCopyModalOpen(false)} className="p-1 rounded-lg hover:bg-indigo-700/85 transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCopySubmit} className="p-6 space-y-4">
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100/50 text-emerald-800 text-xs leading-relaxed">
+              <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100/50 text-indigo-800 text-xs leading-relaxed">
                 Fitur ini menduplikasi seluruh penugasan Jadwal KBM dari Semester Sumber ke Semester Tujuan secara otomatis. Membantu meringankan penyiapan kalender akademik baru.
               </div>
 
@@ -642,7 +642,7 @@ export default function MasterSchedules({
               )}
 
               {successMessage && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{successMessage}</span>
                 </div>
@@ -650,7 +650,7 @@ export default function MasterSchedules({
 
               {/* Source Semester */}
               <div className="border border-slate-100 dark:border-slate-800 rounded-xl p-4 space-y-3 bg-slate-50/20 dark:bg-slate-950/20">
-                <h4 className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-400 uppercase tracking-widest leading-none">Semester Sumber (Asal)</h4>
+                <h4 className="text-[10px] font-extrabold text-indigo-800 dark:text-indigo-400 uppercase tracking-widest leading-none">Semester Sumber (Asal)</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-slate-400 block uppercase">Tahun Ajaran</span>
@@ -676,8 +676,8 @@ export default function MasterSchedules({
               </div>
 
               {/* Destination Semester */}
-              <div className="border border-slate-100 dark:border-slate-800 rounded-xl p-4 space-y-3 bg-emerald-50/10 dark:bg-emerald-950/10">
-                <h4 className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-400 uppercase tracking-widest leading-none">Semester Tujuan (Salin Ke)</h4>
+              <div className="border border-slate-100 dark:border-slate-800 rounded-xl p-4 space-y-3 bg-indigo-50/10 dark:bg-indigo-950/10">
+                <h4 className="text-[10px] font-extrabold text-indigo-800 dark:text-indigo-400 uppercase tracking-widest leading-none">Semester Tujuan (Salin Ke)</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-slate-400 block uppercase">Tahun Ajaran</span>
@@ -712,7 +712,7 @@ export default function MasterSchedules({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
                 >
                   Proses Salin Jadwal
                 </button>

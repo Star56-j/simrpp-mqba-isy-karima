@@ -9,7 +9,7 @@ interface AttendanceGuruProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  Hadir: 'bg-emerald-50 text-emerald-800 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30',
+  Hadir: 'bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30',
   Izin:  'bg-blue-50 text-blue-800 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30',
   Sakit: 'bg-amber-50 text-amber-800 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30',
   Alpha: 'bg-rose-50 text-rose-800 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30',
@@ -117,9 +117,9 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
       {activeTab === 'isi' && (
         <div className="max-w-lg">
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs overflow-hidden">
-            <div className="bg-emerald-800 px-6 py-4">
+            <div className="bg-indigo-800 px-6 py-4">
               <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">Form Pengisian Absensi Mandiri</h3>
-              <p className="text-emerald-300 text-xs mt-0.5">Isi kehadiran Anda untuk hari ini atau hari sebelumnya.</p>
+              <p className="text-indigo-300 text-xs mt-0.5">Isi kehadiran Anda untuk hari ini atau hari sebelumnya.</p>
             </div>
             <form onSubmit={handleSelfSubmit} className="p-6 space-y-4">
               {formError && (
@@ -129,7 +129,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                 </div>
               )}
               {formSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{formSuccess}</span>
                 </div>
@@ -140,7 +140,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal Kehadiran</label>
                 <input type="date" required value={fDate} onChange={e => setFDate(e.target.value)}
                   max={todayStr}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 <p className="text-[10px] text-slate-400">Tidak bisa mengisi absensi untuk tanggal yang akan datang.</p>
               </div>
 
@@ -152,7 +152,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                     <button key={s} type="button" onClick={() => setFStatus(s)}
                       className={`py-3 rounded-xl border-2 text-xs font-extrabold uppercase tracking-wider transition
                         ${fStatus === s
-                          ? s === 'Hadir' ? 'border-emerald-500 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500'
+                          ? s === 'Hadir' ? 'border-indigo-500 bg-indigo-50 text-indigo-800 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-500'
                           : s === 'Izin' ? 'border-blue-500 bg-blue-50 text-blue-800 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-500'
                           : 'border-amber-500 bg-amber-50 text-amber-800 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-500'
                           : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
@@ -178,7 +178,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                     : 'Keterangan tambahan (opsional)...'
                   }
                   value={fNotes} onChange={e => setFNotes(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
               </div>
 
               {/* Tahun Ajaran & Semester */}
@@ -186,14 +186,14 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tahun Ajaran</label>
                   <select required value={fAY} onChange={e => setFAY(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     {academicYears.map(y => <option key={y.id} value={y.id}>TA {y.name}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Semester</label>
                   <select required value={fSem} onChange={e => setFSem(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
@@ -201,7 +201,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
 
               <button type="submit" disabled={submitting}
                 className={`w-full py-3 rounded-xl text-sm font-extrabold uppercase tracking-wider text-white shadow-sm transition flex items-center justify-center space-x-2
-                  ${fStatus === 'Hadir' ? 'bg-emerald-700 hover:bg-emerald-800' : fStatus === 'Izin' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-amber-600 hover:bg-amber-700'}
+                  ${fStatus === 'Hadir' ? 'bg-indigo-700 hover:bg-indigo-800' : fStatus === 'Izin' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-amber-600 hover:bg-amber-700'}
                   disabled:opacity-60 disabled:cursor-not-allowed`}>
                 <Plus className="w-4 h-4" />
                 <span>{submitting ? 'Menyimpan...' : `Simpan Absensi — ${fStatus}`}</span>
@@ -217,21 +217,21 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
           <div className="space-y-1 flex-1 min-w-[130px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tahun Ajaran</label>
             <select value={filterAY} onChange={e => setFilterAY(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
               {academicYears.map(y => <option key={y.id} value={y.id}>TA {y.name}</option>)}
             </select>
           </div>
           <div className="space-y-1 min-w-[120px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Semester</label>
             <select value={filterSem} onChange={e => setFilterSem(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
               {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div className="space-y-1 min-w-[100px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Rentang</label>
             <select value={rekapMode} onChange={e => setRekapMode(e.target.value as any)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="bulan">Per Bulan</option>
               <option value="semester">Per Semester</option>
               <option value="tahun">Per Tahun</option>
@@ -241,7 +241,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
             <div className="space-y-1 min-w-[130px]">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bulan</label>
               <select value={filterMonth} onChange={e => setFilterMonth(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 {MONTHS.map((m, i) => <option key={i} value={String(i + 1)}>{m}</option>)}
               </select>
             </div>
@@ -249,7 +249,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
           <div className="space-y-1 min-w-[80px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tahun</label>
             <input type="number" value={filterYear} onChange={e => setFilterYear(e.target.value)} min={2020} max={2035}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
         </div>
       )}
@@ -270,7 +270,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
               <ClipboardList className="w-10 h-10 mx-auto mb-2 text-slate-200 dark:text-slate-800" />
               <p className="text-sm font-medium">Belum ada data absensi untuk periode ini.</p>
               <button onClick={() => setActiveTab('isi')}
-                className="mt-3 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                className="mt-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                 + Isi Absensi Sekarang
               </button>
             </div>
@@ -318,7 +318,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: 'Hadir', val: summary.hadir, cls: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400' },
+                  { label: 'Hadir', val: summary.hadir, cls: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30 text-indigo-700 dark:text-indigo-400' },
                   { label: 'Izin',  val: summary.izin,  cls: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-700 dark:text-blue-400' },
                   { label: 'Sakit', val: summary.sakit, cls: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400' },
                   { label: 'Alpha', val: summary.alpha, cls: 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-700 dark:text-rose-400' },
@@ -338,17 +338,17 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Persentase Kehadiran</p>
                     <p className="text-xs text-slate-400 mt-0.5">{rekapLabel}</p>
                   </div>
-                  <span className={`text-3xl font-black ${summary.persentaseHadir >= 80 ? 'text-emerald-600' : summary.persentaseHadir >= 60 ? 'text-amber-600' : 'text-rose-600'}`}>
+                  <span className={`text-3xl font-black ${summary.persentaseHadir >= 80 ? 'text-indigo-600' : summary.persentaseHadir >= 60 ? 'text-amber-600' : 'text-rose-600'}`}>
                     {summary.persentaseHadir}%
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
-                  <div className={`h-full rounded-full transition-all duration-700 ${summary.persentaseHadir >= 80 ? 'bg-emerald-500' : summary.persentaseHadir >= 60 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                  <div className={`h-full rounded-full transition-all duration-700 ${summary.persentaseHadir >= 80 ? 'bg-indigo-500' : summary.persentaseHadir >= 60 ? 'bg-amber-500' : 'bg-rose-500'}`}
                     style={{ width: `${summary.persentaseHadir}%` }} />
                 </div>
                 <div className="flex justify-between mt-2 text-[10px] text-slate-400">
                   <span>0%</span>
-                  <span className={`font-bold ${summary.persentaseHadir >= 80 ? 'text-emerald-600' : summary.persentaseHadir >= 60 ? 'text-amber-600' : 'text-rose-600'}`}>
+                  <span className={`font-bold ${summary.persentaseHadir >= 80 ? 'text-indigo-600' : summary.persentaseHadir >= 60 ? 'text-amber-600' : 'text-rose-600'}`}>
                     {summary.persentaseHadir >= 80 ? 'Kehadiran Baik' : summary.persentaseHadir >= 60 ? 'Perlu Ditingkatkan' : 'Kehadiran Rendah'}
                   </span>
                   <span>100%</span>

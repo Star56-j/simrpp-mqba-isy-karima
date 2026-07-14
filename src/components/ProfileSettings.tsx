@@ -102,7 +102,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
         {/* Profile Card */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/20 dark:bg-slate-950/25 flex items-center space-x-2">
-            <User className="w-5 h-5 text-emerald-700" />
+            <User className="w-5 h-5 text-indigo-700" />
             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">Informasi Pribadi</h3>
           </div>
 
@@ -114,7 +114,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
               </div>
             )}
             {successProfile && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+              <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                 <CheckCircle className="w-4 h-4" />
                 <span>{successProfile}</span>
               </div>
@@ -130,7 +130,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
                   placeholder="Masukkan nama lengkap Anda"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -145,7 +145,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
                   placeholder="nama@isykarima.id"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
                 <button
                   type="submit"
                   disabled={savingProfile || !isProfileDirty}
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition"
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition"
                 >
                   {savingProfile ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
@@ -176,7 +176,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
         {/* Password Security Card */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/20 dark:bg-slate-950/25 flex items-center space-x-2">
-            <KeyRound className="w-5 h-5 text-emerald-700" />
+            <KeyRound className="w-5 h-5 text-indigo-700" />
             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">Ganti Kata Sandi</h3>
           </div>
 
@@ -188,7 +188,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
               </div>
             )}
             {successPass && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+              <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                 <CheckCircle className="w-4 h-4" />
                 <span>{successPass}</span>
               </div>
@@ -203,7 +203,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
                   placeholder="Masukkan kata sandi lama Anda"
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <button
                   type="button"
@@ -224,7 +224,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
                   placeholder="Min. 6 karakter rahasia"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <button
                   type="button"
@@ -245,7 +245,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
                   placeholder="Ketik ulang kata sandi baru"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <button
                   type="button"
@@ -260,7 +260,7 @@ export default function ProfileSettings({ onRefresh }: ProfileSettingsProps) {
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition"
+                className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition"
               >
                 Ganti Kata Sandi
               </button>

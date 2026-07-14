@@ -165,7 +165,7 @@ export default function App() {
     if (loading && teachers.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-          <div className="w-12 h-12 rounded-full border-4 border-emerald-100 border-t-emerald-700 animate-spin" />
+          <div className="w-12 h-12 rounded-full border-4 border-indigo-100 border-t-indigo-700 animate-spin" />
           <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Menghubungkan ke pangkalan data MQBA...</p>
         </div>
       );
@@ -303,7 +303,7 @@ export default function App() {
             <h2 className="text-slate-800 dark:text-slate-100 font-extrabold text-sm lg:text-base tracking-tight truncate">
               {getViewTitle()}
             </h2>
-            <span className="hidden sm:inline-block px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold rounded uppercase border border-emerald-100/50 dark:border-emerald-900/30">
+            <span className="hidden sm:inline-block px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 text-[10px] font-bold rounded uppercase border border-indigo-100/50 dark:border-indigo-900/30">
               Semester Ganjil 2026/2027
             </span>
           </div>
@@ -312,7 +312,7 @@ export default function App() {
             {/* Quick Status */}
             <div className="hidden md:flex items-center space-x-2 text-[11px] font-medium text-slate-400 dark:text-slate-500">
               <span className="flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
                 <span>Active Node</span>
               </span>
               <span>•</span>
@@ -366,7 +366,7 @@ export default function App() {
                     <div className="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800">
                       <button
                         onClick={() => { setView(user?.role === 'Admin' ? 'manage-rpps' : 'my-rpps'); setShowNotif(false); }}
-                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline w-full text-center"
+                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline w-full text-center"
                       >
                         Lihat semua RPP →
                       </button>
@@ -382,7 +382,7 @@ export default function App() {
             {user.role === 'Guru' ? (
               <button 
                 onClick={() => setView('my-rpps')}
-                className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Buat RPP Baru</span>
@@ -391,7 +391,7 @@ export default function App() {
             ) : (
               <button 
                 onClick={() => setView('master-teachers')}
-                className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Tambah Guru</span>
@@ -411,8 +411,8 @@ export default function App() {
           <div className="truncate">© 2026 Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima. All rights reserved.</div>
           <div className="flex items-center space-x-4 uppercase tracking-wider font-extrabold">
             <span>v1.0.4 - React Node</span>
-            <span className="text-emerald-500 dark:text-emerald-400 flex items-center space-x-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-indigo-500 dark:text-indigo-400 flex items-center space-x-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
               <span>Online</span>
             </span>
           </div>

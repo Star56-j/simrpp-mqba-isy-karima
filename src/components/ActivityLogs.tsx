@@ -46,7 +46,7 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
           onClick={onRefresh}
           className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition self-start sm:self-auto"
         >
-          <RefreshCw className="w-4 h-4 text-emerald-600" />
+          <RefreshCw className="w-4 h-4 text-indigo-600" />
           <span>Segarkan Log</span>
         </button>
       </div>
@@ -60,7 +60,7 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
             placeholder="Cari kata kunci, nama pengguna, atau deskripsi aktivitas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
@@ -96,7 +96,7 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
               >
                 <div className="flex items-start space-x-4 min-w-0">
                   <div className={`p-2 rounded-xl flex-shrink-0
-                    ${log.userRole === 'Admin' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/25 dark:text-amber-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/25 dark:text-emerald-400'}
+                    ${log.userRole === 'Admin' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/25 dark:text-amber-400' : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/25 dark:text-indigo-400'}
                   `}>
                     <User className="w-4.5 h-4.5" />
                   </div>
@@ -104,7 +104,7 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
                     <div className="flex items-center flex-wrap gap-2">
                       <span className="font-extrabold text-xs text-slate-800 dark:text-slate-100">{log.userName}</span>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider
-                        ${log.userRole === 'Admin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}
+                        ${log.userRole === 'Admin' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'}
                       `}>
                         {log.userRole}
                       </span>

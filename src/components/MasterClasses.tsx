@@ -165,12 +165,12 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/20 dark:bg-slate-950/25 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Layers className="w-5 h-5 text-emerald-700" />
+              <Layers className="w-5 h-5 text-indigo-700" />
               <h3 className="font-bold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">Daftar Kelas</h3>
             </div>
             <button
               onClick={openAddClassModal}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-[10px] uppercase tracking-wider transition"
+              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold text-[10px] uppercase tracking-wider transition"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Tambah Kelas</span>
@@ -197,7 +197,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
                       </td>
                       <td className="p-4">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border
-                          ${cls.level === 'I\'dad' ? 'bg-emerald-50 border-emerald-100 text-emerald-800 dark:bg-emerald-950/20 dark:border-emerald-900/35 dark:text-emerald-400' : 'bg-teal-50 border-teal-100 text-teal-800 dark:bg-teal-950/20 dark:border-teal-900/35 dark:text-teal-400'}
+                          ${cls.level === 'I\'dad' ? 'bg-indigo-50 border-indigo-100 text-indigo-800 dark:bg-indigo-950/20 dark:border-indigo-900/35 dark:text-indigo-400' : 'bg-teal-50 border-teal-100 text-teal-800 dark:bg-teal-950/20 dark:border-teal-900/35 dark:text-teal-400'}
                         `}>
                           {cls.level}
                         </span>
@@ -236,12 +236,12 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/20 dark:bg-slate-950/25 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <CalendarDays className="w-5 h-5 text-emerald-700" />
+              <CalendarDays className="w-5 h-5 text-indigo-700" />
               <h3 className="font-bold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">Tahun Ajaran</h3>
             </div>
             <button
               onClick={openAddAyModal}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-[10px] uppercase tracking-wider transition"
+              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold text-[10px] uppercase tracking-wider transition"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Tambah TA</span>
@@ -300,14 +300,14 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
       {isClassModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-up">
-            <div className="bg-emerald-800 px-6 py-4 flex items-center justify-between text-white">
+            <div className="bg-indigo-800 px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center space-x-2">
-                <GraduationCap className="w-5 h-5 text-emerald-200" />
+                <GraduationCap className="w-5 h-5 text-indigo-200" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wider">
                   {selectedClass ? 'Edit Informasi Kelas' : 'Tambah Kelas Baru'}
                 </h3>
               </div>
-              <button onClick={() => setIsClassModalOpen(false)} className="p-1 rounded-lg hover:bg-emerald-700/85 transition">
+              <button onClick={() => setIsClassModalOpen(false)} className="p-1 rounded-lg hover:bg-indigo-700/85 transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -321,7 +321,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
               )}
 
               {successMessage && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{successMessage}</span>
                 </div>
@@ -335,7 +335,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
                   placeholder="Contoh: PA / PI / 1 PA / 2 PI"
                   value={className}
                   onChange={(e) => setClassName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -345,7 +345,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
                   required
                   value={classLevel}
                   onChange={(e) => setClassLevel(e.target.value as 'I\'dad' | 'Wustho')}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="I'dad">I'dad</option>
                   <option value="Wustho">Wustho</option>
@@ -362,7 +362,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
                 >
                   {selectedClass ? 'Simpan Perubahan' : 'Simpan Kelas'}
                 </button>
@@ -376,14 +376,14 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
       {isAyModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-up">
-            <div className="bg-emerald-800 px-6 py-4 flex items-center justify-between text-white">
+            <div className="bg-indigo-800 px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center space-x-2">
-                <CalendarDays className="w-5 h-5 text-emerald-200" />
+                <CalendarDays className="w-5 h-5 text-indigo-200" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wider">
                   {selectedAy ? 'Edit Tahun Ajaran' : 'Tambah Tahun Ajaran'}
                 </h3>
               </div>
-              <button onClick={() => setIsAyModalOpen(false)} className="p-1 rounded-lg hover:bg-emerald-700/85 transition">
+              <button onClick={() => setIsAyModalOpen(false)} className="p-1 rounded-lg hover:bg-indigo-700/85 transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -397,7 +397,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
               )}
 
               {successMessage && (
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs">
+                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{successMessage}</span>
                 </div>
@@ -411,7 +411,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
                   placeholder="Contoh: 2026 / 2027"
                   value={ayName}
                   onChange={(e) => setAyName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
                 />
               </div>
 
@@ -425,7 +425,7 @@ export default function MasterClasses({ classes, academicYears, onRefresh }: Mas
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
                 >
                   {selectedAy ? 'Simpan Perubahan' : 'Simpan TA'}
                 </button>

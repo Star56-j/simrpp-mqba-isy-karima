@@ -212,7 +212,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
   const ganjilItems = syllabusItems.filter(s => s.semester === 'Ganjil').map(s => ({ ...s, _idx: syllabusItems.indexOf(s) }));
   const genapItems  = syllabusItems.filter(s => s.semester === 'Genap').map(s => ({ ...s, _idx: syllabusItems.indexOf(s) }));
 
-  const inputCls = "w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500";
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500";
   const labelCls = "text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1";
   const sectionCls = "space-y-4 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30";
 
@@ -226,11 +226,11 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
         </div>
         <div className="flex items-center space-x-1 border border-slate-100 dark:border-slate-800 p-1 bg-slate-50 dark:bg-slate-950/20 rounded-xl">
           <button onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition ${activeTab === 'history' ? 'bg-emerald-700 text-white' : 'text-slate-500 hover:text-slate-800'}`}>
+            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition ${activeTab === 'history' ? 'bg-indigo-700 text-white' : 'text-slate-500 hover:text-slate-800'}`}>
             Riwayat RPP
           </button>
           <button onClick={() => { resetForm(); setActiveTab('create'); }}
-            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition ${activeTab === 'create' ? 'bg-emerald-700 text-white' : 'text-slate-500 hover:text-slate-800'}`}>
+            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition ${activeTab === 'create' ? 'bg-indigo-700 text-white' : 'text-slate-500 hover:text-slate-800'}`}>
             Buat RPP Baru
           </button>
         </div>
@@ -244,7 +244,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input type="text" placeholder="Cari mata pelajaran, kelas, atau tahun ajaran..."
                 value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
               className="bg-slate-50 dark:bg-slate-950/25 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
@@ -269,8 +269,8 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                   ${rpp.status === 'Revisi' ? 'border-rose-200 dark:border-rose-900/40' : 'border-slate-100 dark:border-slate-800'}`}>
                   <div className="p-5 flex items-center justify-between gap-3 flex-wrap">
                     <div className="flex items-center space-x-4 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center flex-shrink-0">
-                        <BookOpen className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-5 h-5 text-indigo-600" />
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-extrabold text-slate-800 dark:text-slate-100 truncate">{rpp.subject?.name}</h3>
@@ -279,7 +279,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                     </div>
                     <div className="flex items-center space-x-2 flex-shrink-0">
                       <span className={`hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border
-                        ${rpp.status === 'Disetujui' ? 'bg-emerald-50 text-emerald-800 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400' :
+                        ${rpp.status === 'Disetujui' ? 'bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400' :
                           rpp.status === 'Menunggu Persetujuan' ? 'bg-amber-50 text-amber-800 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400' :
                           rpp.status === 'Revisi' ? 'bg-rose-50 text-rose-800 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400' :
                           'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400'}`}>
@@ -304,7 +304,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                   )}
                   {expandedRppId === rpp.id && (
                     <div className="border-t border-slate-100 dark:border-slate-800 p-5 space-y-4 text-xs text-slate-600 dark:text-slate-400">
-                      {rpp.capaiPembelajaran && <div><p className="font-bold text-emerald-700 dark:text-emerald-400 mb-1">Capaian Pembelajaran</p><p className="whitespace-pre-wrap">{rpp.capaiPembelajaran}</p></div>}
+                      {rpp.capaiPembelajaran && <div><p className="font-bold text-indigo-700 dark:text-indigo-400 mb-1">Capaian Pembelajaran</p><p className="whitespace-pre-wrap">{rpp.capaiPembelajaran}</p></div>}
                       {rpp.tujuanPembelajaran && <div><p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Tujuan Pembelajaran</p><p className="whitespace-pre-wrap">{rpp.tujuanPembelajaran}</p></div>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20">
@@ -334,9 +334,9 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
               {STEPS.map((step, i) => (
                 <button key={step.id} onClick={() => setCurrentStep(step.id)} type="button"
                   className={`flex flex-col items-center px-3 py-2 rounded-xl transition flex-shrink-0 min-w-[80px]
-                    ${currentStep === step.id ? 'bg-emerald-700 text-white' : currentStep > step.id ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                    ${currentStep === step.id ? 'bg-indigo-700 text-white' : currentStep > step.id ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                   <span className={`text-[10px] font-extrabold uppercase tracking-wider ${currentStep === step.id ? 'text-white' : ''}`}>{step.label}</span>
-                  <span className={`text-[9px] mt-0.5 hidden sm:block ${currentStep === step.id ? 'text-emerald-100' : 'text-slate-400'}`}>{step.desc}</span>
+                  <span className={`text-[9px] mt-0.5 hidden sm:block ${currentStep === step.id ? 'text-indigo-100' : 'text-slate-400'}`}>{step.desc}</span>
                 </button>
               ))}
             </div>
@@ -350,14 +350,14 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                 {STEPS[currentStep - 1].label} — {STEPS[currentStep - 1].desc}
               </h3>
               <div className="text-[10px] text-slate-400">
-                {isAutosaving ? <span className="text-emerald-600 font-bold flex items-center gap-1"><CloudLightning className="w-3 h-3 animate-bounce"/>Menyimpan...</span>
-                  : lastAutosave ? <span className="text-emerald-500 italic">Draft tersimpan ({lastAutosave})</span>
+                {isAutosaving ? <span className="text-indigo-600 font-bold flex items-center gap-1"><CloudLightning className="w-3 h-3 animate-bounce"/>Menyimpan...</span>
+                  : lastAutosave ? <span className="text-indigo-500 italic">Draft tersimpan ({lastAutosave})</span>
                   : <span>Auto-save aktif</span>}
               </div>
             </div>
 
             {errorMessage && <div className="p-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 flex items-center space-x-2 text-xs"><AlertCircle className="w-4 h-4"/><span>{errorMessage}</span></div>}
-            {successMessage && <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs"><CheckCircle className="w-4 h-4"/><span>{successMessage}</span></div>}
+            {successMessage && <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs"><CheckCircle className="w-4 h-4"/><span>{successMessage}</span></div>}
 
             {/* STEP 1: Identitas */}
             {currentStep === 1 && (
@@ -399,7 +399,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
             {currentStep === 2 && (
               <div className="space-y-4">
                 <div className={sectionCls}>
-                  <div className="flex items-center space-x-2 mb-1"><span className="w-6 h-6 rounded-full bg-emerald-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">CP</span><label className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Capaian Pembelajaran</label></div>
+                  <div className="flex items-center space-x-2 mb-1"><span className="w-6 h-6 rounded-full bg-indigo-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">CP</span><label className="text-xs font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">Capaian Pembelajaran</label></div>
                   <p className="text-[11px] text-slate-400 mb-2">Deskripsikan kompetensi yang harus dicapai peserta didik di akhir fase/tahun ini.</p>
                   <textarea rows={4} value={capaiPembelajaran} onChange={e => setCapaiPembelajaran(e.target.value)}
                     placeholder="Pada akhir fase ini, peserta didik mampu..." className={inputCls} />
@@ -460,7 +460,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                     placeholder="1. Salam dan doa bersama...\n2. Apersepsi materi sebelumnya...\n3. Penyampaian tujuan hari ini..." className={inputCls}/>
                 </div>
                 <div className={sectionCls}>
-                  <label className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block mb-1">Kegiatan Inti</label>
+                  <label className="text-xs font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block mb-1">Kegiatan Inti</label>
                   <p className="text-[11px] text-slate-400 mb-2">Eksplorasi, kolaborasi, elaborasi, dan refleksi pembelajaran.</p>
                   <textarea rows={5} value={kegiatanInti} onChange={e => setKegiatanInti(e.target.value)}
                     placeholder="1. Eksplorasi: Guru menyampaikan...\n2. Kolaborasi: Santri berdiskusi...\n3. Elaborasi: Santri mempresentasikan...\n4. Refleksi: Guru dan santri menyimpulkan..." className={inputCls}/>
@@ -503,7 +503,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                       placeholder="Observasi keaktifan, tanya jawab, kuis singkat, setoran per pertemuan..." className={inputCls}/>
                   </div>
                   <div className={sectionCls}>
-                    <label className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block mb-1">Asesmen Sumatif</label>
+                    <label className="text-xs font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block mb-1">Asesmen Sumatif</label>
                     <p className="text-[11px] text-slate-400 mb-2">Penilaian akhir untuk mengukur ketercapaian tujuan.</p>
                     <textarea rows={3} value={asesmenSumatif} onChange={e => setAsesmenSumatif(e.target.value)}
                       placeholder="Ujian akhir semester: lisan, tertulis, atau portofolio..." className={inputCls}/>
@@ -546,29 +546,29 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                       <span className="w-6 text-center text-xs font-mono font-bold text-slate-400">{item.meetingNo}</span>
                       <input type="text" placeholder={`Topik pertemuan ${item.meetingNo}...`}
                         value={item.topic} onChange={e => updateSyllabusItem(item._idx, 'topic', e.target.value)}
-                        className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400"/>
+                        className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
                       <input type="date" value={item.date || ''} onChange={e => updateSyllabusItem(item._idx, 'date', e.target.value)}
-                        className="w-32 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-400"/>
+                        className="w-32 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
                       <button onClick={() => removeSyllabusItem(item._idx)} type="button"
                         className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-50 transition"><Trash2 className="w-3.5 h-3.5"/></button>
                     </div>
                   ))}
                   <button onClick={() => addSyllabusItem(syllabusTab)} type="button"
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-dashed border-emerald-300 text-emerald-600 text-xs font-bold hover:bg-emerald-50 transition">
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-dashed border-indigo-300 text-indigo-600 text-xs font-bold hover:bg-indigo-50 transition">
                     <PlusCircle className="w-3.5 h-3.5"/><span>Tambah Pertemuan {syllabusTab}</span>
                   </button>
                 </div>
                 <div className="space-y-2">
                   <label className={labelCls}>Lampiran Pendukung (PDF/Gambar, maks. 5MB)</label>
-                  <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 text-center bg-slate-50/25 hover:border-emerald-400 transition cursor-pointer relative">
+                  <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 text-center bg-slate-50/25 hover:border-indigo-400 transition cursor-pointer relative">
                     <input type="file" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" disabled={uploading}/>
                     <Upload className="w-7 h-7 text-slate-400 mx-auto mb-1"/>
                     <p className="text-xs text-slate-500">Drag & drop atau klik untuk upload</p>
                   </div>
-                  {uploading && <p className="text-xs text-emerald-600 font-bold animate-pulse flex items-center gap-1"><CloudLightning className="w-3.5 h-3.5"/>Mengunggah...</p>}
+                  {uploading && <p className="text-xs text-indigo-600 font-bold animate-pulse flex items-center gap-1"><CloudLightning className="w-3.5 h-3.5"/>Mengunggah...</p>}
                   {attachmentUrl && (
                     <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                      <div className="flex items-center space-x-2"><FileText className="w-4 h-4 text-emerald-600"/><span className="font-semibold truncate max-w-[200px]">{attachmentName}</span></div>
+                      <div className="flex items-center space-x-2"><FileText className="w-4 h-4 text-indigo-600"/><span className="font-semibold truncate max-w-[200px]">{attachmentName}</span></div>
                       <button onClick={() => { setAttachmentUrl(''); setAttachmentName(''); }} className="p-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 transition"><X className="w-3.5 h-3.5"/></button>
                     </div>
                   )}
@@ -593,12 +593,12 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                 </button>
                 {currentStep < STEPS.length ? (
                   <button type="button" onClick={() => setCurrentStep(s => s + 1)}
-                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition">
+                    className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition">
                     Lanjut →
                   </button>
                 ) : (
                   <button type="button" onClick={() => handleSaveRPP('Menunggu Persetujuan')} disabled={isAutosaving}
-                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 disabled:opacity-50">
+                    className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 disabled:opacity-50">
                     <Send className="w-4 h-4"/><span>Kirim RPP</span>
                   </button>
                 )}

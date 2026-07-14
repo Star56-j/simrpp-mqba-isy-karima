@@ -42,7 +42,7 @@ export default function GuruDashboard({
           Dashboard Pengajar
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-          Ahlan wa sahlan, Ust. / Usth. <strong className="text-emerald-800 dark:text-emerald-400">{myUser.name}</strong>. Kelola dan susun rencana pembelajaran (RPP) harian Anda dengan mudah.
+          Ahlan wa sahlan, Ust. / Usth. <strong className="text-indigo-800 dark:text-indigo-400">{myUser.name}</strong>. Kelola dan susun rencana pembelajaran (RPP) harian Anda dengan mudah.
         </p>
       </div>
 
@@ -71,10 +71,10 @@ export default function GuruDashboard({
             label: 'Disetujui', 
             val: stats.rpp.approved, 
             icon: CheckCircle, 
-            color: 'bg-emerald-600',
-            bg: 'bg-emerald-50/40 dark:bg-emerald-950/20',
-            border: 'border-emerald-100/50 dark:border-emerald-900/30',
-            textColor: 'text-emerald-700 dark:text-emerald-400'
+            color: 'bg-indigo-600',
+            bg: 'bg-indigo-50/40 dark:bg-indigo-950/20',
+            border: 'border-indigo-100/50 dark:border-indigo-900/30',
+            textColor: 'text-indigo-700 dark:text-indigo-400'
           },
           { 
             label: 'Perlu Revisi', 
@@ -89,10 +89,10 @@ export default function GuruDashboard({
             label: 'Total RPP Saya', 
             val: stats.rpp.total, 
             icon: FileText, 
-            color: 'bg-emerald-800',
-            bg: 'bg-emerald-900/10 dark:bg-emerald-950/20',
-            border: 'border-emerald-800/20 dark:border-emerald-900/30',
-            textColor: 'text-emerald-800 dark:text-emerald-400'
+            color: 'bg-indigo-800',
+            bg: 'bg-indigo-900/10 dark:bg-indigo-950/20',
+            border: 'border-indigo-800/20 dark:border-indigo-900/30',
+            textColor: 'text-indigo-800 dark:text-indigo-400'
           },
         ].map((item, idx) => (
           <div 
@@ -170,11 +170,11 @@ export default function GuruDashboard({
               return (
                 <div 
                   key={sch.id}
-                  className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/30 flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-700 transition"
+                  className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/30 flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-700 transition"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 uppercase tracking-wide">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-50 dark:bg-indigo-950/30 text-indigo-800 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 uppercase tracking-wide">
                         {sch.day}
                       </span>
                       <span className="text-[11px] font-semibold text-slate-400">{sch.time}</span>
@@ -187,12 +187,12 @@ export default function GuruDashboard({
                   </div>
 
                   <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className={`text-[10px] font-bold uppercase ${hasRpp ? 'text-emerald-600' : 'text-amber-500'}`}>
+                    <span className={`text-[10px] font-bold uppercase ${hasRpp ? 'text-indigo-600' : 'text-amber-500'}`}>
                       {hasRpp ? '● RPP Terbuat' : '○ Belum Ada RPP'}
                     </span>
                     <button
                       onClick={() => onPrepareCreateRPP(sch)}
-                      className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold uppercase tracking-wider shadow-xs transition"
+                      className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-wider shadow-xs transition"
                     >
                       <PlusCircle className="w-3.5 h-3.5" />
                       <span>Buat RPP</span>

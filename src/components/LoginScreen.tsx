@@ -52,27 +52,27 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 font-sans selection:bg-emerald-700 selection:text-white">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 font-sans selection:bg-indigo-700 selection:text-white">
       {/* Background Graphic Accents */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[40%] -right-[30%] w-[80%] h-[80%] bg-emerald-800/10 dark:bg-emerald-800/5 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-[30%] -left-[20%] w-[60%] h-[60%] bg-emerald-900/10 dark:bg-emerald-900/5 rounded-full blur-[100px]" />
+        <div className="absolute -top-[40%] -right-[30%] w-[80%] h-[80%] bg-indigo-800/10 dark:bg-indigo-800/5 rounded-full blur-[120px]" />
+        <div className="absolute -bottom-[30%] -left-[20%] w-[60%] h-[60%] bg-indigo-900/10 dark:bg-indigo-900/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="w-full max-w-md space-y-6 relative z-10">
         {/* Main Logo Card */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800/80 shadow-2xl overflow-hidden">
-          {/* Emerald Brand Header */}
-          <div className="bg-emerald-900 px-8 py-10 text-white relative overflow-hidden text-center">
+          {/* indigo Brand Header */}
+          <div className="bg-indigo-900 px-8 py-10 text-white relative overflow-hidden text-center">
             {/* Geometric Subtle Pattern */}
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
             
-            <div className="inline-flex p-3 rounded-2xl bg-emerald-800/75 border border-emerald-700/60 shadow-inner mb-4">
-              <BookOpen className="w-7 h-7 text-emerald-300" />
+            <div className="inline-flex p-3 rounded-2xl bg-indigo-800/75 border border-indigo-700/60 shadow-inner mb-4">
+              <BookOpen className="w-7 h-7 text-indigo-300" />
             </div>
 
             <h2 className="text-xl font-black tracking-tight uppercase">SIMRPP MQBA</h2>
-            <p className="text-emerald-300/90 text-xs font-bold uppercase tracking-widest mt-1">
+            <p className="text-indigo-300/90 text-xs font-bold uppercase tracking-widest mt-1">
               Isy Karima Karanganyar
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   placeholder="pengajar@isykarima.id"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition flex items-center justify-center space-x-1.5 disabled:bg-emerald-800/50"
+              className="w-full py-3 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition flex items-center justify-center space-x-1.5 disabled:bg-indigo-800/50"
             >
               <span>{loading ? 'Menghubungkan...' : 'Masuk ke Sistem'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -155,9 +155,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               <button
                 type="button"
                 onClick={() => handleDemoLogin('ustadz.malik@isykarima.id', 'guru123')}
-                className="p-3 text-left border border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-950/10 rounded-xl transition cursor-pointer"
+                className="p-3 text-left border border-indigo-200 bg-indigo-50/30 hover:bg-indigo-50 dark:border-indigo-900/40 dark:bg-indigo-950/10 rounded-xl transition cursor-pointer"
               >
-                <span className="block font-black text-emerald-800 dark:text-emerald-400 text-[11px]">Role Guru</span>
+                <span className="block font-black text-indigo-800 dark:text-indigo-400 text-[11px]">Role Guru</span>
                 <span className="text-[10px] text-slate-400 mt-0.5 block truncate">ustadz.malik@isykarima.id</span>
               </button>
             </div>

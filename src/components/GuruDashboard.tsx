@@ -25,7 +25,6 @@ export default function GuruDashboard({
   schedules, 
   rpps, 
   onNavigate,
-  onPrepareCreateRPP 
 }: GuruDashboardProps) {
   // Get schedules for current teacher
   const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
@@ -213,7 +212,7 @@ export default function GuruDashboard({
                       {hasRpp ? '● RPP Terbuat' : '○ Belum Ada RPP'}
                     </span>
                     <button
-                      onClick={() => onPrepareCreateRPP(sch)}
+                      onClick={() => onNavigate('my-rpps')}
                       className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-wider shadow-xs transition"
                     >
                       <PlusCircle className="w-3.5 h-3.5" />

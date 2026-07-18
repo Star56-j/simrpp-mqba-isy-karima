@@ -15,6 +15,18 @@
   }
 }
 
+/* Motif kawung bergaya batik Solo untuk halaman login */
+.login-batik-pattern {
+  background-color: transparent;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, transparent 38%, rgba(111, 47, 34, 0.2) 40%, rgba(111, 47, 34, 0.2) 43%, transparent 45%),
+    radial-gradient(ellipse at 50% 100%, transparent 38%, rgba(111, 47, 34, 0.2) 40%, rgba(111, 47, 34, 0.2) 43%, transparent 45%),
+    radial-gradient(ellipse at 0% 50%, transparent 38%, rgba(53, 32, 79, 0.16) 40%, rgba(53, 32, 79, 0.16) 43%, transparent 45%),
+    radial-gradient(ellipse at 100% 50%, transparent 38%, rgba(53, 32, 79, 0.16) 40%, rgba(53, 32, 79, 0.16) 43%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(184, 138, 68, 0.35) 0 3%, transparent 4%);
+  background-size: 72px 72px;
+}
+
 /* Sidebar scrollbar — sesuaikan warna dengan background indigo-900 */
 aside ::-webkit-scrollbar {
   width: 4px;

@@ -149,6 +149,28 @@ export interface WaliKelas {
   updatedAt: string;
 }
 
+export interface Santri {
+  id: string;
+  nis: string;
+  name: string;
+  classId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Nilai {
+  id: string;
+  santriId: string;
+  subjectId: string;
+  academicYearId: string;
+  semesterId: string;
+  teacherId: string;
+  score: number;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface DatabaseSchema {
   users: User[];
   teachers: Teacher[];
@@ -161,6 +183,8 @@ export interface DatabaseSchema {
   attendances: Attendance[];
   santriAttendances: SantriAttendance[];
   waliKelas: WaliKelas[];
+  santri: Santri[];
+  nilai: Nilai[];
   activityLogs: ActivityLog[];
 }
 
@@ -211,6 +235,16 @@ export function getDatabase(): DatabaseSchema {
     // Migrate: tambah waliKelas jika belum ada
     if (!parsed.waliKelas) {
       parsed.waliKelas = [];
+      saveDatabase(parsed);
+    }
+    // Migrate: tambah santri jika belum ada
+    if (!parsed.santri) {
+      parsed.santri = [];
+      saveDatabase(parsed);
+    }
+    // Migrate: tambah nilai jika belum ada
+    if (!parsed.nilai) {
+      parsed.nilai = [];
       saveDatabase(parsed);
     }
     return parsed;

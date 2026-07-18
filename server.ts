@@ -18,6 +18,8 @@ import {
   Attendance,
   SantriAttendance,
   WaliKelas,
+  Santri,
+  Nilai,
   ActivityLog
 } from './src/server/db.ts';
 
@@ -101,6 +103,37 @@ app.post('/api/auth/login', (req, res) => {
       teacherId: user.teacherId,
       teacher: teacher
     }
+  });
+});
+
+app.post('/api/auth/wali-login', (req, res) => {
+  const { nis } = req.body;
+  if (!nis) {
+    res.status(400).json({ error: 'NIS wajib diisi' });
+    return;
+  }
+  const db = getDatabase();
+  const santri = db.santri.find(s => s.nis === nis);
+
+  if (!santri) {
+    res.status(404).json({ error: 'NIS tidak ditemukan' });
+    return;
+  }
+
+  // Set mock user for wali santri
+  const user: User = {
+    id: `wali-${santri.id}`,
+    name: `Wali dari ${santri.name}`,
+    email: '',
+    role: 'WaliSantri',
+    santriId: santri.id
+  };
+
+  logActivity(user.id, user.name, user.role, 'Login', `Berhasil melakukan login sebagai Wali Santri (NIS: ${santri.nis}).`);
+
+  res.json({
+    token: user.id, // Simplistic mock token
+    user: user
   });
 });
 
@@ -1499,6 +1532,221 @@ app.delete('/api/wali-kelas/:id', requireAuth('Admin'), (req, res) => {
   res.json({ message: 'Penugasan wali kelas berhasil dihapus' });
 });
 
+
+// 13. Santri API
+app.get('/api/santri', requireAuth(), (req, res) => {
+  const db = getDatabase();
+  const { classId } = req.query as Record<string, string>;
+  let list = db.santri || [];
+  if (classId) list = list.filter(s => s.classId === classId);
+  
+  // Decorate with class
+  const decorated = list.map(s => ({
+    ...s,
+    class: db.classes.find(c => c.id === s.classId)
+  }));
+  res.json(decorated);
+});
+
+app.post('/api/santri', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const { nis, name, classId } = req.body;
+
+  if (!nis || !name || !classId) {
+    res.status(400).json({ error: 'NIS, Nama, dan Kelas wajib diisi' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.santri) db.santri = [];
+
+  if (db.santri.find(s => s.nis === nis)) {
+    res.status(400).json({ error: 'NIS sudah terdaftar' });
+    return;
+  }
+
+  const cls = db.classes.find(c => c.id === classId);
+  if (!cls) {
+    res.status(404).json({ error: 'Kelas tidak ditemukan' });
+    return;
+  }
+
+  const newSantri: Santri = {
+    id: `santri-${Date.now()}`,
+    nis, name, classId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  db.santri.push(newSantri);
+  saveDatabase(db);
+  logActivity(admin.id, admin.name, 'Admin', 'Tambah Santri', `Menambahkan santri baru: ${name} (NIS: ${nis}) di Kelas ${cls.name}`);
+  res.status(201).json(newSantri);
+});
+
+app.put('/api/santri/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.santri) db.santri = [];
+
+  const santri = db.santri.find(s => s.id === req.params.id);
+  if (!santri) { res.status(404).json({ error: 'Santri tidak ditemukan' }); return; }
+
+  const { nis, name, classId } = req.body;
+  if (nis && nis !== santri.nis && db.santri.find(s => s.id !== santri.id && s.nis === nis)) {
+    res.status(400).json({ error: 'NIS sudah terdaftar untuk santri lain' });
+    return;
+  }
+
+  if (nis) santri.nis = nis;
+  if (name) santri.name = name;
+  if (classId) santri.classId = classId;
+  santri.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  logActivity(admin.id, admin.name, 'Admin', 'Edit Santri', `Mengubah data santri: ${santri.name} (NIS: ${santri.nis})`);
+  res.json(santri);
+});
+
+app.delete('/api/santri/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.santri) db.santri = [];
+
+  const idx = db.santri.findIndex(s => s.id === req.params.id);
+  if (idx === -1) { res.status(404).json({ error: 'Santri tidak ditemukan' }); return; }
+
+  const santri = db.santri[idx];
+  db.santri.splice(idx, 1);
+  // Optional: delete related nilai? (keep it simple for now, or just let them be orphaned, or delete them)
+  if (db.nilai) {
+    db.nilai = db.nilai.filter(n => n.santriId !== santri.id);
+  }
+
+  saveDatabase(db);
+  logActivity(admin.id, admin.name, 'Admin', 'Hapus Santri', `Menghapus santri: ${santri.name} (NIS: ${santri.nis})`);
+  res.json({ message: 'Santri berhasil dihapus' });
+});
+
+
+// 14. Nilai API
+app.get('/api/nilai', requireAuth(), (req, res) => {
+  const db = getDatabase();
+  const { santriId, classId, subjectId, academicYearId, semesterId, teacherId } = req.query as Record<string, string>;
+  let list = db.nilai || [];
+
+  if (santriId) list = list.filter(n => n.santriId === santriId);
+  if (subjectId) list = list.filter(n => n.subjectId === subjectId);
+  if (academicYearId) list = list.filter(n => n.academicYearId === academicYearId);
+  if (semesterId) list = list.filter(n => n.semesterId === semesterId);
+  if (teacherId) list = list.filter(n => n.teacherId === teacherId);
+
+  // Filter by classId via santri's class
+  if (classId) {
+    const santriIdsInClass = (db.santri || []).filter(s => s.classId === classId).map(s => s.id);
+    list = list.filter(n => santriIdsInClass.includes(n.santriId));
+  }
+
+  const decorated = list.map(n => ({
+    ...n,
+    santri: db.santri.find(s => s.id === n.santriId),
+    subject: db.subjects.find(sub => sub.id === n.subjectId),
+    academicYear: db.academicYears.find(ay => ay.id === n.academicYearId),
+    semester: db.semesters.find(sem => sem.id === n.semesterId),
+    teacher: db.teachers.find(t => t.id === n.teacherId)
+  }));
+  res.json(decorated);
+});
+
+app.post('/api/nilai', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const { santriId, subjectId, academicYearId, semesterId, score, notes } = req.body;
+
+  if (!santriId || !subjectId || !academicYearId || !semesterId || score === undefined) {
+    res.status(400).json({ error: 'Data nilai tidak lengkap' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.nilai) db.nilai = [];
+
+  const santri = db.santri.find(s => s.id === santriId);
+  const subject = db.subjects.find(s => s.id === subjectId);
+  if (!santri || !subject) {
+    res.status(404).json({ error: 'Santri atau Mata Pelajaran tidak ditemukan' });
+    return;
+  }
+
+  // Check if nilai already exists for this santri, subject, AY, semester
+  let nilai = db.nilai.find(n => n.santriId === santriId && n.subjectId === subjectId && n.academicYearId === academicYearId && n.semesterId === semesterId);
+
+  if (nilai) {
+    // Update
+    nilai.score = Number(score);
+    nilai.notes = notes || '';
+    nilai.teacherId = user.teacherId || user.id;
+    nilai.updatedAt = new Date().toISOString();
+    logActivity(user.id, user.name, user.role, 'Update Nilai', `Mengubah nilai ${subject.name} untuk ${santri.name}`);
+  } else {
+    // Create
+    nilai = {
+      id: `nilai-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+      santriId, subjectId, academicYearId, semesterId,
+      teacherId: user.teacherId || user.id,
+      score: Number(score),
+      notes: notes || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    db.nilai.push(nilai);
+    logActivity(user.id, user.name, user.role, 'Input Nilai', `Menginput nilai ${subject.name} untuk ${santri.name}`);
+  }
+
+  saveDatabase(db);
+  res.status(201).json(nilai);
+});
+
+app.put('/api/nilai/:id', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.nilai) db.nilai = [];
+
+  const nilai = db.nilai.find(n => n.id === req.params.id);
+  if (!nilai) { res.status(404).json({ error: 'Nilai tidak ditemukan' }); return; }
+
+  const { score, notes } = req.body;
+  if (score !== undefined) nilai.score = Number(score);
+  if (notes !== undefined) nilai.notes = notes;
+  nilai.teacherId = user.teacherId || user.id; // Mark last editor
+  nilai.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  
+  const santri = db.santri.find(s => s.id === nilai.santriId);
+  const subject = db.subjects.find(s => s.id === nilai.subjectId);
+  logActivity(user.id, user.name, user.role, 'Edit Nilai', `Mengubah nilai ${subject?.name} untuk ${santri?.name}`);
+  
+  res.json(nilai);
+});
+
+app.delete('/api/nilai/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.nilai) db.nilai = [];
+
+  const idx = db.nilai.findIndex(n => n.id === req.params.id);
+  if (idx === -1) { res.status(404).json({ error: 'Nilai tidak ditemukan' }); return; }
+
+  const nilai = db.nilai[idx];
+  db.nilai.splice(idx, 1);
+  saveDatabase(db);
+
+  const santri = db.santri.find(s => s.id === nilai.santriId);
+  const subject = db.subjects.find(s => s.id === nilai.subjectId);
+  logActivity(admin.id, admin.name, 'Admin', 'Hapus Nilai', `Menghapus nilai ${subject?.name} untuk ${santri?.name}`);
+  
+  res.json({ message: 'Nilai berhasil dihapus' });
+});
 
 // 11. Activity Logs API
 app.get('/api/activity-logs', requireAuth('Admin'), (req, res) => {

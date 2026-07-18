@@ -45,11 +45,13 @@ export default function Sidebar({
     { id: 'master-teachers', label: 'Data Guru', icon: Users },
     { id: 'master-subjects', label: 'Mata Pelajaran', icon: BookOpen },
     { id: 'master-classes', label: 'Data Kelas', icon: GraduationCap },
+    { id: 'master-santri', label: 'Data Santri', icon: Users2 },
     { id: 'master-schedules', label: 'Jadwal KBM', icon: Calendar },
     { id: 'manage-rpps', label: 'Persetujuan RPP', icon: FileText },
     { id: 'attendance', label: 'Absensi Guru', icon: FileSpreadsheet },
     { id: 'santri-attendance', label: 'Absensi Santri', icon: Users2 },
     { id: 'wali-kelas', label: 'Wali Kelas', icon: Crown },
+    { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
     { id: 'activity-logs', label: 'Activity Log', icon: Activity },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ] : [
@@ -57,6 +59,7 @@ export default function Sidebar({
     { id: 'my-rpps', label: 'RPP Saya', icon: FileText },
     { id: 'my-attendance', label: 'Absensi Saya', icon: FileSpreadsheet },
     { id: 'my-santri-attendance', label: 'Absensi Santri', icon: Users2 },
+    { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ];
 

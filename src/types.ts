@@ -2,8 +2,9 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'Admin' | 'Guru';
+  role: 'Admin' | 'Guru' | 'WaliSantri';
   teacherId?: string;
+  santriId?: string; // Khusus untuk wali santri
   teacher?: Teacher;
 }
 
@@ -206,6 +207,36 @@ export interface WaliKelas {
   teacher?: Teacher;
   academicYear?: AcademicYear;
   semester?: Semester;
+}
+
+export interface Santri {
+  id: string;
+  nis: string;
+  name: string;
+  classId: string;
+  createdAt: string;
+  updatedAt: string;
+  // Decorated
+  class?: SchoolClass;
+}
+
+export interface Nilai {
+  id: string;
+  santriId: string;
+  subjectId: string;
+  academicYearId: string;
+  semesterId: string;
+  teacherId: string;
+  score: number;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  // Decorated
+  santri?: Santri;
+  subject?: Subject;
+  academicYear?: AcademicYear;
+  semester?: Semester;
+  teacher?: Teacher;
 }
 
 export interface AdminStats {

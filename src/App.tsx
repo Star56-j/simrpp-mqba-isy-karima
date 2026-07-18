@@ -35,6 +35,9 @@ import AttendanceGuru from './components/AttendanceGuru';
 import AttendanceSantriAdmin from './components/AttendanceSantriAdmin';
 import AttendanceSantriGuru from './components/AttendanceSantriGuru';
 import WaliKelasPage from './components/WaliKelas';
+import MasterSantri from './components/MasterSantri';
+import NilaiSantri from './components/NilaiSantri';
+import WaliDashboard from './components/WaliDashboard';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -169,6 +172,18 @@ export default function App() {
     return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
 
+  // Khusus Wali Santri, tampilkan UI terpisah tanpa Sidebar admin/guru
+  if (user?.role === 'WaliSantri') {
+    return (
+      <WaliDashboard 
+        user={user} 
+        academicYears={academicYears} 
+        semesters={semesters} 
+        onLogout={handleLogout} 
+      />
+    );
+  }
+
   // Render view controller
   const renderContent = () => {
     if (loading && teachers.length === 0) {
@@ -292,6 +307,23 @@ export default function App() {
             classes={classes}
             academicYears={academicYears}
             semesters={semesters}
+            onRefresh={fetchData}
+          />
+        );
+
+      case 'master-santri':
+        return <MasterSantri classes={classes} onRefresh={fetchData} />;
+
+      case 'nilai-santri':
+        return (
+          <NilaiSantri
+            classes={classes}
+            academicYears={academicYears}
+            semesters={semesters}
+            subjects={subjects}
+            schedules={schedules}
+            waliKelasList={waliKelasList}
+            currentUser={user}
             onRefresh={fetchData}
           />
         );

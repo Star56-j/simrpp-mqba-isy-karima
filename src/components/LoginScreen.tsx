@@ -4,7 +4,10 @@ import {
   Mail,
   AlertCircle,
   ArrowRight,
-  Sparkles
+  ArrowRight,
+  Sparkles,
+  Users,
+  GraduationCap
 } from 'lucide-react';
 import { api } from '../api';
 
@@ -18,16 +21,24 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
+  const [loginType, setLoginType] = React.useState<'guru' | 'wali'>('guru');
+  const [nis, setNis] = React.useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const response = await api.login(email, password);
-      onLoginSuccess(response.user);
+      if (loginType === 'guru') {
+        const response = await api.login(email, password);
+        onLoginSuccess(response.user);
+      } else {
+        const response = await api.waliLogin(nis);
+        onLoginSuccess(response.user);
+      }
     } catch (err: any) {
-      setError(err.message || 'Alamat email atau kata sandi Anda salah.');
+      setError(err.message || 'Alamat email, kata sandi, atau NIS Anda salah.');
     } finally {
       setLoading(false);
     }
@@ -94,41 +105,85 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#725b4e] dark:text-[#c5b2a5]">Alamat Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9c7650]" aria-hidden="true" />
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    placeholder="pengajar@isykarima.id"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-[#d8c6a5] bg-[#fffcf5] py-3.5 pl-11 pr-4 text-xs text-[#30211b] outline-none transition placeholder:text-[#aa9a8d] focus:border-[#7a4931] focus:ring-4 focus:ring-[#b88a44]/15 dark:border-[#584437] dark:bg-[#30251f] dark:text-[#fff8e8]"
-                  />
-                </div>
+              {/* Tabs */}
+              <div className="flex rounded-xl bg-[#f0e6d2] p-1 dark:bg-[#342720]">
+                <button
+                  type="button"
+                  onClick={() => { setLoginType('guru'); setError(''); }}
+                  className={`flex-1 rounded-lg py-2.5 text-[10px] font-extrabold uppercase tracking-wider transition ${loginType === 'guru' ? 'bg-white text-[#5b3024] shadow-sm dark:bg-[#473428] dark:text-[#dfc88f]' : 'text-[#826f64] hover:text-[#5b3024] dark:text-[#9f8e83] dark:hover:text-[#dfc88f]'}`}
+                >
+                  <Users className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5" />
+                  Staf & Guru
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setLoginType('wali'); setError(''); }}
+                  className={`flex-1 rounded-lg py-2.5 text-[10px] font-extrabold uppercase tracking-wider transition ${loginType === 'wali' ? 'bg-white text-[#5b3024] shadow-sm dark:bg-[#473428] dark:text-[#dfc88f]' : 'text-[#826f64] hover:text-[#5b3024] dark:text-[#9f8e83] dark:hover:text-[#dfc88f]'}`}
+                >
+                  <GraduationCap className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5" />
+                  Wali Santri
+                </button>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#725b4e] dark:text-[#c5b2a5]">Kata Sandi</label>
-                <div className="relative">
-                  <KeyRound className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9c7650]" aria-hidden="true" />
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#d8c6a5] bg-[#fffcf5] py-3.5 pl-11 pr-4 text-xs text-[#30211b] outline-none transition placeholder:text-[#aa9a8d] focus:border-[#7a4931] focus:ring-4 focus:ring-[#b88a44]/15 dark:border-[#584437] dark:bg-[#30251f] dark:text-[#fff8e8]"
-                  />
+              {loginType === 'guru' ? (
+                <>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#725b4e] dark:text-[#c5b2a5]">Alamat Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9c7650]" aria-hidden="true" />
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        placeholder="pengajar@isykarima.id"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full rounded-xl border border-[#d8c6a5] bg-[#fffcf5] py-3.5 pl-11 pr-4 text-xs text-[#30211b] outline-none transition placeholder:text-[#aa9a8d] focus:border-[#7a4931] focus:ring-4 focus:ring-[#b88a44]/15 dark:border-[#584437] dark:bg-[#30251f] dark:text-[#fff8e8]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#725b4e] dark:text-[#c5b2a5]">Kata Sandi</label>
+                    <div className="relative">
+                      <KeyRound className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9c7650]" aria-hidden="true" />
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        required
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full rounded-xl border border-[#d8c6a5] bg-[#fffcf5] py-3.5 pl-11 pr-4 text-xs text-[#30211b] outline-none transition placeholder:text-[#aa9a8d] focus:border-[#7a4931] focus:ring-4 focus:ring-[#b88a44]/15 dark:border-[#584437] dark:bg-[#30251f] dark:text-[#fff8e8]"
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <label htmlFor="nis" className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#725b4e] dark:text-[#c5b2a5]">NIS Santri (Nomor Induk)</label>
+                  <div className="relative">
+                    <GraduationCap className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9c7650]" aria-hidden="true" />
+                    <input
+                      id="nis"
+                      name="nis"
+                      type="text"
+                      required
+                      placeholder="Contoh: 2026001"
+                      value={nis}
+                      onChange={(e) => setNis(e.target.value)}
+                      className="w-full rounded-xl border border-[#d8c6a5] bg-[#fffcf5] py-3.5 pl-11 pr-4 text-xs text-[#30211b] outline-none transition placeholder:text-[#aa9a8d] focus:border-[#7a4931] focus:ring-4 focus:ring-[#b88a44]/15 dark:border-[#584437] dark:bg-[#30251f] dark:text-[#fff8e8]"
+                    />
+                  </div>
+                  <p className="text-[10px] text-[#9a887b] dark:text-[#9f8e83] mt-2">
+                    Masukkan NIS anak Anda untuk melihat nilai dan rapor. Hubungi bagian akademik jika Anda lupa NIS anak Anda.
+                  </p>
                 </div>
-              </div>
+              )}
 
               <button
                 type="submit"

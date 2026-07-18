@@ -13,6 +13,8 @@ import {
   SantriAttendance,
   SantriAttendanceSummary,
   WaliKelas,
+  Santri,
+  Nilai,
   AdminStats,
   GuruStats
 } from './types';
@@ -48,6 +50,16 @@ export const api = {
     const res = await fetchJson<{ token: string; user: User }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password })
+    });
+    localStorage.setItem('simrpp_token', res.token);
+    localStorage.setItem('simrpp_user', JSON.stringify(res.user));
+    return res;
+  },
+
+  async waliLogin(nis: string): Promise<{ token: string; user: User }> {
+    const res = await fetchJson<{ token: string; user: User }>('/api/auth/wali-login', {
+      method: 'POST',
+      body: JSON.stringify({ nis })
     });
     localStorage.setItem('simrpp_token', res.token);
     localStorage.setItem('simrpp_user', JSON.stringify(res.user));
@@ -390,6 +402,53 @@ export const api = {
 
   async deleteWaliKelas(id: string): Promise<{ message: string }> {
     return fetchJson<{ message: string }>(`/api/wali-kelas/${id}`, { method: 'DELETE' });
+  },
+
+  // Santri
+  async getSantri(classId?: string): Promise<Santri[]> {
+    return fetchJson<Santri[]>(`/api/santri${classId ? `?classId=${classId}` : ''}`);
+  },
+
+  async createSantri(data: Omit<Santri, 'id' | 'createdAt' | 'updatedAt'>): Promise<Santri> {
+    return fetchJson<Santri>('/api/santri', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateSantri(id: string, data: Partial<Santri>): Promise<Santri> {
+    return fetchJson<Santri>(`/api/santri/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteSantri(id: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`/api/santri/${id}`, { method: 'DELETE' });
+  },
+
+  // Nilai
+  async getNilai(params?: { santriId?: string; classId?: string; subjectId?: string; academicYearId?: string; semesterId?: string; teacherId?: string }): Promise<Nilai[]> {
+    const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
+    return fetchJson<Nilai[]>(`/api/nilai${q ? '?' + q : ''}`);
+  },
+
+  async createNilai(data: Omit<Nilai, 'id' | 'createdAt' | 'updatedAt'>): Promise<Nilai> {
+    return fetchJson<Nilai>('/api/nilai', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateNilai(id: string, data: Partial<Nilai>): Promise<Nilai> {
+    return fetchJson<Nilai>(`/api/nilai/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteNilai(id: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`/api/nilai/${id}`, { method: 'DELETE' });
   },
 
   // Upload File Attachment (converts File to base64, uploads via JSON api)

@@ -192,6 +192,22 @@ export interface ActivityLog {
   timestamp: string;
 }
 
+export interface WaliKelas {
+  id: string;
+  classId: string;
+  teacherId: string;
+  academicYearId: string;
+  semesterId: string;
+  assignedBy: string;
+  createdAt: string;
+  updatedAt: string;
+  // Decorated
+  class?: SchoolClass;
+  teacher?: Teacher;
+  academicYear?: AcademicYear;
+  semester?: Semester;
+}
+
 export interface AdminStats {
   teachers: number;
   subjects: number;

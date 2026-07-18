@@ -17,6 +17,7 @@ import {
   RPP,
   Attendance,
   SantriAttendance,
+  WaliKelas,
   ActivityLog
 } from './src/server/db.ts';
 
@@ -1375,6 +1376,127 @@ app.delete('/api/santri-attendances/:id', requireAuth('Admin'), (req, res) => {
   logActivity(admin.id, admin.name, 'Admin', 'Hapus Absensi Santri',
     `Menghapus absensi santri Kelas ${cls?.name} pada ${att.date}`);
   res.json({ message: 'Absensi santri berhasil dihapus' });
+});
+
+
+// 12. Wali Kelas API
+// GET — daftar wali kelas (semua user dapat akses, filter by teacherId dll)
+app.get('/api/wali-kelas', requireAuth(), (req, res) => {
+  const db = getDatabase();
+  if (!db.waliKelas) db.waliKelas = [];
+  const { teacherId, classId, academicYearId, semesterId } = req.query as Record<string, string>;
+
+  let list = db.waliKelas;
+  if (teacherId)      list = list.filter(w => w.teacherId === teacherId);
+  if (classId)        list = list.filter(w => w.classId === classId);
+  if (academicYearId) list = list.filter(w => w.academicYearId === academicYearId);
+  if (semesterId)     list = list.filter(w => w.semesterId === semesterId);
+
+  const decorated = list.map(w => ({
+    ...w,
+    class: db.classes.find(c => c.id === w.classId),
+    teacher: db.teachers.find(t => t.id === w.teacherId),
+    academicYear: db.academicYears.find(y => y.id === w.academicYearId),
+    semester: db.semesters.find(s => s.id === w.semesterId),
+  }));
+
+  res.json(decorated);
+});
+
+// POST — Admin menunjuk wali kelas
+app.post('/api/wali-kelas', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const { classId, teacherId, academicYearId, semesterId } = req.body;
+
+  if (!classId || !teacherId || !academicYearId || !semesterId) {
+    res.status(400).json({ error: 'classId, teacherId, academicYearId, dan semesterId wajib diisi' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.waliKelas) db.waliKelas = [];
+
+  // Cek duplikat: 1 kelas hanya boleh 1 wali kelas per TA+Semester
+  const dup = db.waliKelas.find(w => w.classId === classId && w.academicYearId === academicYearId && w.semesterId === semesterId);
+  if (dup) {
+    res.status(400).json({ error: 'Kelas ini sudah memiliki wali kelas pada periode tersebut. Hapus dulu sebelum menunjuk yang baru.' });
+    return;
+  }
+
+  const cls = db.classes.find(c => c.id === classId);
+  const teacher = db.teachers.find(t => t.id === teacherId);
+  if (!cls || !teacher) {
+    res.status(404).json({ error: 'Kelas atau guru tidak ditemukan' });
+    return;
+  }
+
+  const newWali: WaliKelas = {
+    id: `wali-${Date.now()}`,
+    classId, teacherId, academicYearId, semesterId,
+    assignedBy: admin.id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  db.waliKelas.push(newWali);
+  saveDatabase(db);
+  logActivity(admin.id, admin.name, 'Admin', 'Tunjuk Wali Kelas',
+    `Menunjuk ${teacher.name} sebagai wali kelas ${cls.name}`);
+  res.status(201).json(newWali);
+});
+
+// PUT — Admin mengubah wali kelas (ganti guru/kelas)
+app.put('/api/wali-kelas/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.waliKelas) db.waliKelas = [];
+
+  const wali = db.waliKelas.find(w => w.id === req.params.id);
+  if (!wali) { res.status(404).json({ error: 'Data wali kelas tidak ditemukan' }); return; }
+
+  const { teacherId, academicYearId, semesterId } = req.body;
+
+  // Cek duplikat (kecuali data ini sendiri)
+  const targetClassId = wali.classId;
+  const targetAY = academicYearId || wali.academicYearId;
+  const targetSem = semesterId || wali.semesterId;
+  const dup = db.waliKelas.find(w => w.id !== wali.id && w.classId === targetClassId && w.academicYearId === targetAY && w.semesterId === targetSem);
+  if (dup) {
+    res.status(400).json({ error: 'Kelas ini sudah memiliki wali kelas lain pada periode tersebut.' });
+    return;
+  }
+
+  if (teacherId)      wali.teacherId = teacherId;
+  if (academicYearId) wali.academicYearId = academicYearId;
+  if (semesterId)     wali.semesterId = semesterId;
+  wali.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  const cls = db.classes.find(c => c.id === wali.classId);
+  const teacher = db.teachers.find(t => t.id === wali.teacherId);
+  logActivity(admin.id, admin.name, 'Admin', 'Ubah Wali Kelas',
+    `Mengubah wali kelas ${cls?.name} menjadi ${teacher?.name}`);
+  res.json(wali);
+});
+
+// DELETE — Admin menghapus penugasan wali kelas
+app.delete('/api/wali-kelas/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.waliKelas) db.waliKelas = [];
+
+  const idx = db.waliKelas.findIndex(w => w.id === req.params.id);
+  if (idx === -1) { res.status(404).json({ error: 'Data wali kelas tidak ditemukan' }); return; }
+
+  const wali = db.waliKelas[idx];
+  db.waliKelas.splice(idx, 1);
+  saveDatabase(db);
+
+  const cls = db.classes.find(c => c.id === wali.classId);
+  const teacher = db.teachers.find(t => t.id === wali.teacherId);
+  logActivity(admin.id, admin.name, 'Admin', 'Hapus Wali Kelas',
+    `Menghapus penugasan wali kelas ${cls?.name} (${teacher?.name})`);
+  res.json({ message: 'Penugasan wali kelas berhasil dihapus' });
 });
 
 

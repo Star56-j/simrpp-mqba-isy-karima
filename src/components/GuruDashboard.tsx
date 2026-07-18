@@ -8,28 +8,34 @@ import {
   FileEdit,
   ArrowRight,
   PlusCircle,
-  FileWarning
+  FileWarning,
+  Crown
 } from 'lucide-react';
-import { GuruStats, RPP, TeachingSchedule } from '../types';
+import { GuruStats, RPP, TeachingSchedule, WaliKelas } from '../types';
 import RealTimeClock from './RealTimeClock';
 
 interface GuruDashboardProps {
   stats: GuruStats;
   schedules: TeachingSchedule[];
   rpps: RPP[];
+  waliKelas: WaliKelas[];
   onNavigate: (view: string, targetTab?: string) => void;
 }
 
 export default function GuruDashboard({ 
   stats, 
   schedules, 
-  rpps, 
+  rpps,
+  waliKelas,
   onNavigate,
 }: GuruDashboardProps) {
   // Get schedules for current teacher
   const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
   const mySchedules = schedules.filter(s => s.teacherId === myUser.teacherId);
   const myRpps = rpps.filter(r => r.teacherId === myUser.teacherId);
+  
+  // Wali kelas untuk guru ini
+  const myWaliKelas = waliKelas.filter(w => w.teacherId === myUser.teacherId);
   
   // Find RPPs in "Revisi" state
   const revisionRpps = myRpps.filter(r => r.status === 'Revisi');
@@ -66,6 +72,41 @@ export default function GuruDashboard({
           <RealTimeClock />
         </div>
       </div>
+
+      {/* Widget Wali Kelas — tampil jika guru adalah wali kelas */}
+      {myWaliKelas.length > 0 && (
+        <div className="space-y-2">
+          {myWaliKelas.map(w => (
+            <div key={w.id}
+              className="relative overflow-hidden flex items-center space-x-4 bg-gradient-to-r from-amber-50 to-amber-50/40 dark:from-amber-950/30 dark:to-amber-950/10 border border-amber-200/60 dark:border-amber-800/40 rounded-2xl p-4 shadow-xs">
+              {/* Glow accent */}
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-l-2xl" />
+              <div className="ml-2 w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                <Crown className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-0.5">
+                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Wali Kelas</span>
+                  <span className="w-1 h-1 rounded-full bg-amber-400" />
+                  <span className="text-[10px] font-semibold text-amber-500 dark:text-amber-500">
+                    TA {(w as any).academicYear?.name} — Semester {(w as any).semester?.name}
+                  </span>
+                </div>
+                <p className="text-base font-extrabold text-amber-800 dark:text-amber-200 tracking-tight">
+                  Kelas {(w as any).class?.name}
+                </p>
+              </div>
+              <div className="flex-shrink-0 text-right">
+                <button onClick={() => onNavigate('my-santri-attendance')}
+                  className="text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 uppercase tracking-wider transition flex items-center space-x-1">
+                  <span>Absensi Santri</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* RPP Dashboard Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">

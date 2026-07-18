@@ -11,6 +11,7 @@ import {
   RPP, 
   ActivityLog,
   Attendance,
+  WaliKelas,
   AdminStats,
   GuruStats
 } from './types';
@@ -33,6 +34,7 @@ import AttendanceAdmin from './components/AttendanceAdmin';
 import AttendanceGuru from './components/AttendanceGuru';
 import AttendanceSantriAdmin from './components/AttendanceSantriAdmin';
 import AttendanceSantriGuru from './components/AttendanceSantriGuru';
+import WaliKelasPage from './components/WaliKelas';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -65,6 +67,7 @@ export default function App() {
   const [rpps, setRpps] = React.useState<RPP[]>([]);
   const [attendances, setAttendances] = React.useState<Attendance[]>([]);
   const [activityLogs, setActivityLogs] = React.useState<ActivityLog[]>([]);
+  const [waliKelas, setWaliKelas] = React.useState<WaliKelas[]>([]);
 
   // Statistics
   const [adminStats, setAdminStats] = React.useState<AdminStats | null>(null);
@@ -116,6 +119,10 @@ export default function App() {
       setSchedules(sch);
       setRpps(r);
       setAttendances(att);
+
+      // Fetch wali kelas
+      const waliRes = await api.getWaliKelas().catch(() => []);
+      setWaliKelas(waliRes);
 
       // Fetch Stats
       const statRes = await api.getDashboardStats().catch(() => null);
@@ -189,6 +196,7 @@ export default function App() {
             stats={guruStats}
             schedules={schedules}
             rpps={rpps}
+            waliKelas={waliKelas}
             onNavigate={(view) => setView(view)}
           />
         ) : null;
@@ -277,6 +285,17 @@ export default function App() {
       case 'profile-settings':
         return <ProfileSettings onRefresh={fetchData} />;
 
+      case 'wali-kelas':
+        return (
+          <WaliKelasPage
+            teachers={teachers}
+            classes={classes}
+            academicYears={academicYears}
+            semesters={semesters}
+            onRefresh={fetchData}
+          />
+        );
+
       default:
         return (
           <div className="p-8 text-center text-slate-400">
@@ -301,6 +320,7 @@ export default function App() {
       case 'my-attendance': return 'Absensi Saya';
       case 'santri-attendance': return 'Absensi Santri';
       case 'my-santri-attendance': return 'Absensi Santri';
+      case 'wali-kelas': return 'Wali Kelas';
       case 'profile-settings': return 'Pengaturan Profil';
       default: return 'Akademik MQBA Isy Karima';
     }

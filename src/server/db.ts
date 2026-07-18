@@ -138,6 +138,17 @@ export interface ActivityLog {
   timestamp: string;
 }
 
+export interface WaliKelas {
+  id: string;
+  classId: string;
+  teacherId: string;
+  academicYearId: string;
+  semesterId: string;
+  assignedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface DatabaseSchema {
   users: User[];
   teachers: Teacher[];
@@ -149,6 +160,7 @@ export interface DatabaseSchema {
   rpps: RPP[];
   attendances: Attendance[];
   santriAttendances: SantriAttendance[];
+  waliKelas: WaliKelas[];
   activityLogs: ActivityLog[];
 }
 
@@ -194,6 +206,11 @@ export function getDatabase(): DatabaseSchema {
     // Migrate: tambah santriAttendances jika belum ada
     if (!parsed.santriAttendances) {
       parsed.santriAttendances = [];
+      saveDatabase(parsed);
+    }
+    // Migrate: tambah waliKelas jika belum ada
+    if (!parsed.waliKelas) {
+      parsed.waliKelas = [];
       saveDatabase(parsed);
     }
     return parsed;

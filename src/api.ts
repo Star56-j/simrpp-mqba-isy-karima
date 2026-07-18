@@ -12,6 +12,7 @@ import {
   AttendanceSummary,
   SantriAttendance,
   SantriAttendanceSummary,
+  WaliKelas,
   AdminStats,
   GuruStats
 } from './types';
@@ -360,6 +361,35 @@ export const api = {
   }): Promise<SantriAttendanceSummary[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
     return fetchJson<SantriAttendanceSummary[]>(`/api/santri-attendances/summary${q ? '?' + q : ''}`);
+  },
+
+  // Wali Kelas
+  async getWaliKelas(params?: {
+    teacherId?: string;
+    classId?: string;
+    academicYearId?: string;
+    semesterId?: string;
+  }): Promise<WaliKelas[]> {
+    const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
+    return fetchJson<WaliKelas[]>(`/api/wali-kelas${q ? '?' + q : ''}`);
+  },
+
+  async createWaliKelas(data: Omit<WaliKelas, 'id' | 'assignedBy' | 'createdAt' | 'updatedAt'>): Promise<WaliKelas> {
+    return fetchJson<WaliKelas>('/api/wali-kelas', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateWaliKelas(id: string, data: Partial<WaliKelas>): Promise<WaliKelas> {
+    return fetchJson<WaliKelas>(`/api/wali-kelas/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteWaliKelas(id: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`/api/wali-kelas/${id}`, { method: 'DELETE' });
   },
 
   // Upload File Attachment (converts File to base64, uploads via JSON api)

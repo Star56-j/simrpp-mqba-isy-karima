@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { RPP, Subject, SchoolClass, AcademicYear, SyllabusItem } from '../types';
 import { api } from '../api';
+import { exportToExcel } from '../utils/exportExcel';
 
 interface MyRPPsProps {
   rpps: RPP[];
@@ -209,6 +210,20 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
     return matchSearch && (statusFilter === 'Semua' || r.status === statusFilter);
   });
 
+  const handleExport = () => {
+    const dataToExport = filteredMyRpps.map((r, idx) => ({
+      'No': idx + 1,
+      'Mata Pelajaran': r.subject?.name || r.subjectId,
+      'Kelas': r.class?.name || r.classId,
+      'Tahun Ajaran': r.academicYear?.name || r.academicYearId,
+      'Fase / Semester': `${r.fase || '-'} / ${r.semester || '-'}`,
+      'Status': r.status,
+      'Tgl Dibuat': new Date(r.createdAt).toLocaleDateString('id-ID'),
+      'Catatan Revisi': r.revisionNotes || '-'
+    }));
+    exportToExcel(dataToExport, `Riwayat_RPP_Saya`);
+  };
+
   const ganjilItems = syllabusItems.filter(s => s.semester === 'Ganjil').map(s => ({ ...s, _idx: syllabusItems.indexOf(s) }));
   const genapItems  = syllabusItems.filter(s => s.semester === 'Genap').map(s => ({ ...s, _idx: syllabusItems.indexOf(s) }));
 
@@ -249,11 +264,14 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
               className="bg-slate-50 dark:bg-slate-950/25 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
               <option value="Semua">Semua Status</option>
-              <option value="Draft">Draft</option>
-              <option value="Menunggu Persetujuan">Menunggu Persetujuan</option>
+              <option value="Menunggu Persetujuan">Menunggu</option>
               <option value="Disetujui">Disetujui</option>
               <option value="Revisi">Revisi</option>
+              <option value="Draft">Draft</option>
             </select>
+            <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 whitespace-nowrap">
+              <Download className="w-4 h-4" /><span>Export</span>
+            </button>
           </div>
 
           {filteredMyRpps.length === 0 ? (

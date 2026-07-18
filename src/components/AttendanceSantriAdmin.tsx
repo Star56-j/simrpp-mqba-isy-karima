@@ -1,10 +1,11 @@
 import React from 'react';
 import {
   ClipboardList, Plus, Edit, Trash2, X,
-  CheckCircle, AlertCircle, BarChart2, Calendar, Users
+  CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download
 } from 'lucide-react';
 import { SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester } from '../types';
 import { api } from '../api';
+import { exportToExcel } from '../utils/exportExcel';
 
 interface AttendanceSantriAdminProps {
   classes: SchoolClass[];
@@ -81,6 +82,37 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
 
   React.useEffect(() => { loadAttendances(); loadSummary(); }, [loadAttendances, loadSummary]);
 
+  const handleExport = () => {
+    const ayName = academicYears.find(a => a.id === filterAY)?.name || '';
+    const semName = semesters.find(s => s.id === filterSem)?.name || '';
+    
+    if (activeTab === 'input') {
+      const dataToExport = attendances.map((a, idx) => ({
+        'No': idx + 1,
+        'Tanggal': new Date(a.date).toLocaleDateString('id-ID'),
+        'Kelas': classes.find(c => c.id === a.classId)?.name || a.classId,
+        'Hadir': a.jumlahHadir,
+        'Izin': a.jumlahIzin,
+        'Sakit': a.jumlahSakit,
+        'Alpha': a.jumlahAlpha,
+        'Total': a.jumlahTotal,
+        'Keterangan': a.notes || '-'
+      }));
+      exportToExcel(dataToExport, `Absensi_Santri_${ayName}_${semName}`);
+    } else {
+      const dataToExport = summary.map((s, idx) => ({
+        'No': idx + 1,
+        'Kelas': classes.find(c => c.id === s.classId)?.name || s.classId,
+        'Total Pertemuan': s.totalSessions,
+        'Rata-rata Hadir': Math.round(s.avgHadir),
+        'Rata-rata Izin': Math.round(s.avgIzin),
+        'Rata-rata Sakit': Math.round(s.avgSakit),
+        'Rata-rata Alpha': Math.round(s.avgAlpha)
+      }));
+      exportToExcel(dataToExport, `Rekap_Absensi_Santri_${ayName}_${semName}`);
+    }
+  };
+
   const resetForm = () => {
     setEditId(null); setFClass(''); setFDate(new Date().toISOString().split('T')[0]);
     setFHadir(0); setFIzin(0); setFSakit(0); setFAlpha(0); setFNotes('');
@@ -144,14 +176,21 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
         </button>
       </div>
 
-      {/* Tab */}
-      <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
-        {(['input','rekap'] as const).map(t => (
-          <button key={t} onClick={() => setActiveTab(t)}
-            className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition ${activeTab===t?'bg-white dark:bg-slate-700 shadow text-slate-800 dark:text-white':'text-slate-500 hover:text-slate-700'}`}>
-            {t === 'input' ? 'Data Absensi' : 'Rekap & Statistik'}
+      {/* Toggle View & Export */}
+      <div className="flex items-center gap-2">
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+          <button onClick={() => setActiveTab('input')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition ${activeTab === 'input' ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+            <Edit className="w-3.5 h-3.5" /><span>Data Harian</span>
           </button>
-        ))}
+          <button onClick={() => setActiveTab('rekap')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition ${activeTab === 'rekap' ? 'bg-white dark:bg-slate-700 text-teal-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+            <BarChart2 className="w-3.5 h-3.5" /><span>Rekapitulasi</span>
+          </button>
+        </div>
+        <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+          <Download className="w-4 h-4" /><span>Export</span>
+        </button>
       </div>
 
       {/* Filter Bar */}

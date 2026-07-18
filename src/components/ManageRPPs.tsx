@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { RPP } from '../types';
 import { api } from '../api';
+import { exportToExcel } from '../utils/exportExcel';
 
 interface ManageRPPsProps {
   rpps: RPP[];
@@ -171,6 +172,21 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
     w.document.close();
   };
 
+  const handleExport = () => {
+    const dataToExport = filteredRpps.map((r, idx) => ({
+      'No': idx + 1,
+      'Guru Pengajar': r.teacher?.name || r.teacherId,
+      'Mata Pelajaran': r.subject?.name || r.subjectId,
+      'Kelas': r.class?.name || r.classId,
+      'Tahun Ajaran': r.academicYear?.name || r.academicYearId,
+      'Fase / Semester': `${r.fase || '-'} / ${r.semester || '-'}`,
+      'Status': r.status,
+      'Tgl Dibuat': new Date(r.createdAt).toLocaleDateString('id-ID'),
+      'Catatan Revisi': r.revisionNotes || '-'
+    }));
+    exportToExcel(dataToExport, `Data_Persetujuan_RPP`);
+  };
+
   const statusBadge = (status: string) => {
     const base = 'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border';
     if (status === 'Disetujui') return `${base} bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30`;
@@ -198,14 +214,16 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
         <div className="flex items-center bg-slate-50 dark:bg-slate-950/25 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800 w-full md:w-auto gap-2">
           <Filter className="w-4 h-4 text-slate-400" />
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-            className="bg-transparent border-none text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer w-full md:w-auto">
+            className="bg-transparent border-none text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
             <option value="Semua">Semua Status</option>
-            <option value="Menunggu Persetujuan">Menunggu Persetujuan</option>
+            <option value="Menunggu Persetujuan">Menunggu</option>
             <option value="Disetujui">Disetujui</option>
             <option value="Revisi">Revisi</option>
-            <option value="Draft">Draft</option>
           </select>
         </div>
+        <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 whitespace-nowrap">
+          <Download className="w-4 h-4" /><span>Export</span>
+        </button>
       </div>
 
       {/* RPP list */}

@@ -1,9 +1,10 @@
 import React from 'react';
 import { 
-  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle
+  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle, Download
 } from 'lucide-react';
 import { Santri, Nilai, SchoolClass, AcademicYear, Semester, Subject, WaliKelas, TeachingSchedule } from '../types';
 import { api } from '../api';
+import { exportToExcel } from '../utils/exportExcel';
 
 interface NilaiSantriProps {
   classes: SchoolClass[];
@@ -127,6 +128,41 @@ export default function NilaiSantri({
     }
   }, [availableSubjects, filterSubject, mode]);
 
+  const handleExport = () => {
+    const ay = academicYears.find(y => y.id === filterAY)?.name || '';
+    const sem = semesters.find(s => s.id === filterSem)?.name || '';
+    const cls = classes.find(c => c.id === filterClass)?.name || '';
+    
+    if (mode === 'input') {
+      const subj = subjects.find(s => s.id === filterSubject)?.name || '';
+      const exportData = santriList.map((santri, idx) => {
+        const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === filterSubject);
+        return {
+          'No': idx + 1,
+          'NIS': santri.nis,
+          'Nama Santri': santri.name,
+          'Nilai': n ? n.score : '-',
+          'Catatan': n ? n.notes : '-'
+        };
+      });
+      exportToExcel(exportData, `Nilai_${subj}_${cls}_TA${ay}_${sem}`);
+    } else {
+      const exportData = santriList.map((santri, idx) => {
+        const santriNilai = nilaiList.filter(x => x.santriId === santri.id);
+        const avg = santriNilai.length > 0 
+          ? Math.round(santriNilai.reduce((a, b) => a + b.score, 0) / santriNilai.length) 
+          : 0;
+        return {
+          'No': idx + 1,
+          'NIS': santri.nis,
+          'Nama Santri': santri.name,
+          'Rata-rata Nilai': santriNilai.length > 0 ? avg : 'Belum ada nilai'
+        };
+      });
+      exportToExcel(exportData, `Rapor_${cls}_TA${ay}_${sem}`);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -136,19 +172,24 @@ export default function NilaiSantri({
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Input nilai mata pelajaran dan lihat rapor santri.</p>
         </div>
         
-        {/* Toggle Mode */}
-        {isWaliKelas && (
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-            <button onClick={() => setMode('input')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition ${mode === 'input' ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-              <Edit className="w-3.5 h-3.5" /><span>Input Nilai</span>
-            </button>
-            <button onClick={() => setMode('rapor')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition ${mode === 'rapor' ? 'bg-white dark:bg-slate-700 text-teal-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-              <BookOpen className="w-3.5 h-3.5" /><span>Rekap Rapor</span>
-            </button>
-          </div>
-        )}
+        {/* Toggle Mode & Export */}
+        <div className="flex items-center gap-2">
+          {isWaliKelas && (
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+              <button onClick={() => setMode('input')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition ${mode === 'input' ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                <Edit className="w-3.5 h-3.5" /><span>Input Nilai</span>
+              </button>
+              <button onClick={() => setMode('rapor')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition ${mode === 'rapor' ? 'bg-white dark:bg-slate-700 text-teal-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                <BookOpen className="w-3.5 h-3.5" /><span>Rekap Rapor</span>
+              </button>
+            </div>
+          )}
+          <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+            <Download className="w-4 h-4" /><span>Export Excel</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter */}

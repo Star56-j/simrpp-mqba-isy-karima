@@ -1,7 +1,8 @@
 import React from 'react';
-import { ClipboardList, Plus, CheckCircle, AlertCircle } from 'lucide-react';
+import { ClipboardList, Plus, CheckCircle, AlertCircle, Download } from 'lucide-react';
 import { SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester, TeachingSchedule } from '../types';
 import { api } from '../api';
+import { exportToExcel } from '../utils/exportExcel';
 
 interface AttendanceSantriGuruProps {
   academicYears: AcademicYear[];
@@ -75,6 +76,37 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
 
   React.useEffect(() => { loadData(); }, [loadData]);
 
+  const handleExport = () => {
+    const ayName = academicYears.find(a => a.id === filterAY)?.name || '';
+    const semName = semesters.find(s => s.id === filterSem)?.name || '';
+    
+    if (activeTab === 'riwayat') {
+      const dataToExport = attendances.map((a, idx) => ({
+        'No': idx + 1,
+        'Tanggal': new Date(a.date).toLocaleDateString('id-ID'),
+        'Kelas': classes.find(c => c.id === a.classId)?.name || a.classId,
+        'Hadir': a.jumlahHadir,
+        'Izin': a.jumlahIzin,
+        'Sakit': a.jumlahSakit,
+        'Alpha': a.jumlahAlpha,
+        'Total': a.jumlahTotal,
+        'Keterangan': a.notes || '-'
+      }));
+      exportToExcel(dataToExport, `Absensi_Santri_Guru_${ayName}_${semName}`);
+    } else if (activeTab === 'rekap') {
+      const dataToExport = summary.map((s, idx) => ({
+        'No': idx + 1,
+        'Kelas': classes.find(c => c.id === s.classId)?.name || s.classId,
+        'Total Pertemuan': s.totalSessions,
+        'Rata-rata Hadir': Math.round(s.avgHadir),
+        'Rata-rata Izin': Math.round(s.avgIzin),
+        'Rata-rata Sakit': Math.round(s.avgSakit),
+        'Rata-rata Alpha': Math.round(s.avgAlpha)
+      }));
+      exportToExcel(dataToExport, `Rekap_Absensi_Santri_Guru_${ayName}_${semName}`);
+    }
+  };
+
   const handleSelfSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(''); setFormSuccess('');
@@ -111,19 +143,27 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Catat dan pantau kehadiran santri kelas yang Anda ajar.</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
-        {([
-          { id: 'isi',   label: 'Isi Absensi' },
-          { id: 'list',  label: 'Riwayat' },
-          { id: 'rekap', label: 'Rekap' },
-        ] as const).map(t => (
-          <button key={t.id} onClick={() => setActiveTab(t.id)}
-            className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition
-              ${activeTab === t.id ? 'bg-white dark:bg-slate-700 shadow text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700'}`}>
-            {t.label}
+      {/* Tab & Export */}
+      <div className="flex items-center gap-2">
+        <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
+          {([
+            { id: 'isi', label: 'Isi Absensi' },
+            { id: 'riwayat', label: 'Riwayat' },
+            { id: 'rekap', label: 'Rekapitulasi' }
+          ] as const).map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition
+                ${activeTab === t.id ? 'bg-white dark:bg-slate-700 shadow text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700'}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        
+        {activeTab !== 'isi' && (
+          <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+            <Download className="w-4 h-4" /><span>Export</span>
           </button>
-        ))}
+        )}
       </div>
 
       {/* ===== TAB: ISI ABSENSI ===== */}

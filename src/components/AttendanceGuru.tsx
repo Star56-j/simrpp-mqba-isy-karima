@@ -1,7 +1,8 @@
 import React from 'react';
-import { ClipboardList, Plus, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { ClipboardList, Plus, CheckCircle, AlertCircle, X, Download } from 'lucide-react';
 import { Attendance, AttendanceSummary, AcademicYear, Semester } from '../types';
 import { api } from '../api';
+import { exportToExcel } from '../utils/exportExcel';
 
 interface AttendanceGuruProps {
   academicYears: AcademicYear[];
@@ -66,6 +67,28 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
 
   React.useEffect(() => { loadData(); }, [loadData]);
 
+  const handleExport = () => {
+    if (activeTab === 'list') {
+      const dataToExport = attendances.map((a, idx) => ({
+        'No': idx + 1,
+        'Tanggal': new Date(a.date).toLocaleDateString('id-ID'),
+        'Status': a.status,
+        'Keterangan': a.notes || '-'
+      }));
+      exportToExcel(dataToExport, `Riwayat_Absensi_Saya`);
+    } else if (activeTab === 'rekap' && summary) {
+      const dataToExport = [{
+        'Tahun Ajaran': academicYears.find(y => y.id === summary.academicYearId)?.name || summary.academicYearId,
+        'Semester': semesters.find(sem => sem.id === summary.semesterId)?.name || summary.semesterId,
+        'Hadir': summary.totalHadir,
+        'Izin': summary.totalIzin,
+        'Sakit': summary.totalSakit,
+        'Alpha': summary.totalAlpha
+      }];
+      exportToExcel(dataToExport, `Rekap_Absensi_Saya`);
+    }
+  };
+
   const handleSelfSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(''); setFormSuccess('');
@@ -98,19 +121,26 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Isi kehadiran harian dan pantau rekap absensi Anda.</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
-        {([
-          { id: 'isi',   label: 'Isi Absensi' },
-          { id: 'list',  label: 'Riwayat' },
-          { id: 'rekap', label: 'Rekap' },
-        ] as const).map(t => (
-          <button key={t.id} onClick={() => setActiveTab(t.id)}
-            className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition
-              ${activeTab === t.id ? 'bg-white dark:bg-slate-700 shadow text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700'}`}>
-            {t.label}
+      {/* Tabs & Export */}
+      <div className="flex items-center gap-2">
+        <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
+          {([
+            { id: 'isi',   label: 'Isi Absensi' },
+            { id: 'list',  label: 'Riwayat' },
+            { id: 'rekap', label: 'Rekap' },
+          ] as const).map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition
+                ${activeTab === t.id ? 'bg-white dark:bg-slate-700 shadow text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700'}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {activeTab !== 'isi' && (
+          <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+            <Download className="w-4 h-4" /><span>Export</span>
           </button>
-        ))}
+        )}
       </div>
 
       {/* ===== TAB: ISI ABSENSI ===== */}

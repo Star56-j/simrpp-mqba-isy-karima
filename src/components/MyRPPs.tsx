@@ -2,11 +2,12 @@ import React from 'react';
 import {
   FileText, Edit, Trash, Search, X, AlertCircle,
   CheckCircle, Upload, CloudLightning, Send, Save,
-  ChevronDown, ChevronUp, PlusCircle, Trash2, BookOpen
+  ChevronDown, ChevronUp, PlusCircle, Trash2, BookOpen, Download
 } from 'lucide-react';
 import { RPP, Subject, SchoolClass, AcademicYear, SyllabusItem } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
+import { parseExcelFile } from '../utils/importExcel';
 
 interface MyRPPsProps {
   rpps: RPP[];
@@ -224,6 +225,42 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
     exportToExcel(dataToExport, `Riwayat_RPP_Saya`);
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const data = await parseExcelFile<any>(file);
+      if (data.length === 0) throw new Error("File kosong");
+      const rppListToSave = data.map(row => {
+        const subjName = String(row['Mata Pelajaran']);
+        const clsName = String(row['Kelas']);
+        const subj = subjects.find(s => s.name === subjName || s.id === subjName);
+        const cls = classes.find(c => c.name === clsName || c.id === clsName);
+        const ayName = String(row['Tahun Ajaran']);
+        const ay = academicYears.find(a => a.name === ayName || a.id === ayName) || academicYears[0];
+        
+        if (!subj || !cls) return null;
+        return {
+          subjectId: subj.id,
+          classId: cls.id,
+          academicYearId: ay?.id,
+          fase: String(row['Fase'] || ''),
+          semester: String(row['Semester'] || ''),
+          capaiPembelajaran: String(row['Capaian Pembelajaran'] || ''),
+          tujuanPembelajaran: String(row['Tujuan Pembelajaran'] || '')
+        };
+      }).filter(Boolean);
+      await api.createRPPBulk({ rppList: rppListToSave });
+      alert(`Berhasil mengimport data RPP`);
+      onRefresh();
+    } catch (err: any) {
+      alert("Gagal mengimport: " + err.message);
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const ganjilItems = syllabusItems.filter(s => s.semester === 'Ganjil').map(s => ({ ...s, _idx: syllabusItems.indexOf(s) }));
   const genapItems  = syllabusItems.filter(s => s.semester === 'Genap').map(s => ({ ...s, _idx: syllabusItems.indexOf(s) }));
 
@@ -269,9 +306,15 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
               <option value="Revisi">Revisi</option>
               <option value="Draft">Draft</option>
             </select>
-            <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 whitespace-nowrap">
-              <Download className="w-4 h-4" /><span>Export</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleImport} className="hidden" />
+              <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 whitespace-nowrap">
+                <Upload className="w-4 h-4" /><span>Import</span>
+              </button>
+              <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 whitespace-nowrap">
+                <Download className="w-4 h-4" /><span>Export</span>
+              </button>
+            </div>
           </div>
 
           {filteredMyRpps.length === 0 ? (

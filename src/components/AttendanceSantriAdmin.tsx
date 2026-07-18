@@ -1,11 +1,12 @@
 import React from 'react';
 import {
   ClipboardList, Plus, Edit, Trash2, X,
-  CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download
+  CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download, Upload
 } from 'lucide-react';
 import { SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
+import { parseExcelFile } from '../utils/importExcel';
 
 interface AttendanceSantriAdminProps {
   classes: SchoolClass[];
@@ -113,6 +114,40 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
     }
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const data = await parseExcelFile<any>(file);
+      if (data.length === 0) throw new Error("File kosong");
+      const attendancesToSave = data.map(row => {
+        const clsName = String(row['Kelas']).replace('Kelas ', '');
+        const cls = classes.find(c => c.name === clsName || c.id === clsName);
+        if (!cls) return null;
+        return {
+          santriId: 'import', // we only have class level for this UI actually wait
+          classId: cls.id,
+          date: row['Tanggal'] || new Date().toISOString().split('T')[0],
+          status: 'Hadir',
+          jumlahHadir: Number(row['Hadir'] || 0),
+          jumlahIzin: Number(row['Izin'] || 0),
+          jumlahSakit: Number(row['Sakit'] || 0),
+          jumlahAlpha: Number(row['Alpha'] || 0),
+          jumlahTotal: Number(row['Total'] || 0),
+          notes: row['Keterangan'] || ''
+        };
+      }).filter(Boolean);
+      await api.createSantriAttendanceBulk({ attendances: attendancesToSave });
+      alert(`Berhasil mengimport data absensi`);
+      loadAttendances(); loadSummary();
+    } catch (err: any) {
+      alert("Gagal mengimport: " + err.message);
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const resetForm = () => {
     setEditId(null); setFClass(''); setFDate(new Date().toISOString().split('T')[0]);
     setFHadir(0); setFIzin(0); setFSakit(0); setFAlpha(0); setFNotes('');
@@ -188,9 +223,23 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
             <BarChart2 className="w-3.5 h-3.5" /><span>Rekapitulasi</span>
           </button>
         </div>
-        <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-          <Download className="w-4 h-4" /><span>Export</span>
-        </button>
+        
+        {activeTab === 'input' && (
+          <div className="flex items-center space-x-2">
+            <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleImport} className="hidden" />
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+              <Upload className="w-4 h-4" /><span>Import</span>
+            </button>
+            <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+              <Download className="w-4 h-4" /><span>Export</span>
+            </button>
+          </div>
+        )}
+        {activeTab === 'rekap' && (
+          <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+            <Download className="w-4 h-4" /><span>Export</span>
+          </button>
+        )}
       </div>
 
       {/* Filter Bar */}

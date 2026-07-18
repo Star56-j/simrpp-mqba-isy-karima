@@ -1,7 +1,8 @@
 import React from 'react';
-import { BookOpen, LogOut, GraduationCap, Calendar } from 'lucide-react';
+import { BookOpen, LogOut, GraduationCap, Calendar, Printer } from 'lucide-react';
 import { User, Santri, Nilai, AcademicYear, Semester } from '../types';
 import { api } from '../api';
+import { printRapor } from '../utils/printRapor';
 
 interface WaliDashboardProps {
   user: User;
@@ -14,6 +15,7 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
   const [santri, setSantri] = React.useState<Santri | null>(null);
   const [nilaiList, setNilaiList] = React.useState<Nilai[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [printing, setPrinting] = React.useState(false);
 
   // Filter
   const [filterAY, setFilterAY] = React.useState(academicYears[0]?.id || '');
@@ -123,9 +125,43 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
               <span>Rapor Hasil Belajar</span>
             </h3>
             {nilaiList.length > 0 && (
-              <div className="text-right">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#826f64] dark:text-[#bdaea4]">Rata-rata</p>
-                <p className="text-xl font-black text-[#6f2f22] dark:text-[#c7a86a]">{avg}</p>
+              <div className="flex items-center gap-6">
+                <div className="text-right">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#826f64] dark:text-[#bdaea4]">Rata-rata</p>
+                  <p className="text-xl font-black text-[#6f2f22] dark:text-[#c7a86a]">{avg}</p>
+                </div>
+                <button
+                  onClick={async () => {
+                    if (!santri) return;
+                    setPrinting(true);
+                    try {
+                      const [classes, subjects, waliKelasList, raporDetails] = await Promise.all([
+                        api.getClasses(),
+                        api.getSubjects(),
+                        api.getWaliKelas(),
+                        api.getRaporDetail({ santriId: santri.id, academicYearId: filterAY, semesterId: filterSem })
+                      ]);
+                      const cls = classes.find(c => c.id === santri.classId);
+                      const ay = academicYears.find(a => a.id === filterAY);
+                      const sem = semesters.find(s => s.id === filterSem);
+                      const raporDetail = raporDetails.length > 0 ? raporDetails[0] : null;
+                      const wali = waliKelasList.find(w => w.classId === santri.classId && w.academicYearId === filterAY && w.semesterId === filterSem);
+                      const waliName = wali?.teacher?.name || "Wali Kelas";
+                      
+                      if (cls && ay && sem) {
+                        printRapor(santri, cls, ay, sem, nilaiList, subjects, raporDetail, waliName);
+                      }
+                    } catch (err) {
+                      alert("Gagal menyiapkan data cetak rapor.");
+                    } finally {
+                      setPrinting(false);
+                    }
+                  }}
+                  disabled={printing}
+                  className="px-4 py-2 bg-[#402654] hover:bg-[#2c1a3b] text-[#dfc88f] rounded-lg text-xs font-bold uppercase tracking-wider shadow-md transition-colors flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Printer className="w-4 h-4"/> {printing ? 'Menyiapkan...' : 'Cetak Rapor'}
+                </button>
               </div>
             )}
           </div>

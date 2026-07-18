@@ -262,5 +262,43 @@ export interface GuruStats {
     pending: number;
     approved: number;
     revision: number;
-  };
+}
+
+export interface KepribadianItem {
+  aspek: string;
+  predikat: string;
+  deskripsi: string;
+}
+
+export interface KetahfizhanItem {
+  capaian: string;
+  penilaian: string;
+}
+
+export interface EkstrakurikulerItem {
+  namaKegiatan: string;
+  nilai: string;
+  keterangan: string;
+}
+
+export interface Ketidakhadiran {
+  sakit: number;
+  izin: number;
+  tanpaKeterangan: number;
+}
+
+export interface RaporDetail {
+  id: string;
+  santriId: string;
+  academicYearId: string;
+  semesterId: string;
+  kepribadian: KepribadianItem[];
+  ketahfizhan: KetahfizhanItem[];
+  ekstrakurikuler: EkstrakurikulerItem[];
+  ketidakhadiran: Ketidakhadiran;
+  catatanWaliKelas: string;
+  keputusanKenaikan: string;
+  tanggapanOrangTua?: string;
+  createdAt: string;
+  updatedAt: string;
 }

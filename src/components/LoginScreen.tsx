@@ -31,14 +31,20 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
     try {
       if (loginType === 'guru') {
-        const response = await api.login(email, password);
-        onLoginSuccess(response.user);
+        try {
+          const res = await api.login(email, password);
+          onLoginSuccess(res.user);
+        } catch (err: any) {
+          setError(err.message || 'Login gagal. Periksa kembali email dan password Anda.');
+        }
       } else {
-        const response = await api.waliLogin(nis);
-        onLoginSuccess(response.user);
+        try {
+          const res = await api.waliLogin(nis);
+          onLoginSuccess(res.user);
+        } catch (err: any) {
+          setError(err.message || 'Data wali santri tidak ditemukan.');
+        }
       }
-    } catch (err: any) {
-      setError(err.message || 'Alamat email, kata sandi, atau NIS Anda salah.');
     } finally {
       setLoading(false);
     }
@@ -113,7 +119,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   className={`flex-1 rounded-lg py-2.5 text-[10px] font-extrabold uppercase tracking-wider transition ${loginType === 'guru' ? 'bg-white text-indigo-700 shadow-sm dark:bg-slate-700 dark:text-blue-300' : 'text-slate-500 hover:text-indigo-700 dark:text-slate-400 dark:hover:text-blue-300'}`}
                 >
                   <Users className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5" />
-                  Staf & Guru
+                  Ustadz dan Ustadzah
                 </button>
                 <button
                   type="button"
@@ -165,7 +171,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 </>
               ) : (
                 <div className="space-y-2">
-                  <label htmlFor="nis" className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-400">NIS Santri (Nomor Induk)</label>
+                  <label htmlFor="nis" className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-400">Nama Lengkap Santri</label>
                   <div className="relative">
                     <GraduationCap className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400" aria-hidden="true" />
                     <input
@@ -173,14 +179,14 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                       name="nis"
                       type="text"
                       required
-                      placeholder="Contoh: 2026001"
+                      placeholder="Contoh: Ahmad Abdullah"
                       value={nis}
                       onChange={(e) => setNis(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                     />
                   </div>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-2">
-                    Masukkan NIS anak Anda untuk melihat nilai dan rapor. Hubungi bagian akademik jika Anda lupa NIS anak Anda.
+                    Masukkan nama lengkap anak Anda untuk melihat nilai dan rapor. Hubungi bagian akademik jika nama tidak ditemukan.
                   </p>
                 </div>
               )}

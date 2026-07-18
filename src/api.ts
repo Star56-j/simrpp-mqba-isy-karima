@@ -16,7 +16,8 @@ import {
   Santri,
   Nilai,
   AdminStats,
-  GuruStats
+  GuruStats,
+  RaporDetail
 } from './types';
 
 const getHeaders = () => {
@@ -56,10 +57,10 @@ export const api = {
     return res;
   },
 
-  async waliLogin(nis: string): Promise<{ token: string; user: User }> {
+  async waliLogin(name: string): Promise<{ token: string; user: User }> {
     const res = await fetchJson<{ token: string; user: User }>('/api/auth/wali-login', {
       method: 'POST',
-      body: JSON.stringify({ nis })
+      body: JSON.stringify({ name })
     });
     localStorage.setItem('simrpp_token', res.token);
     localStorage.setItem('simrpp_user', JSON.stringify(res.user));
@@ -255,6 +256,13 @@ export const api = {
     });
   },
 
+  async createRPPBulk(data: { rppList: any[] }): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>('/api/rpp/bulk', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   async updateRPP(id: string, rpp: Partial<RPP>): Promise<RPP> {
     return fetchJson<RPP>(`/api/rpps/${id}`, {
       method: 'PUT',
@@ -365,6 +373,13 @@ export const api = {
     return fetchJson<{ message: string }>(`/api/santri-attendances/${id}`, { method: 'DELETE' });
   },
 
+  async createSantriAttendanceBulk(data: { attendances: any[] }): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>('/api/santri-attendance/bulk', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   async getSantriAttendanceSummary(params?: {
     month?: string;
     year?: string;
@@ -449,6 +464,40 @@ export const api = {
 
   async deleteNilai(id: string): Promise<{ message: string }> {
     return fetchJson<{ message: string }>(`/api/nilai/${id}`, { method: 'DELETE' });
+  },
+
+  async createNilaiBulk(data: { nilaiList: any[] }): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>('/api/nilai/bulk', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Rapor Detail
+  async getRaporDetail(params?: { santriId?: string; academicYearId?: string; semesterId?: string }): Promise<RaporDetail[]> {
+    const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
+    return fetchJson<RaporDetail[]>(`/api/rapor-detail${q ? '?' + q : ''}`);
+  },
+
+  async createRaporDetail(data: Omit<RaporDetail, 'id' | 'createdAt' | 'updatedAt'>): Promise<RaporDetail> {
+    return fetchJson<RaporDetail>('/api/rapor-detail', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateRaporDetail(id: string, data: Partial<RaporDetail>): Promise<RaporDetail> {
+    return fetchJson<RaporDetail>(`/api/rapor-detail/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async createRaporDetailBulk(data: { raporList: any[] }): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>('/api/rapor-detail/bulk', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   },
 
   // Upload File Attachment (converts File to base64, uploads via JSON api)

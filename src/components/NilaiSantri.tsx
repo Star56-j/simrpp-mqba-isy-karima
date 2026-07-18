@@ -1,10 +1,14 @@
 import React from 'react';
 import { 
-  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle, Download
+  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle, Download, Upload
 } from 'lucide-react';
 import { Santri, Nilai, SchoolClass, AcademicYear, Semester, Subject, WaliKelas, TeachingSchedule } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
+import { parseExcelFile } from '../utils/importExcel';
+import { printRapor } from '../utils/printRapor';
+import RaporModal from './RaporModal';
+import { Printer } from 'lucide-react';
 
 interface NilaiSantriProps {
   classes: SchoolClass[];
@@ -40,6 +44,9 @@ export default function NilaiSantri({
 
   const [saving, setSaving] = React.useState(false);
   const [msg, setMsg] = React.useState({ type: '', text: '' });
+
+  // Rapor modal state
+  const [raporModalSantri, setRaporModalSantri] = React.useState<Santri | null>(null);
 
   // Filter schedules that the current teacher teaches
   const mySchedules = currentUser.role === 'Admin' ? schedules : schedules.filter(s => s.teacherId === currentUser.teacherId);
@@ -163,6 +170,59 @@ export default function NilaiSantri({
     }
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      const data = await parseExcelFile<any>(file);
+      if (data.length === 0) throw new Error("File Excel kosong.");
+      
+      setSaving(true);
+      if (mode === 'input') {
+        const nilaiListToSave = data.map(row => {
+          const santri = santriList.find(s => s.nis === String(row['NIS']));
+          if (!santri) return null;
+          return {
+            santriId: santri.id,
+            subjectId: filterSubject,
+            academicYearId: filterAY,
+            semesterId: filterSem,
+            score: Number(row['Nilai'] || 0),
+            notes: row['Catatan'] || ''
+          };
+        }).filter(Boolean);
+        
+        await api.createNilaiBulk({ nilaiList: nilaiListToSave });
+        setMsg({ type: 'success', text: `Berhasil mengimport ${nilaiListToSave.length} data nilai.` });
+      } else {
+        const raporListToSave = data.map(row => {
+          const santri = santriList.find(s => s.nis === String(row['NIS']));
+          if (!santri) return null;
+          return {
+            santriId: santri.id,
+            academicYearId: filterAY,
+            semesterId: filterSem,
+            catatanWaliKelas: row['Catatan Wali Kelas'] || '',
+            keputusanKenaikan: row['Keputusan'] || ''
+          };
+        }).filter(Boolean);
+        
+        await api.createRaporDetailBulk({ raporList: raporListToSave });
+        setMsg({ type: 'success', text: `Berhasil mengimport ${raporListToSave.length} data rapor.` });
+      }
+      loadData();
+    } catch (err: any) {
+      setMsg({ type: 'error', text: err.message || 'Gagal mengimport file Excel.' });
+    } finally {
+      setSaving(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setTimeout(() => setMsg({ type: '', text: '' }), 3000);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -186,6 +246,10 @@ export default function NilaiSantri({
               </button>
             </div>
           )}
+          <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleImport} className="hidden" />
+          <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+            <Upload className="w-4 h-4" /><span>{mode === 'input' ? 'Import Nilai' : 'Import Rapor'}</span>
+          </button>
           <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
             <Download className="w-4 h-4" /><span>Export Excel</span>
           </button>
@@ -256,7 +320,10 @@ export default function NilaiSantri({
                       <th className="px-4 py-3 text-center w-24">Aksi</th>
                     </>
                   ) : (
-                    <th className="px-4 py-3 text-center">Rata-rata Nilai</th>
+                    <>
+                      <th className="px-4 py-3 text-center">Rata-rata Nilai</th>
+                      <th className="px-4 py-3 text-center w-64">Aksi Rapor</th>
+                    </>
                   )}
                 </tr>
               </thead>
@@ -325,6 +392,34 @@ export default function NilaiSantri({
                             <span className="text-xs text-slate-400 italic">Belum ada nilai</span>
                           )}
                         </td>
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex justify-center gap-2">
+                            <button onClick={() => setRaporModalSantri(santri)} className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold flex items-center">
+                              <Edit className="w-3.5 h-3.5 mr-1"/> Isi Detail
+                            </button>
+                            <button onClick={async () => {
+                              try {
+                                const details = await api.getRaporDetail({ santriId: santri.id, academicYearId: filterAY, semesterId: filterSem });
+                                const raporDetail = details.length > 0 ? details[0] : null;
+                                const waliName = waliKelasList.find(w => w.classId === filterClass && w.academicYearId === filterAY && w.semesterId === filterSem)?.teacher?.name || currentUser.name || "Wali Kelas";
+                                printRapor(
+                                  santri,
+                                  classes.find(c => c.id === filterClass)!,
+                                  academicYears.find(a => a.id === filterAY)!,
+                                  semesters.find(s => s.id === filterSem)!,
+                                  nilaiList,
+                                  subjects,
+                                  raporDetail,
+                                  waliName
+                                );
+                              } catch (err) {
+                                alert("Gagal memuat detail rapor. Silakan coba lagi.");
+                              }
+                            }} className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-xs font-semibold flex items-center">
+                              <Printer className="w-3.5 h-3.5 mr-1"/> Cetak
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   }
@@ -334,6 +429,19 @@ export default function NilaiSantri({
           </div>
         )}
       </div>
+
+      {raporModalSantri && (
+        <RaporModal
+          santri={raporModalSantri}
+          academicYearId={filterAY}
+          semesterId={filterSem}
+          onClose={() => setRaporModalSantri(null)}
+          onSave={() => {
+            setRaporModalSantri(null);
+            alert("Data rapor berhasil disimpan.");
+          }}
+        />
+      )}
     </div>
   );
 }

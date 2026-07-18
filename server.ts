@@ -122,16 +122,17 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 app.post('/api/auth/wali-login', (req, res) => {
-  const { nis } = req.body;
-  if (!nis) {
-    res.status(400).json({ error: 'NIS wajib diisi' });
+  const { name } = req.body;
+  if (!name) {
+    res.status(400).json({ error: 'Nama santri wajib diisi' });
     return;
   }
   const db = getDatabase();
-  const santri = db.santri.find(s => s.nis === nis);
+  // case-insensitive search
+  const santri = db.santri.find(s => s.name.toLowerCase() === name.toLowerCase());
 
   if (!santri) {
-    res.status(404).json({ error: 'NIS tidak ditemukan' });
+    res.status(404).json({ error: 'Data santri dengan nama tersebut tidak ditemukan' });
     return;
   }
 
@@ -144,7 +145,7 @@ app.post('/api/auth/wali-login', (req, res) => {
     santriId: santri.id
   };
 
-  logActivity(user.id, user.name, user.role, 'Login', `Berhasil melakukan login sebagai Wali Santri (NIS: ${santri.nis}).`);
+  logActivity(user.id, user.name, user.role, 'Login', `Berhasil melakukan login sebagai Wali Santri (Anak: ${santri.name}).`);
 
   res.json({
     token: user.id, // Simplistic mock token
@@ -1761,6 +1762,227 @@ app.delete('/api/nilai/:id', requireAuth('Admin'), (req, res) => {
   logActivity(admin.id, admin.name, 'Admin', 'Hapus Nilai', `Menghapus nilai ${subject?.name} untuk ${santri?.name}`);
   
   res.json({ message: 'Nilai berhasil dihapus' });
+});
+
+// 15. RaporDetail API
+app.get('/api/rapor-detail', requireAuth(), (req, res) => {
+  const db = getDatabase();
+  const { santriId, academicYearId, semesterId } = req.query as Record<string, string>;
+  let list = db.raporDetails || [];
+
+  if (santriId) list = list.filter(r => r.santriId === santriId);
+  if (academicYearId) list = list.filter(r => r.academicYearId === academicYearId);
+  if (semesterId) list = list.filter(r => r.semesterId === semesterId);
+
+  res.json(list);
+});
+
+app.post('/api/rapor-detail', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const { santriId, academicYearId, semesterId, kepribadian, ketahfizhan, ekstrakurikuler, ketidakhadiran, catatanWaliKelas, keputusanKenaikan, tanggapanOrangTua } = req.body;
+
+  if (!santriId || !academicYearId || !semesterId) {
+    res.status(400).json({ error: 'Data santri, tahun ajaran, dan semester wajib diisi' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.raporDetails) db.raporDetails = [];
+
+  const existing = db.raporDetails.find(r => r.santriId === santriId && r.academicYearId === academicYearId && r.semesterId === semesterId);
+  if (existing) {
+    res.status(400).json({ error: 'Detail Rapor untuk santri pada periode ini sudah ada. Gunakan metode PUT untuk mengupdate.' });
+    return;
+  }
+
+  const santri = db.santri.find(s => s.id === santriId);
+
+  const newRapor: RaporDetail = {
+    id: `rapor-${Date.now()}`,
+    santriId,
+    academicYearId,
+    semesterId,
+    kepribadian: kepribadian || [],
+    ketahfizhan: ketahfizhan || [],
+    ekstrakurikuler: ekstrakurikuler || [],
+    ketidakhadiran: ketidakhadiran || { sakit: 0, izin: 0, tanpaKeterangan: 0 },
+    catatanWaliKelas: catatanWaliKelas || '',
+    keputusanKenaikan: keputusanKenaikan || '',
+    tanggapanOrangTua: tanggapanOrangTua || '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  db.raporDetails.push(newRapor);
+  saveDatabase(db);
+  
+  logActivity(user.id, user.name, user.role, 'Isi Detail Rapor', `Menginput detail rapor untuk ${santri?.name || santriId}`);
+  res.status(201).json(newRapor);
+});
+
+app.put('/api/rapor-detail/:id', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.raporDetails) db.raporDetails = [];
+
+  const rapor = db.raporDetails.find(r => r.id === req.params.id);
+  if (!rapor) {
+    res.status(404).json({ error: 'Detail Rapor tidak ditemukan' });
+    return;
+  }
+
+  const { kepribadian, ketahfizhan, ekstrakurikuler, ketidakhadiran, catatanWaliKelas, keputusanKenaikan, tanggapanOrangTua } = req.body;
+
+  if (kepribadian) rapor.kepribadian = kepribadian;
+  if (ketahfizhan) rapor.ketahfizhan = ketahfizhan;
+  if (ekstrakurikuler) rapor.ekstrakurikuler = ekstrakurikuler;
+  if (ketidakhadiran) rapor.ketidakhadiran = ketidakhadiran;
+  if (catatanWaliKelas !== undefined) rapor.catatanWaliKelas = catatanWaliKelas;
+  if (keputusanKenaikan !== undefined) rapor.keputusanKenaikan = keputusanKenaikan;
+  if (tanggapanOrangTua !== undefined) rapor.tanggapanOrangTua = tanggapanOrangTua;
+  
+  rapor.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  
+  const santri = db.santri.find(s => s.id === rapor.santriId);
+  logActivity(user.id, user.name, user.role, 'Update Detail Rapor', `Mengubah detail rapor untuk ${santri?.name || rapor.santriId}`);
+  
+  res.json(rapor);
+});
+
+// BULK API FOR IMPORT EXCEL
+app.post('/api/santri-attendance/bulk', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const { attendances } = req.body;
+  if (!Array.isArray(attendances)) {
+    res.status(400).json({ error: 'Format data salah, harus berupa array' });
+    return;
+  }
+  const db = getDatabase();
+  let count = 0;
+  for (const item of attendances) {
+    const { santriId, classId, date, status, notes } = item;
+    if (!santriId || !classId || !date) continue;
+    const existing = db.santriAttendances.find(a => a.santriId === santriId && a.date === date);
+    if (existing) {
+      existing.status = status;
+      existing.notes = notes || '';
+      existing.updatedAt = new Date().toISOString();
+      existing.teacherId = user.teacherId || user.id;
+    } else {
+      db.santriAttendances.push({
+        id: `att-santri-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+        santriId, classId, date,
+        status: status || 'Hadir',
+        notes: notes || '',
+        teacherId: user.teacherId || user.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    count++;
+  }
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Bulk Import Absensi', `Mengimport ${count} data absensi santri via Excel`);
+  res.status(201).json({ message: `Berhasil mengimport ${count} data` });
+});
+
+app.post('/api/nilai/bulk', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const { nilaiList } = req.body;
+  if (!Array.isArray(nilaiList)) {
+    res.status(400).json({ error: 'Format data salah, harus berupa array' });
+    return;
+  }
+  const db = getDatabase();
+  let count = 0;
+  for (const item of nilaiList) {
+    const { santriId, subjectId, academicYearId, semesterId, score, notes } = item;
+    if (!santriId || !subjectId || !academicYearId || !semesterId) continue;
+    const existing = db.nilai.find(n => n.santriId === santriId && n.subjectId === subjectId && n.academicYearId === academicYearId && n.semesterId === semesterId);
+    if (existing) {
+      existing.score = Number(score);
+      existing.notes = notes || '';
+      existing.updatedAt = new Date().toISOString();
+      existing.teacherId = user.teacherId || user.id;
+    } else {
+      db.nilai.push({
+        id: `nilai-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+        santriId, subjectId, academicYearId, semesterId,
+        teacherId: user.teacherId || user.id,
+        score: Number(score),
+        notes: notes || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    count++;
+  }
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Bulk Import Nilai', `Mengimport ${count} data nilai via Excel`);
+  res.status(201).json({ message: `Berhasil mengimport ${count} data` });
+});
+
+app.post('/api/rpp/bulk', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const { rppList } = req.body;
+  if (!Array.isArray(rppList)) {
+    res.status(400).json({ error: 'Format data salah, harus berupa array' });
+    return;
+  }
+  const db = getDatabase();
+  let count = 0;
+  for (const rpp of rppList) {
+    if (!rpp.classId || !rpp.subjectId || !rpp.academicYearId) continue;
+    db.rpps.push({
+      ...rpp,
+      id: `rpp-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+      teacherId: user.teacherId || user.id,
+      status: 'Draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    count++;
+  }
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Bulk Import RPP', `Mengimport ${count} dokumen RPP via Excel`);
+  res.status(201).json({ message: `Berhasil mengimport ${count} RPP` });
+});
+
+app.post('/api/rapor-detail/bulk', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const { raporList } = req.body;
+  if (!Array.isArray(raporList)) {
+    res.status(400).json({ error: 'Format data salah, harus berupa array' });
+    return;
+  }
+  const db = getDatabase();
+  let count = 0;
+  for (const rapor of raporList) {
+    if (!rapor.santriId || !rapor.academicYearId || !rapor.semesterId) continue;
+    const existing = db.raporDetails.find(r => r.santriId === rapor.santriId && r.academicYearId === rapor.academicYearId && r.semesterId === rapor.semesterId);
+    if (existing) {
+      existing.kepribadian = rapor.kepribadian || existing.kepribadian;
+      existing.ketahfizhan = rapor.ketahfizhan || existing.ketahfizhan;
+      existing.ekstrakurikuler = rapor.ekstrakurikuler || existing.ekstrakurikuler;
+      existing.ketidakhadiran = rapor.ketidakhadiran || existing.ketidakhadiran;
+      existing.catatanWaliKelas = rapor.catatanWaliKelas || existing.catatanWaliKelas;
+      existing.keputusanKenaikan = rapor.keputusanKenaikan || existing.keputusanKenaikan;
+      existing.updatedAt = new Date().toISOString();
+    } else {
+      db.raporDetails.push({
+        ...rapor,
+        id: `rapor-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    count++;
+  }
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Bulk Import Detail Rapor', `Mengimport ${count} data detail rapor via Excel`);
+  res.status(201).json({ message: `Berhasil mengimport ${count} data rapor` });
 });
 
 // 11. Activity Logs API

@@ -1,8 +1,9 @@
 import React from 'react';
-import { ClipboardList, Plus, CheckCircle, AlertCircle, Download } from 'lucide-react';
-import { SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester, TeachingSchedule } from '../types';
+import { ClipboardList, Plus, CheckCircle, AlertCircle, Download, Upload } from 'lucide-react';
+import { Santri, SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester, TeachingSchedule } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
+import { parseExcelFile } from '../utils/importExcel';
 
 interface AttendanceSantriGuruProps {
   academicYears: AcademicYear[];
@@ -107,6 +108,36 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
     }
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const data = await parseExcelFile<any>(file);
+      if (data.length === 0) throw new Error("File kosong");
+      setSubmitting(true);
+      const attendancesToSave = data.map(row => {
+        const santri = mySantri.find(s => s.nis === String(row['NIS']));
+        if (!santri) return null;
+        return {
+          santriId: santri.id,
+          classId: santri.classId,
+          date: row['Tanggal'] || new Date().toISOString().split('T')[0],
+          status: row['Status'] || 'Hadir',
+          notes: row['Keterangan'] || ''
+        };
+      }).filter(Boolean);
+      await api.createSantriAttendanceBulk({ attendances: attendancesToSave });
+      alert(`Berhasil mengimport ${attendancesToSave.length} data absensi`);
+      loadData();
+    } catch (err: any) {
+      alert("Gagal mengimport: " + err.message);
+    } finally {
+      setSubmitting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleSelfSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(''); setFormSuccess('');
@@ -160,9 +191,15 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
         </div>
         
         {activeTab !== 'isi' && (
-          <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-            <Download className="w-4 h-4" /><span>Export</span>
-          </button>
+          <>
+            <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleImport} className="hidden" />
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+              <Upload className="w-4 h-4" /><span>Import</span>
+            </button>
+            <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
+              <Download className="w-4 h-4" /><span>Export</span>
+            </button>
+          </>
         )}
       </div>
 

@@ -54,9 +54,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               <BookOpen className="w-7 h-7 text-indigo-300" />
             </div>
 
-            <h2 className="text-xl font-black tracking-tight uppercase">SIMRPP MQBA</h2>
+            <h2 className="text-xl font-black tracking-tight uppercase">Akademik MQBA Isy Karima</h2>
             <p className="text-indigo-300/90 text-xs font-bold uppercase tracking-widest mt-1">
-              Isy Karima Karanganyar
+              Karanganyar
             </p>
           </div>
 
@@ -122,7 +122,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
         {/* Footer Credit */}
         <p className="text-center text-[10px] text-slate-400 leading-normal">
-          SIMRPP MQBA Isy Karima — Sistem Manajemen Pembelajaran Terpadu<br/>
+          Akademik MQBA Isy Karima — Sistem Manajemen Pembelajaran Terpadu<br/>
           Copyright © 2026. All rights reserved.
         </p>
       </div>

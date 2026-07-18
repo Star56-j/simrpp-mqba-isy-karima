@@ -46,7 +46,7 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <span className="w-8 h-1 bg-amber-400 rounded-full"></span>
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">SIMRPP MQBA Isy Karima</span>
+              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Akademik MQBA Isy Karima</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
               Dashboard Administrasi

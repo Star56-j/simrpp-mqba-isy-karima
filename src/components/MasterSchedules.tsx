@@ -160,7 +160,7 @@ export default function MasterSchedules({
             ${style}
           </head>
           <body>
-            <h1>SIMRPP MQBA Isy Karima</h1>
+            <h1>Akademik MQBA Isy Karima</h1>
             <p>Sistem Informasi Rencana Pelaksanaan Pembelajaran - Dokumen Resmi Jadwal Kegiatan Belajar Mengajar (KBM)</p>
             <table>
               <thead>

@@ -279,7 +279,7 @@ export default function App() {
       case 'attendance': return 'Absensi Guru';
       case 'my-attendance': return 'Absensi Saya';
       case 'profile-settings': return 'Pengaturan Profil';
-      default: return 'SIMRPP MQBA';
+      default: return 'Akademik MQBA Isy Karima';
     }
   };
 

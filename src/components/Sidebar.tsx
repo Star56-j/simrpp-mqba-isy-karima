@@ -62,8 +62,8 @@ export default function Sidebar({
         <div className="flex items-center space-x-2">
           <img src="/logo-mqba.png" alt="Logo MQBA" className="w-8 h-8 object-contain" />
           <div>
-            <h1 className="text-xs font-bold leading-tight uppercase tracking-wider">SIMRPP MQBA</h1>
-            <p className="text-[9px] text-indigo-100 font-medium">Isy Karima</p>
+            <h1 className="text-xs font-bold leading-tight uppercase tracking-wider">Akademik MQBA Isy Karima</h1>
+            <p className="text-[9px] text-indigo-100 font-medium">Sistem Akademik</p>
           </div>
         </div>
         <div className="flex items-center space-x-3">
@@ -106,8 +106,8 @@ export default function Sidebar({
               className="w-20 h-20 object-contain drop-shadow-lg"
             />
             <div>
-              <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-tight">SIMRPP MQBA</h2>
-              <p className="text-[10px] text-indigo-300 font-semibold tracking-wider mt-0.5 uppercase">Isy Karima</p>
+              <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-tight">Akademik MQBA Isy Karima</h2>
+              <p className="text-[10px] text-indigo-300 font-semibold tracking-wider mt-0.5 uppercase">Sistem Akademik</p>
             </div>
           </div>
         </div>
@@ -172,7 +172,7 @@ export default function Sidebar({
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-indigo-800/60 bg-indigo-950/40">
-          <p className="text-[10px] text-indigo-600 text-center font-semibold uppercase tracking-wider">SIMRPP MQBA © 2026</p>
+          <p className="text-[10px] text-indigo-600 text-center font-semibold uppercase tracking-wider">Akademik MQBA Isy Karima © 2026</p>
         </div>
       </aside>
     </>

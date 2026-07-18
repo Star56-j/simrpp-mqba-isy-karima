@@ -48,7 +48,22 @@ function getAuthUser(req: express.Request): User | null {
   const token = authHeader.substring(7);
   const db = getDatabase();
   // Find user by their id encoded in mock token
-  const user = db.users.find(u => u.id === token);
+  let user = db.users.find(u => u.id === token);
+  
+  if (!user && token.startsWith('wali-')) {
+    const santriId = token.replace('wali-', '');
+    const santri = db.santri.find(s => s.id === santriId);
+    if (santri) {
+      user = {
+        id: token,
+        name: `Wali dari ${santri.name}`,
+        email: '',
+        role: 'WaliSantri',
+        santriId: santri.id
+      };
+    }
+  }
+
   return user || null;
 }
 

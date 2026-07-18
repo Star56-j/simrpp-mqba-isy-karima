@@ -61,7 +61,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 Akademik MQBA<br />Isy Karima
               </h1>
               <p className="mt-4 max-w-xs text-xs leading-6 text-[#efe2c5]/80">
-                Ruang terpadu untuk mengelola pembelajaran dengan semangat pendidikan dan kearifan budaya Nusantara.
+                Ruang terpadu untuk mengelola pembelajaran dengan semangat pendidikan.
               </p>
             </div>
 

@@ -5,7 +5,6 @@ import {
   BookOpen, 
   AlertCircle,
   HelpCircle,
-  Sparkles,
   ArrowRight
 } from 'lucide-react';
 import { api } from '../api';
@@ -30,22 +29,6 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       onLoginSuccess(response.user);
     } catch (err: any) {
       setError(err.message || 'Alamat email atau kata sandi Anda salah.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async (demoEmail: string, demoPass: string) => {
-    setError('');
-    setLoading(true);
-    setEmail(demoEmail);
-    setPassword(demoPass);
-
-    try {
-      const response = await api.login(demoEmail, demoPass);
-      onLoginSuccess(response.user);
-    } catch (err: any) {
-      setError(err.message || 'Demo login failed.');
     } finally {
       setLoading(false);
     }
@@ -135,33 +118,6 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             </button>
           </form>
 
-          {/* Quick Click Demo Box */}
-          <div className="border-t border-slate-50 dark:border-slate-800/60 p-6 bg-slate-50/50 dark:bg-slate-950/20 text-xs space-y-3">
-            <div className="flex items-center space-x-1.5 text-slate-500 dark:text-slate-400">
-              <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
-              <span className="font-extrabold uppercase tracking-wide text-[10px]">Uji Coba Demo Akun (Satu-Klik)</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('admin@isykarima.id', 'admin123')}
-                className="p-3 text-left border border-amber-200 bg-amber-50/30 hover:bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/10 rounded-xl transition cursor-pointer"
-              >
-                <span className="block font-black text-amber-800 dark:text-amber-400 text-[11px]">Role Admin</span>
-                <span className="text-[10px] text-slate-400 mt-0.5 block truncate">admin@isykarima.id</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('ustadz.malik@isykarima.id', 'guru123')}
-                className="p-3 text-left border border-indigo-200 bg-indigo-50/30 hover:bg-indigo-50 dark:border-indigo-900/40 dark:bg-indigo-950/10 rounded-xl transition cursor-pointer"
-              >
-                <span className="block font-black text-indigo-800 dark:text-indigo-400 text-[11px]">Role Guru</span>
-                <span className="text-[10px] text-slate-400 mt-0.5 block truncate">ustadz.malik@isykarima.id</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Footer Credit */}

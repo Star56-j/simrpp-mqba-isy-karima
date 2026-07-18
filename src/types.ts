@@ -149,6 +149,39 @@ export interface AttendanceSummary {
   persentaseHadir: number;
 }
 
+export interface SantriAttendance {
+  id: string;
+  classId: string;
+  date: string;
+  jumlahHadir: number;
+  jumlahIzin: number;
+  jumlahSakit: number;
+  jumlahAlpha: number;
+  jumlahTotal: number;
+  notes: string;
+  academicYearId: string;
+  semesterId: string;
+  recordedBy: string;
+  teacherId?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Decorated
+  class?: SchoolClass;
+  academicYear?: AcademicYear;
+  semester?: Semester;
+}
+
+export interface SantriAttendanceSummary {
+  classId: string;
+  className: string;
+  hadir: number;
+  izin: number;
+  sakit: number;
+  alpha: number;
+  total: number;
+  rataHadir: number;
+}
+
 export interface ActivityLog {
   id: string;
   userId: string;

@@ -31,6 +31,8 @@ import ActivityLogs from './components/ActivityLogs';
 import ProfileSettings from './components/ProfileSettings';
 import AttendanceAdmin from './components/AttendanceAdmin';
 import AttendanceGuru from './components/AttendanceGuru';
+import AttendanceSantriAdmin from './components/AttendanceSantriAdmin';
+import AttendanceSantriGuru from './components/AttendanceSantriGuru';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -253,6 +255,25 @@ export default function App() {
           />
         );
 
+      case 'santri-attendance':
+        return (
+          <AttendanceSantriAdmin
+            classes={classes}
+            academicYears={academicYears}
+            semesters={semesters}
+          />
+        );
+
+      case 'my-santri-attendance':
+        return (
+          <AttendanceSantriGuru
+            classes={classes}
+            academicYears={academicYears}
+            semesters={semesters}
+            schedules={schedules}
+          />
+        );
+
       case 'profile-settings':
         return <ProfileSettings onRefresh={fetchData} />;
 
@@ -278,6 +299,8 @@ export default function App() {
       case 'activity-logs': return 'Log Aktivitas';
       case 'attendance': return 'Absensi Guru';
       case 'my-attendance': return 'Absensi Saya';
+      case 'santri-attendance': return 'Absensi Santri';
+      case 'my-santri-attendance': return 'Absensi Santri';
       case 'profile-settings': return 'Pengaturan Profil';
       default: return 'Akademik MQBA Isy Karima';
     }

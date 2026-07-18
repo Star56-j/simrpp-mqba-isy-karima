@@ -10,6 +10,8 @@ import {
   ActivityLog,
   Attendance,
   AttendanceSummary,
+  SantriAttendance,
+  SantriAttendanceSummary,
   AdminStats,
   GuruStats
 } from './types';
@@ -311,6 +313,53 @@ export const api = {
   }): Promise<AttendanceSummary[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
     return fetchJson<AttendanceSummary[]>(`/api/attendances/summary${q ? '?' + q : ''}`);
+  },
+
+  // Santri Attendance
+  async getSantriAttendances(params?: {
+    classId?: string;
+    month?: string;
+    year?: string;
+    semesterId?: string;
+    academicYearId?: string;
+  }): Promise<SantriAttendance[]> {
+    const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
+    return fetchJson<SantriAttendance[]>(`/api/santri-attendances${q ? '?' + q : ''}`);
+  },
+
+  async createSantriAttendance(data: Omit<SantriAttendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<SantriAttendance> {
+    return fetchJson<SantriAttendance>('/api/santri-attendances', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async createSantriAttendanceGuru(data: Omit<SantriAttendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<SantriAttendance> {
+    return fetchJson<SantriAttendance>('/api/santri-attendances/guru', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateSantriAttendance(id: string, data: Partial<SantriAttendance>): Promise<SantriAttendance> {
+    return fetchJson<SantriAttendance>(`/api/santri-attendances/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteSantriAttendance(id: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`/api/santri-attendances/${id}`, { method: 'DELETE' });
+  },
+
+  async getSantriAttendanceSummary(params?: {
+    month?: string;
+    year?: string;
+    semesterId?: string;
+    academicYearId?: string;
+  }): Promise<SantriAttendanceSummary[]> {
+    const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
+    return fetchJson<SantriAttendanceSummary[]>(`/api/santri-attendances/summary${q ? '?' + q : ''}`);
   },
 
   // Upload File Attachment (converts File to base64, uploads via JSON api)

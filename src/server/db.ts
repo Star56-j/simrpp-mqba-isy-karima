@@ -110,6 +110,24 @@ export interface Attendance {
   updatedAt: string;
 }
 
+export interface SantriAttendance {
+  id: string;
+  classId: string;
+  date: string;
+  jumlahHadir: number;
+  jumlahIzin: number;
+  jumlahSakit: number;
+  jumlahAlpha: number;
+  jumlahTotal: number;
+  notes: string;
+  academicYearId: string;
+  semesterId: string;
+  recordedBy: string;
+  teacherId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ActivityLog {
   id: string;
   userId: string;
@@ -130,6 +148,7 @@ export interface DatabaseSchema {
   teachingSchedules: TeachingSchedule[];
   rpps: RPP[];
   attendances: Attendance[];
+  santriAttendances: SantriAttendance[];
   activityLogs: ActivityLog[];
 }
 
@@ -170,6 +189,11 @@ export function getDatabase(): DatabaseSchema {
     // Migrate: tambah attendances jika belum ada
     if (!parsed.attendances) {
       parsed.attendances = [];
+      saveDatabase(parsed);
+    }
+    // Migrate: tambah santriAttendances jika belum ada
+    if (!parsed.santriAttendances) {
+      parsed.santriAttendances = [];
       saveDatabase(parsed);
     }
     return parsed;

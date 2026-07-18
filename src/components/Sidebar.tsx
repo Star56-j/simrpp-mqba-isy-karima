@@ -15,7 +15,8 @@ import {
   Moon, 
   Sun,
   Activity,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Users2
 } from 'lucide-react';
 import { User as UserType } from '../types';
 
@@ -46,12 +47,14 @@ export default function Sidebar({
     { id: 'master-schedules', label: 'Jadwal KBM', icon: Calendar },
     { id: 'manage-rpps', label: 'Persetujuan RPP', icon: FileText },
     { id: 'attendance', label: 'Absensi Guru', icon: FileSpreadsheet },
+    { id: 'santri-attendance', label: 'Absensi Santri', icon: Users2 },
     { id: 'activity-logs', label: 'Activity Log', icon: Activity },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ] : [
     { id: 'guru-dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'my-rpps', label: 'RPP Saya', icon: FileText },
     { id: 'my-attendance', label: 'Absensi Saya', icon: FileSpreadsheet },
+    { id: 'my-santri-attendance', label: 'Absensi Santri', icon: Users2 },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ];
 

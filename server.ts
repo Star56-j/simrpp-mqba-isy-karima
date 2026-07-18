@@ -16,6 +16,7 @@ import {
   TeachingSchedule,
   RPP,
   Attendance,
+  SantriAttendance,
   ActivityLog
 } from './src/server/db.ts';
 
@@ -1138,7 +1139,246 @@ app.delete('/api/attendances/:id', requireAuth('Admin'), (req, res) => {
 
 
 
-// 10. Activity Logs API
+// 10. Santri Attendance API
+// GET semua absensi santri (Admin: semua, Guru: kelas yang diajar)
+app.get('/api/santri-attendances', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  const { month, year, semesterId, academicYearId, classId } = req.query as Record<string, string>;
+
+  if (!db.santriAttendances) db.santriAttendances = [];
+  let list = db.santriAttendances;
+
+  // Guru hanya bisa lihat kelas yang diajarnya
+  if (user.role === 'Guru') {
+    const guruClassIds = new Set(
+      db.teachingSchedules
+        .filter(s => s.teacherId === user.teacherId)
+        .map(s => s.classId)
+    );
+    list = list.filter(a => guruClassIds.has(a.classId));
+  } else if (classId) {
+    list = list.filter(a => a.classId === classId);
+  }
+
+  if (academicYearId) list = list.filter(a => a.academicYearId === academicYearId);
+  if (semesterId)     list = list.filter(a => a.semesterId === semesterId);
+  if (year)           list = list.filter(a => a.date.startsWith(year));
+  if (month && year)  list = list.filter(a => a.date.startsWith(`${year}-${month.padStart(2,'0')}`));
+
+  const decorated = list.map(a => ({
+    ...a,
+    class: db.classes.find(c => c.id === a.classId),
+    academicYear: db.academicYears.find(y => y.id === a.academicYearId),
+    semester: db.semesters.find(s => s.id === a.semesterId),
+  }));
+
+  decorated.sort((a, b) => b.date.localeCompare(a.date));
+  res.json(decorated);
+});
+
+// GET rekap absensi santri — summary per kelas
+app.get('/api/santri-attendances/summary', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  const { month, year, semesterId, academicYearId } = req.query as Record<string, string>;
+
+  if (!db.santriAttendances) db.santriAttendances = [];
+  let list = db.santriAttendances;
+
+  if (user.role === 'Guru') {
+    const guruClassIds = new Set(
+      db.teachingSchedules
+        .filter(s => s.teacherId === user.teacherId)
+        .map(s => s.classId)
+    );
+    list = list.filter(a => guruClassIds.has(a.classId));
+  }
+
+  if (academicYearId) list = list.filter(a => a.academicYearId === academicYearId);
+  if (semesterId)     list = list.filter(a => a.semesterId === semesterId);
+  if (year)           list = list.filter(a => a.date.startsWith(year));
+  if (month && year)  list = list.filter(a => a.date.startsWith(`${year}-${month.padStart(2,'0')}`));
+
+  const map = new Map<string, { hadir: number; izin: number; sakit: number; alpha: number }>();
+  for (const a of list) {
+    if (!map.has(a.classId)) map.set(a.classId, { hadir: 0, izin: 0, sakit: 0, alpha: 0 });
+    const s = map.get(a.classId)!;
+    s.hadir  += a.jumlahHadir;
+    s.izin   += a.jumlahIzin;
+    s.sakit  += a.jumlahSakit;
+    s.alpha  += a.jumlahAlpha;
+  }
+
+  const summary = Array.from(map.entries()).map(([cid, counts]) => {
+    const cls = db.classes.find(c => c.id === cid);
+    const total = counts.hadir + counts.izin + counts.sakit + counts.alpha;
+    return {
+      classId: cid,
+      className: cls?.name || cid,
+      ...counts,
+      total,
+      rataHadir: total > 0 ? Math.round((counts.hadir / total) * 100) : 0,
+    };
+  });
+
+  summary.sort((a, b) => a.className.localeCompare(b.className));
+  res.json(summary);
+});
+
+// POST guru mencatat absensi santri kelas yang diajar
+app.post('/api/santri-attendances/guru', requireAuth('Guru'), (req, res) => {
+  const guru = (req as any).user as User;
+  if (!guru.teacherId) {
+    res.status(400).json({ error: 'Akun guru tidak terhubung ke data pengajar' });
+    return;
+  }
+
+  const { classId, date, jumlahHadir, jumlahIzin, jumlahSakit, jumlahAlpha, jumlahTotal, notes, academicYearId, semesterId } = req.body;
+
+  if (!classId || !date || !academicYearId || !semesterId) {
+    res.status(400).json({ error: 'classId, date, academicYearId, dan semesterId wajib diisi' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.santriAttendances) db.santriAttendances = [];
+
+  // Pastikan guru mengajar di kelas tersebut
+  const guruClassIds = new Set(
+    db.teachingSchedules.filter(s => s.teacherId === guru.teacherId).map(s => s.classId)
+  );
+  if (!guruClassIds.has(classId)) {
+    res.status(403).json({ error: 'Anda tidak mengajar di kelas ini' });
+    return;
+  }
+
+  // Cek duplikat: 1 absensi per kelas per tanggal
+  const dup = db.santriAttendances.find(a => a.classId === classId && a.date === date);
+  if (dup) {
+    res.status(400).json({ error: 'Absensi santri untuk kelas ini pada tanggal tersebut sudah ada.' });
+    return;
+  }
+
+  const cls = db.classes.find(c => c.id === classId);
+  const newAtt: SantriAttendance = {
+    id: `satt-${Date.now()}`,
+    classId, date,
+    jumlahHadir: jumlahHadir || 0,
+    jumlahIzin: jumlahIzin || 0,
+    jumlahSakit: jumlahSakit || 0,
+    jumlahAlpha: jumlahAlpha || 0,
+    jumlahTotal: jumlahTotal || 0,
+    notes: notes || '',
+    academicYearId, semesterId,
+    recordedBy: guru.id,
+    teacherId: guru.teacherId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  db.santriAttendances.push(newAtt);
+  saveDatabase(db);
+  logActivity(guru.id, guru.name, 'Guru', 'Catat Absensi Santri',
+    `${guru.name} mencatat absensi santri Kelas ${cls?.name} pada ${date}`);
+  res.status(201).json(newAtt);
+});
+
+// POST Admin mencatat absensi santri
+app.post('/api/santri-attendances', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const { classId, date, jumlahHadir, jumlahIzin, jumlahSakit, jumlahAlpha, jumlahTotal, notes, academicYearId, semesterId } = req.body;
+
+  if (!classId || !date || !academicYearId || !semesterId) {
+    res.status(400).json({ error: 'classId, date, academicYearId, dan semesterId wajib diisi' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.santriAttendances) db.santriAttendances = [];
+
+  const cls = db.classes.find(c => c.id === classId);
+  if (!cls) { res.status(404).json({ error: 'Kelas tidak ditemukan' }); return; }
+
+  // Cek duplikat: 1 absensi per kelas per tanggal
+  const dup = db.santriAttendances.find(a => a.classId === classId && a.date === date);
+  if (dup) {
+    res.status(400).json({ error: 'Absensi santri untuk kelas ini pada tanggal tersebut sudah ada. Gunakan edit untuk mengubah.' });
+    return;
+  }
+
+  const newAtt: SantriAttendance = {
+    id: `satt-${Date.now()}`,
+    classId, date,
+    jumlahHadir: jumlahHadir || 0,
+    jumlahIzin: jumlahIzin || 0,
+    jumlahSakit: jumlahSakit || 0,
+    jumlahAlpha: jumlahAlpha || 0,
+    jumlahTotal: jumlahTotal || 0,
+    notes: notes || '',
+    academicYearId, semesterId,
+    recordedBy: admin.id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  db.santriAttendances.push(newAtt);
+  saveDatabase(db);
+  logActivity(admin.id, admin.name, 'Admin', 'Catat Absensi Santri',
+    `Mencatat absensi santri Kelas ${cls.name} pada ${date}`);
+  res.status(201).json(newAtt);
+});
+
+// PUT update absensi santri (Admin only)
+app.put('/api/santri-attendances/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.santriAttendances) db.santriAttendances = [];
+
+  const att = db.santriAttendances.find(a => a.id === req.params.id);
+  if (!att) { res.status(404).json({ error: 'Data absensi santri tidak ditemukan' }); return; }
+
+  const { jumlahHadir, jumlahIzin, jumlahSakit, jumlahAlpha, jumlahTotal, notes, date, academicYearId, semesterId } = req.body;
+
+  if (jumlahHadir !== undefined) att.jumlahHadir = jumlahHadir;
+  if (jumlahIzin !== undefined)  att.jumlahIzin = jumlahIzin;
+  if (jumlahSakit !== undefined) att.jumlahSakit = jumlahSakit;
+  if (jumlahAlpha !== undefined) att.jumlahAlpha = jumlahAlpha;
+  if (jumlahTotal !== undefined) att.jumlahTotal = jumlahTotal;
+  if (notes !== undefined)       att.notes = notes;
+  if (date)                      att.date = date;
+  if (academicYearId)            att.academicYearId = academicYearId;
+  if (semesterId)                att.semesterId = semesterId;
+  att.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  const cls = db.classes.find(c => c.id === att.classId);
+  logActivity(admin.id, admin.name, 'Admin', 'Edit Absensi Santri',
+    `Mengubah absensi santri Kelas ${cls?.name} pada ${att.date}`);
+  res.json(att);
+});
+
+// DELETE absensi santri (Admin only)
+app.delete('/api/santri-attendances/:id', requireAuth('Admin'), (req, res) => {
+  const admin = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.santriAttendances) db.santriAttendances = [];
+
+  const idx = db.santriAttendances.findIndex(a => a.id === req.params.id);
+  if (idx === -1) { res.status(404).json({ error: 'Data absensi santri tidak ditemukan' }); return; }
+
+  const att = db.santriAttendances[idx];
+  db.santriAttendances.splice(idx, 1);
+  saveDatabase(db);
+
+  const cls = db.classes.find(c => c.id === att.classId);
+  logActivity(admin.id, admin.name, 'Admin', 'Hapus Absensi Santri',
+    `Menghapus absensi santri Kelas ${cls?.name} pada ${att.date}`);
+  res.json({ message: 'Absensi santri berhasil dihapus' });
+});
+
+
+// 11. Activity Logs API
 app.get('/api/activity-logs', requireAuth('Admin'), (req, res) => {
   res.json(getDatabase().activityLogs);
 });

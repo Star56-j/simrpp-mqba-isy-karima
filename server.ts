@@ -20,6 +20,7 @@ import {
   WaliKelas,
   Santri,
   Nilai,
+  RaporDetail,
   ActivityLog
 } from './src/server/db.ts';
 
@@ -58,6 +59,7 @@ function getAuthUser(req: express.Request): User | null {
         id: token,
         name: `Wali dari ${santri.name}`,
         email: '',
+        passwordHash: '',
         role: 'WaliSantri',
         santriId: santri.id
       };
@@ -141,6 +143,7 @@ app.post('/api/auth/wali-login', (req, res) => {
     id: `wali-${santri.id}`,
     name: `Wali dari ${santri.name}`,
     email: '',
+    passwordHash: '',
     role: 'WaliSantri',
     santriId: santri.id
   };
@@ -689,7 +692,7 @@ app.delete('/api/schedules/:id', requireAuth('Admin'), (req, res) => {
   const sch = db.teachingSchedules[schIdx];
   
   // Verify if there are associated RPP reports before deletion
-  if (db.rpps.some(r => r.scheduleId === sch.id)) {
+  if (db.rpps.some(r => r.classId === sch.classId && r.subjectId === sch.subjectId && r.academicYearId === sch.academicYearId)) {
     res.status(400).json({ error: 'Jadwal ini tidak bisa dihapus karena sudah ada laporan RPP yang dibuat pengajar' });
     return;
   }
@@ -1862,20 +1865,31 @@ app.post('/api/santri-attendance/bulk', requireAuth(), (req, res) => {
   const db = getDatabase();
   let count = 0;
   for (const item of attendances) {
-    const { santriId, classId, date, status, notes } = item;
-    if (!santriId || !classId || !date) continue;
-    const existing = db.santriAttendances.find(a => a.santriId === santriId && a.date === date);
+    const { classId, date, jumlahHadir, jumlahIzin, jumlahSakit, jumlahAlpha, jumlahTotal, notes, academicYearId, semesterId } = item;
+    if (!classId || !date) continue;
+    const existing = db.santriAttendances.find(a => a.classId === classId && a.date === date);
     if (existing) {
-      existing.status = status;
+      existing.jumlahHadir = Number(jumlahHadir || 0);
+      existing.jumlahIzin = Number(jumlahIzin || 0);
+      existing.jumlahSakit = Number(jumlahSakit || 0);
+      existing.jumlahAlpha = Number(jumlahAlpha || 0);
+      existing.jumlahTotal = Number(jumlahTotal || 0);
       existing.notes = notes || '';
       existing.updatedAt = new Date().toISOString();
       existing.teacherId = user.teacherId || user.id;
     } else {
       db.santriAttendances.push({
         id: `att-santri-${Date.now()}-${Math.floor(Math.random()*1000)}`,
-        santriId, classId, date,
-        status: status || 'Hadir',
+        classId, date,
+        jumlahHadir: Number(jumlahHadir || 0),
+        jumlahIzin: Number(jumlahIzin || 0),
+        jumlahSakit: Number(jumlahSakit || 0),
+        jumlahAlpha: Number(jumlahAlpha || 0),
+        jumlahTotal: Number(jumlahTotal || 0),
         notes: notes || '',
+        academicYearId: academicYearId || db.academicYears[0]?.id || '',
+        semesterId: semesterId || db.semesters[0]?.id || '',
+        recordedBy: user.name,
         teacherId: user.teacherId || user.id,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

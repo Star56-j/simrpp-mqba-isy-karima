@@ -262,6 +262,7 @@ export interface GuruStats {
     pending: number;
     approved: number;
     revision: number;
+  };
 }
 
 export interface KepribadianItem {

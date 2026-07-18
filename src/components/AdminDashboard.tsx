@@ -223,7 +223,7 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
                           <span>•</span>
                           <span>Kelas {rpp.class?.name}</span>
                           <span>•</span>
-                          <span>Pertemuan {rpp.meetingNo}</span>
+                          <span>TA {rpp.academicYear?.name || '-'}</span>
                         </span>
                       </div>
                     </div>

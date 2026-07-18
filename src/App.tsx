@@ -322,7 +322,7 @@ export default function App() {
             semesters={semesters}
             subjects={subjects}
             schedules={schedules}
-            waliKelasList={waliKelasList}
+            waliKelasList={waliKelas}
             currentUser={user}
             onRefresh={fetchData}
           />

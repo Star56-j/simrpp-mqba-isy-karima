@@ -7,8 +7,9 @@ export interface User {
   name: string;
   email: string;
   passwordHash: string;
-  role: 'Admin' | 'Guru';
+  role: 'Admin' | 'Guru' | 'WaliSantri';
   teacherId?: string;
+  santriId?: string;
 }
 
 export interface Teacher {
@@ -572,6 +573,13 @@ function seedDatabase(): DatabaseSchema {
       details: "Sistem berhasil diinisialisasi dan data master berhasil di-seed.",
       timestamp: new Date().toISOString()
     }
+  ];
+
+  const waliKelas: WaliKelas[] = [];
+  const santri: Santri[] = [
+    { id: "santri-1", nis: "2026001", name: "Ahmad Abdullah", classId: "cls-3", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "santri-2", nis: "2026002", name: "Muhammad Ibrahim", classId: "cls-3", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "santri-3", nis: "2026003", name: "Ali Ridho", classId: "cls-5", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   ];
 
   return {

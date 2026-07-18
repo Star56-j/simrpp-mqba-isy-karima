@@ -179,7 +179,7 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
       'Mata Pelajaran': r.subject?.name || r.subjectId,
       'Kelas': r.class?.name || r.classId,
       'Tahun Ajaran': r.academicYear?.name || r.academicYearId,
-      'Fase / Semester': `${r.fase || '-'} / ${r.semester || '-'}`,
+      'Fase / Semester': '-',
       'Status': r.status,
       'Tgl Dibuat': new Date(r.createdAt).toLocaleDateString('id-ID'),
       'Catatan Revisi': r.revisionNotes || '-'

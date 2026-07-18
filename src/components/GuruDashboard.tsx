@@ -191,7 +191,7 @@ export default function GuruDashboard({
               >
                 <div className="space-y-1">
                   <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {rpp.subject?.name} - Kelas {rpp.class?.name} (Pertemuan ke-{rpp.meetingNo})
+                    {rpp.subject?.name} - Kelas {rpp.class?.name}
                   </span>
                   <p className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
                     Catatan Revisi: <em className="italic font-normal">"{rpp.revisionNotes}"</em>
@@ -227,7 +227,7 @@ export default function GuruDashboard({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {mySchedules.map((sch) => {
               // Find if RPP already exists for this schedule to show indicator
-              const hasRpp = myRpps.some(r => r.scheduleId === sch.id);
+              const hasRpp = myRpps.some(r => r.classId === sch.classId && r.subjectId === sch.subjectId && r.academicYearId === sch.academicYearId);
               
               return (
                 <div 

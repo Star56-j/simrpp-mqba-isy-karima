@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle, Download, Upload
+  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle, Download, Upload, X
 } from 'lucide-react';
 import { Santri, Nilai, SchoolClass, AcademicYear, Semester, Subject, WaliKelas, TeachingSchedule } from '../types';
 import { api } from '../api';

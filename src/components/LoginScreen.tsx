@@ -4,7 +4,6 @@ import {
   Mail,
   AlertCircle,
   ArrowRight,
-  ArrowRight,
   Sparkles,
   Users,
   GraduationCap

@@ -117,18 +117,24 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
       if (data.length === 0) throw new Error("File kosong");
       setSubmitting(true);
       const attendancesToSave = data.map(row => {
-        const santri = mySantri.find(s => s.nis === String(row['NIS']));
-        if (!santri) return null;
+        const clsName = String(row['Kelas']).replace('Kelas ', '');
+        const cls = myClasses.find(c => c.name === clsName || c.id === clsName);
+        if (!cls) return null;
         return {
-          santriId: santri.id,
-          classId: santri.classId,
+          classId: cls.id,
           date: row['Tanggal'] || new Date().toISOString().split('T')[0],
-          status: row['Status'] || 'Hadir',
-          notes: row['Keterangan'] || ''
+          jumlahHadir: Number(row['Hadir'] || 0),
+          jumlahIzin: Number(row['Izin'] || 0),
+          jumlahSakit: Number(row['Sakit'] || 0),
+          jumlahAlpha: Number(row['Alpha'] || 0),
+          jumlahTotal: Number(row['Total'] || 0),
+          notes: row['Keterangan'] || '',
+          academicYearId: filterAY,
+          semesterId: filterSem
         };
       }).filter(Boolean);
       await api.createSantriAttendanceBulk({ attendances: attendancesToSave });
-      alert(`Berhasil mengimport ${attendancesToSave.length} data absensi`);
+      alert(`Berhasil mengimport data absensi`);
       loadData();
     } catch (err: any) {
       alert("Gagal mengimport: " + err.message);

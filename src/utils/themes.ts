@@ -116,7 +116,7 @@ export const dailyThemes: Theme[] = [
   // 6: Sabtu (Saturday) - Nuansa Nusantara (Islam Nusantara - Teakwood & Kawung Cream)
   {
     name: "Nusantara",
-    description: "Islam Nusantara (Cokelat Jati & Krem Kawung)",
+    description: "Islam Rahmatal lil alamin (Cokelat Jati & Krem Kawung)",
     colors: {
       "50": "#faf6f0",
       "100": "#f3e9db",

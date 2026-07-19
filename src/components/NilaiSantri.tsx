@@ -71,7 +71,7 @@ export default function NilaiSantri({
   
   // Available classes for dropdown
   const availableClasses = mode === 'input' 
-    ? (currentUser.role === 'Admin' ? classes : classes.filter(c => myClassIds.includes(c.id)))
+    ? (currentUser.role === 'Admin' ? classes : classes.filter(c => myClassIds.includes(c.id) || myWaliClasses.includes(c.id)))
     : (currentUser.role === 'Admin' ? classes : classes.filter(c => myWaliClasses.includes(c.id)));
 
   React.useEffect(() => {
@@ -141,7 +141,7 @@ export default function NilaiSantri({
     }
   };
 
-  const availableSubjects = currentUser.role === 'Admin' 
+  const availableSubjects = (currentUser.role === 'Admin' || myWaliClasses.includes(filterClass)) 
     ? subjects 
     : subjects.filter(s => mySchedules.some(sch => sch.classId === filterClass && sch.subjectId === s.id));
 

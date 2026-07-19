@@ -11,12 +11,18 @@ export function printRapor(
   waliKelasName: string,
   ketuaUnitName: string = "Ust. Umar Alamuddin, Lc."
 ) {
+  const getAverage = (n: Nilai): number => {
+    const count = [n.harian, n.bulanan, n.uts, n.uas].filter(v => v > 0).length;
+    if (count === 0) return 0;
+    return Math.round((n.harian + n.bulanan + n.uts + n.uas) / count);
+  };
+
   // Compute rata-rata kelas for each subject
   const subjectAverages: Record<string, number> = {};
   allSubjects.forEach(subj => {
     const subjNilai = nilaiList.filter(n => n.subjectId === subj.id);
     if (subjNilai.length > 0) {
-      subjectAverages[subj.id] = Math.round(subjNilai.reduce((a, b) => a + b.score, 0) / subjNilai.length);
+      subjectAverages[subj.id] = Math.round(subjNilai.reduce((a, b) => a + getAverage(b), 0) / subjNilai.length);
     } else {
       subjectAverages[subj.id] = 0;
     }
@@ -27,7 +33,7 @@ export function printRapor(
     const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === subj.id);
     return {
       subject: subj.name,
-      score: n ? n.score : 0,
+      score: n ? getAverage(n) : 0,
       classAvg: subjectAverages[subj.id] || 0
     };
   });

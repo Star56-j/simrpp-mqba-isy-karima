@@ -10,6 +10,13 @@ import { printRapor } from '../utils/printRapor';
 import RaporModal from './RaporModal';
 import { Printer } from 'lucide-react';
 
+// Helper: hitung rata-rata dari 4 kategori
+function nilaiAvg(n: Nilai): number {
+  const count = [n.harian, n.bulanan, n.uts, n.uas].filter(v => v > 0).length;
+  if (count === 0) return 0;
+  return Math.round((n.harian + n.bulanan + n.uts + n.uas) / count);
+}
+
 interface NilaiSantriProps {
   classes: SchoolClass[];
   academicYears: AcademicYear[];
@@ -37,9 +44,12 @@ export default function NilaiSantri({
   // Mode: 'input' (Guru) atau 'rapor' (Wali Kelas)
   const [mode, setMode] = React.useState<'input' | 'rapor'>('input');
 
-  // Input state
+  // Input state — 4 kategori
   const [editingId, setEditingId] = React.useState<string | null>(null);
-  const [editScore, setEditScore] = React.useState('');
+  const [editHarian, setEditHarian] = React.useState('');
+  const [editBulanan, setEditBulanan] = React.useState('');
+  const [editUts, setEditUts] = React.useState('');
+  const [editUas, setEditUas] = React.useState('');
   const [editNotes, setEditNotes] = React.useState('');
 
   const [saving, setSaving] = React.useState(false);
@@ -93,7 +103,10 @@ export default function NilaiSantri({
 
   const startEdit = (sId: string, n?: Nilai) => {
     setEditingId(sId);
-    setEditScore(n ? n.score.toString() : '');
+    setEditHarian(n ? n.harian.toString() : '');
+    setEditBulanan(n ? n.bulanan.toString() : '');
+    setEditUts(n ? n.uts.toString() : '');
+    setEditUas(n ? n.uas.toString() : '');
     setEditNotes(n ? n.notes : '');
     setMsg({ type: '', text: '' });
   };
@@ -111,7 +124,10 @@ export default function NilaiSantri({
         subjectId: filterSubject,
         academicYearId: filterAY,
         semesterId: filterSem,
-        score: Number(editScore) || 0,
+        harian: Number(editHarian) || 0,
+        bulanan: Number(editBulanan) || 0,
+        uts: Number(editUts) || 0,
+        uas: Number(editUas) || 0,
         notes: editNotes,
         teacherId: currentUser.teacherId || currentUser.id
       });
@@ -148,7 +164,11 @@ export default function NilaiSantri({
           'No': idx + 1,
           'NIS': santri.nis,
           'Nama Santri': santri.name,
-          'Nilai': n ? n.score : '-',
+          'Harian': n ? n.harian : '-',
+          'Bulanan': n ? n.bulanan : '-',
+          'UTS': n ? n.uts : '-',
+          'UAS': n ? n.uas : '-',
+          'Rata-rata': n ? nilaiAvg(n) : '-',
           'Catatan': n ? n.notes : '-'
         };
       });
@@ -157,7 +177,7 @@ export default function NilaiSantri({
       const exportData = santriList.map((santri, idx) => {
         const santriNilai = nilaiList.filter(x => x.santriId === santri.id);
         const avg = santriNilai.length > 0 
-          ? Math.round(santriNilai.reduce((a, b) => a + b.score, 0) / santriNilai.length) 
+          ? Math.round(santriNilai.reduce((a, b) => a + nilaiAvg(b), 0) / santriNilai.length) 
           : 0;
         return {
           'No': idx + 1,
@@ -190,7 +210,10 @@ export default function NilaiSantri({
             subjectId: filterSubject,
             academicYearId: filterAY,
             semesterId: filterSem,
-            score: Number(row['Nilai'] || 0),
+            harian: Number(row['Harian'] || 0),
+            bulanan: Number(row['Bulanan'] || 0),
+            uts: Number(row['UTS'] || 0),
+            uas: Number(row['UAS'] || 0),
             notes: row['Catatan'] || ''
           };
         }).filter(Boolean);
@@ -223,17 +246,25 @@ export default function NilaiSantri({
     }
   };
 
+  // Fungsi render warna nilai
+  const scoreColor = (v: number) => {
+    if (v === 0) return 'text-slate-300';
+    if (v < 60) return 'text-rose-500';
+    if (v < 75) return 'text-amber-500';
+    return 'text-teal-600 dark:text-teal-400';
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Nilai & Rapor</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Input nilai mata pelajaran dan lihat rapor santri.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Input nilai 4 kategori (Harian, Bulanan, UTS, UAS) dan lihat rapor santri.</p>
         </div>
         
         {/* Toggle Mode & Export */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {isWaliKelas && (
             <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
               <button onClick={() => setMode('input')}
@@ -293,9 +324,19 @@ export default function NilaiSantri({
       </div>
 
       {msg.text && (
-        <div className={`p-4 rounded-xl flex items-center space-x-2 text-sm font-semibold ${msg.type === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-teal-50 text-teal-700'}`}>
+        <div className={`p-4 rounded-xl flex items-center space-x-2 text-sm font-semibold ${msg.type === 'error' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400' : 'bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400'}`}>
           {msg.type === 'error' ? <AlertCircle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
           <span>{msg.text}</span>
+        </div>
+      )}
+
+      {/* Legend — kategori penilaian */}
+      {mode === 'input' && (
+        <div className="flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500" /><span>Harian</span></span>
+          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span>Bulanan</span></span>
+          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-teal-500" /><span>UTS</span></span>
+          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /><span>UAS</span></span>
         </div>
       )}
 
@@ -310,14 +351,26 @@ export default function NilaiSantri({
             <table className="w-full text-left text-sm">
               <thead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/30 dark:bg-slate-800/20">
                 <tr>
-                  <th className="px-4 py-3 w-16">No</th>
-                  <th className="px-4 py-3 w-32">NIS</th>
+                  <th className="px-4 py-3 w-12">No</th>
+                  <th className="px-4 py-3 w-24">NIS</th>
                   <th className="px-4 py-3">Nama Santri</th>
                   {mode === 'input' ? (
                     <>
-                      <th className="px-4 py-3 text-center w-24">Nilai</th>
-                      <th className="px-4 py-3">Catatan / Deskripsi</th>
-                      <th className="px-4 py-3 text-center w-24">Aksi</th>
+                      <th className="px-3 py-3 text-center w-20">
+                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /><span>Harian</span></span>
+                      </th>
+                      <th className="px-3 py-3 text-center w-20">
+                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /><span>Bulanan</span></span>
+                      </th>
+                      <th className="px-3 py-3 text-center w-20">
+                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-teal-500" /><span>UTS</span></span>
+                      </th>
+                      <th className="px-3 py-3 text-center w-20">
+                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /><span>UAS</span></span>
+                      </th>
+                      <th className="px-3 py-3 text-center w-20">Rata²</th>
+                      <th className="px-3 py-3">Catatan</th>
+                      <th className="px-3 py-3 text-center w-20">Aksi</th>
                     </>
                   ) : (
                     <>
@@ -332,6 +385,7 @@ export default function NilaiSantri({
                   if (mode === 'input') {
                     const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === filterSubject);
                     const isEditing = editingId === santri.id;
+                    const avg = n ? nilaiAvg(n) : 0;
                     
                     return (
                       <tr key={santri.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
@@ -339,25 +393,71 @@ export default function NilaiSantri({
                         <td className="px-4 py-3 font-mono text-xs">{santri.nis}</td>
                         <td className="px-4 py-3 font-bold">{santri.name}</td>
                         
-                        <td className="px-4 py-3 text-center">
+                        {/* Harian */}
+                        <td className="px-3 py-3 text-center">
                           {isEditing ? (
-                            <input type="number" min="0" max="100" value={editScore} onChange={e => setEditScore(e.target.value)}
-                              className="w-16 px-2 py-1 text-center border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                            <input type="number" min="0" max="100" value={editHarian} onChange={e => setEditHarian(e.target.value)}
+                              placeholder="0" className="w-14 px-1.5 py-1 text-center border border-indigo-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                           ) : (
-                            <span className={`font-bold ${n ? (n.score < 75 ? 'text-rose-500' : 'text-teal-600') : 'text-slate-300'}`}>
-                              {n ? n.score : '-'}
+                            <span className={`font-bold text-xs ${n ? scoreColor(n.harian) : 'text-slate-300'}`}>
+                              {n && n.harian > 0 ? n.harian : '-'}
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3">
+                        {/* Bulanan */}
+                        <td className="px-3 py-3 text-center">
+                          {isEditing ? (
+                            <input type="number" min="0" max="100" value={editBulanan} onChange={e => setEditBulanan(e.target.value)}
+                              placeholder="0" className="w-14 px-1.5 py-1 text-center border border-amber-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                          ) : (
+                            <span className={`font-bold text-xs ${n ? scoreColor(n.bulanan) : 'text-slate-300'}`}>
+                              {n && n.bulanan > 0 ? n.bulanan : '-'}
+                            </span>
+                          )}
+                        </td>
+                        {/* UTS */}
+                        <td className="px-3 py-3 text-center">
+                          {isEditing ? (
+                            <input type="number" min="0" max="100" value={editUts} onChange={e => setEditUts(e.target.value)}
+                              placeholder="0" className="w-14 px-1.5 py-1 text-center border border-teal-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                          ) : (
+                            <span className={`font-bold text-xs ${n ? scoreColor(n.uts) : 'text-slate-300'}`}>
+                              {n && n.uts > 0 ? n.uts : '-'}
+                            </span>
+                          )}
+                        </td>
+                        {/* UAS */}
+                        <td className="px-3 py-3 text-center">
+                          {isEditing ? (
+                            <input type="number" min="0" max="100" value={editUas} onChange={e => setEditUas(e.target.value)}
+                              placeholder="0" className="w-14 px-1.5 py-1 text-center border border-rose-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-rose-500" />
+                          ) : (
+                            <span className={`font-bold text-xs ${n ? scoreColor(n.uas) : 'text-slate-300'}`}>
+                              {n && n.uas > 0 ? n.uas : '-'}
+                            </span>
+                          )}
+                        </td>
+                        {/* Rata-rata */}
+                        <td className="px-3 py-3 text-center">
+                          {!isEditing && n ? (
+                            <span className={`font-black text-sm ${scoreColor(avg)}`}>{avg > 0 ? avg : '-'}</span>
+                          ) : isEditing ? (
+                            <span className="text-[10px] text-slate-400 italic">Auto</span>
+                          ) : (
+                            <span className="text-slate-300">-</span>
+                          )}
+                        </td>
+                        {/* Catatan */}
+                        <td className="px-3 py-3">
                           {isEditing ? (
                             <input type="text" placeholder="Catatan (opsional)" value={editNotes} onChange={e => setEditNotes(e.target.value)}
-                              className="w-full px-2 py-1 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                              className="w-full px-2 py-1 border border-indigo-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                           ) : (
                             <span className="text-slate-500 text-xs">{n?.notes || '-'}</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        {/* Aksi */}
+                        <td className="px-3 py-3 text-center">
                           {isEditing ? (
                             <div className="flex space-x-1 justify-center">
                               <button onClick={() => setEditingId(null)} className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded" disabled={saving}><X className="w-3.5 h-3.5"/></button>
@@ -375,7 +475,7 @@ export default function NilaiSantri({
                     // RAPOR MODE (Wali Kelas / Admin)
                     const santriNilai = nilaiList.filter(x => x.santriId === santri.id);
                     const avg = santriNilai.length > 0 
-                      ? Math.round(santriNilai.reduce((a, b) => a + b.score, 0) / santriNilai.length) 
+                      ? Math.round(santriNilai.reduce((a, b) => a + nilaiAvg(b), 0) / santriNilai.length) 
                       : 0;
 
                     return (

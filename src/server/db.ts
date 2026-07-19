@@ -166,7 +166,10 @@ export interface Nilai {
   academicYearId: string;
   semesterId: string;
   teacherId: string;
-  score: number;
+  harian: number;    // Nilai Harian
+  bulanan: number;   // Nilai Bulanan
+  uts: number;       // Ujian Tengah Semester
+  uas: number;       // Ujian Akhir Semester
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -292,6 +295,20 @@ export function getDatabase(): DatabaseSchema {
     if (!parsed.raporDetails) {
       parsed.raporDetails = [];
       saveDatabase(parsed);
+    }
+    // Migrate: konversi score tunggal → 4 kategori (harian, bulanan, uts, uas)
+    if (parsed.nilai && parsed.nilai.length > 0 && (parsed.nilai[0] as any).score !== undefined) {
+      parsed.nilai = parsed.nilai.map((n: any) => ({
+        ...n,
+        harian: n.score || 0,
+        bulanan: n.bulanan || 0,
+        uts: n.uts || 0,
+        uas: n.uas || 0,
+      }));
+      // Remove old score field
+      parsed.nilai.forEach((n: any) => { delete n.score; });
+      saveDatabase(parsed);
+      console.log('Migrated nilai from single score to 4 categories');
     }
     return parsed;
   } catch (error) {

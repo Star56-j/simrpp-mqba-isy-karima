@@ -1679,9 +1679,9 @@ app.get('/api/nilai', requireAuth(), (req, res) => {
 
 app.post('/api/nilai', requireAuth(), (req, res) => {
   const user = (req as any).user as User;
-  const { santriId, subjectId, academicYearId, semesterId, score, notes } = req.body;
+  const { santriId, subjectId, academicYearId, semesterId, harian, bulanan, uts, uas, notes } = req.body;
 
-  if (!santriId || !subjectId || !academicYearId || !semesterId || score === undefined) {
+  if (!santriId || !subjectId || !academicYearId || !semesterId) {
     res.status(400).json({ error: 'Data nilai tidak lengkap' });
     return;
   }
@@ -1701,7 +1701,10 @@ app.post('/api/nilai', requireAuth(), (req, res) => {
 
   if (nilai) {
     // Update
-    nilai.score = Number(score);
+    if (harian !== undefined) nilai.harian = Number(harian);
+    if (bulanan !== undefined) nilai.bulanan = Number(bulanan);
+    if (uts !== undefined) nilai.uts = Number(uts);
+    if (uas !== undefined) nilai.uas = Number(uas);
     nilai.notes = notes || '';
     nilai.teacherId = user.teacherId || user.id;
     nilai.updatedAt = new Date().toISOString();
@@ -1712,7 +1715,10 @@ app.post('/api/nilai', requireAuth(), (req, res) => {
       id: `nilai-${Date.now()}-${Math.floor(Math.random()*1000)}`,
       santriId, subjectId, academicYearId, semesterId,
       teacherId: user.teacherId || user.id,
-      score: Number(score),
+      harian: Number(harian || 0),
+      bulanan: Number(bulanan || 0),
+      uts: Number(uts || 0),
+      uas: Number(uas || 0),
       notes: notes || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -1733,8 +1739,11 @@ app.put('/api/nilai/:id', requireAuth(), (req, res) => {
   const nilai = db.nilai.find(n => n.id === req.params.id);
   if (!nilai) { res.status(404).json({ error: 'Nilai tidak ditemukan' }); return; }
 
-  const { score, notes } = req.body;
-  if (score !== undefined) nilai.score = Number(score);
+  const { harian, bulanan, uts, uas, notes } = req.body;
+  if (harian !== undefined) nilai.harian = Number(harian);
+  if (bulanan !== undefined) nilai.bulanan = Number(bulanan);
+  if (uts !== undefined) nilai.uts = Number(uts);
+  if (uas !== undefined) nilai.uas = Number(uas);
   if (notes !== undefined) nilai.notes = notes;
   nilai.teacherId = user.teacherId || user.id; // Mark last editor
   nilai.updatedAt = new Date().toISOString();
@@ -1912,11 +1921,14 @@ app.post('/api/nilai/bulk', requireAuth(), (req, res) => {
   const db = getDatabase();
   let count = 0;
   for (const item of nilaiList) {
-    const { santriId, subjectId, academicYearId, semesterId, score, notes } = item;
+    const { santriId, subjectId, academicYearId, semesterId, harian, bulanan, uts, uas, notes } = item;
     if (!santriId || !subjectId || !academicYearId || !semesterId) continue;
     const existing = db.nilai.find(n => n.santriId === santriId && n.subjectId === subjectId && n.academicYearId === academicYearId && n.semesterId === semesterId);
     if (existing) {
-      existing.score = Number(score);
+      if (harian !== undefined) existing.harian = Number(harian);
+      if (bulanan !== undefined) existing.bulanan = Number(bulanan);
+      if (uts !== undefined) existing.uts = Number(uts);
+      if (uas !== undefined) existing.uas = Number(uas);
       existing.notes = notes || '';
       existing.updatedAt = new Date().toISOString();
       existing.teacherId = user.teacherId || user.id;
@@ -1925,7 +1937,10 @@ app.post('/api/nilai/bulk', requireAuth(), (req, res) => {
         id: `nilai-${Date.now()}-${Math.floor(Math.random()*1000)}`,
         santriId, subjectId, academicYearId, semesterId,
         teacherId: user.teacherId || user.id,
-        score: Number(score),
+        harian: Number(harian || 0),
+        bulanan: Number(bulanan || 0),
+        uts: Number(uts || 0),
+        uas: Number(uas || 0),
         notes: notes || '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

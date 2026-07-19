@@ -49,8 +49,14 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
     );
   }
 
+  const getAverage = (n: Nilai): number => {
+    const count = [n.harian, n.bulanan, n.uts, n.uas].filter(v => v > 0).length;
+    if (count === 0) return 0;
+    return Math.round((n.harian + n.bulanan + n.uts + n.uas) / count);
+  };
+
   const avg = nilaiList.length > 0 
-    ? Math.round(nilaiList.reduce((a, b) => a + b.score, 0) / nilaiList.length) 
+    ? Math.round(nilaiList.reduce((a, b) => a + getAverage(b), 0) / nilaiList.length) 
     : 0;
 
   return (
@@ -119,7 +125,7 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
 
         {/* Rapor Section */}
         <div className="bg-[#fffdf8] dark:bg-[#251c18] rounded-3xl border border-[#c7a86a]/30 shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#c7a86a]/20 bg-gradient-to-r from-[#402654]/5 to-transparent flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-[#c7a86a]/20 bg-gradient-to-r from-[#402654]/5 to-transparent flex items-center justify-between flex-wrap gap-4">
             <h3 className="text-sm font-extrabold text-[#30211b] dark:text-[#dfc88f] uppercase tracking-wider flex items-center space-x-2">
               <BookOpen className="w-4 h-4 text-[#8f6b39]" />
               <span>Rapor Hasil Belajar</span>
@@ -175,30 +181,41 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="text-[10px] font-black text-[#79462e] dark:text-[#dfc88f] uppercase tracking-[0.1em] bg-[#f8eed9] dark:bg-[#342720]">
                   <tr>
-                    <th className="px-6 py-3">Mata Pelajaran</th>
-                    <th className="px-6 py-3 text-center">Nilai Angka</th>
-                    <th className="px-6 py-3">Catatan / Deskripsi</th>
+                    <th className="px-4 py-3">Mata Pelajaran</th>
+                    <th className="px-2 py-3 text-center">Harian</th>
+                    <th className="px-2 py-3 text-center">Bulanan</th>
+                    <th className="px-2 py-3 text-center">UTS</th>
+                    <th className="px-2 py-3 text-center">UAS</th>
+                    <th className="px-3 py-3 text-center">Rata²</th>
+                    <th className="px-4 py-3">Catatan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#c7a86a]/10 text-sm">
-                  {nilaiList.map(n => (
-                    <tr key={n.id} className="hover:bg-[#402654]/5 transition-colors">
-                      <td className="px-6 py-4 font-bold text-[#30211b] dark:text-[#fff8e8]">
-                        {(n as any).subject?.name || n.subjectId}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full font-black ${n.score < 75 ? 'bg-rose-100 text-rose-700' : 'bg-[#e9dcc5] text-[#402654] dark:bg-[#473428] dark:text-[#dfc88f]'}`}>
-                          {n.score}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-xs leading-5 text-[#826f64] dark:text-[#bdaea4]">
-                        {n.notes || <span className="italic opacity-50">Tidak ada catatan</span>}
-                      </td>
-                    </tr>
-                  ))}
+                <tbody className="divide-y divide-[#c7a86a]/10 text-xs sm:text-sm">
+                  {nilaiList.map(n => {
+                    const studentAvg = getAverage(n);
+                    return (
+                      <tr key={n.id} className="hover:bg-[#402654]/5 transition-colors">
+                        <td className="px-4 py-4 font-bold text-[#30211b] dark:text-[#fff8e8]">
+                          {(n as any).subject?.name || n.subjectId}
+                        </td>
+                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.harian || '-'}</td>
+                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.bulanan || '-'}</td>
+                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uts || '-'}</td>
+                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uas || '-'}</td>
+                        <td className="px-3 py-4 text-center">
+                          <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-black ${studentAvg < 75 ? 'bg-rose-100 text-rose-700' : 'bg-[#e9dcc5] text-[#402654] dark:bg-[#473428] dark:text-[#dfc88f]'}`}>
+                            {studentAvg}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-xs leading-5 text-[#826f64] dark:text-[#bdaea4]">
+                          {n.notes || <span className="italic opacity-50">Tidak ada catatan</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

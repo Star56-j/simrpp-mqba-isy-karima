@@ -10,11 +10,11 @@ import { printRapor } from '../utils/printRapor';
 import RaporModal from './RaporModal';
 import { Printer } from 'lucide-react';
 
-// Helper: hitung rata-rata dari 4 kategori
+// Helper: hitung rata-rata dari 5 kategori
 function nilaiAvg(n: Nilai): number {
-  const count = [n.harian, n.bulanan, n.uts, n.uas].filter(v => v > 0).length;
+  const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;
   if (count === 0) return 0;
-  return Math.round((n.harian + n.bulanan + n.uts + n.uas) / count);
+  return Math.round((n.harian + n.bulanan + n.uts + n.uas + (n.uasLisan || 0)) / count);
 }
 
 interface NilaiSantriProps {
@@ -44,12 +44,13 @@ export default function NilaiSantri({
   // Mode: 'input' (Guru) atau 'rapor' (Wali Kelas)
   const [mode, setMode] = React.useState<'input' | 'rapor'>('input');
 
-  // Input state — 4 kategori
+  // Input state — 5 kategori
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editHarian, setEditHarian] = React.useState('');
   const [editBulanan, setEditBulanan] = React.useState('');
   const [editUts, setEditUts] = React.useState('');
   const [editUas, setEditUas] = React.useState('');
+  const [editUasLisan, setEditUasLisan] = React.useState('');
   const [editNotes, setEditNotes] = React.useState('');
 
   const [saving, setSaving] = React.useState(false);
@@ -107,6 +108,7 @@ export default function NilaiSantri({
     setEditBulanan(n ? n.bulanan.toString() : '');
     setEditUts(n ? n.uts.toString() : '');
     setEditUas(n ? n.uas.toString() : '');
+    setEditUasLisan(n && n.uasLisan ? n.uasLisan.toString() : '');
     setEditNotes(n ? n.notes : '');
     setMsg({ type: '', text: '' });
   };
@@ -128,6 +130,7 @@ export default function NilaiSantri({
         bulanan: Number(editBulanan) || 0,
         uts: Number(editUts) || 0,
         uas: Number(editUas) || 0,
+        uasLisan: Number(editUasLisan) || 0,
         notes: editNotes,
         teacherId: currentUser.teacherId || currentUser.id
       });
@@ -167,7 +170,8 @@ export default function NilaiSantri({
           'Harian': n ? n.harian : '-',
           'Bulanan': n ? n.bulanan : '-',
           'UTS': n ? n.uts : '-',
-          'UAS': n ? n.uas : '-',
+          'UAS Tulis': n ? n.uas : '-',
+          'UAS Lisan': n ? n.uasLisan : '-',
           'Rata-rata': n ? nilaiAvg(n) : '-',
           'Catatan': n ? n.notes : '-'
         };
@@ -213,7 +217,8 @@ export default function NilaiSantri({
             harian: Number(row['Harian'] || 0),
             bulanan: Number(row['Bulanan'] || 0),
             uts: Number(row['UTS'] || 0),
-            uas: Number(row['UAS'] || 0),
+            uas: Number(row['UAS Tulis'] || row['UAS'] || 0),
+            uasLisan: Number(row['UAS Lisan'] || 0),
             notes: row['Catatan'] || ''
           };
         }).filter(Boolean);
@@ -260,7 +265,7 @@ export default function NilaiSantri({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Nilai & Rapor</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Input nilai 4 kategori (Harian, Bulanan, UTS, UAS) dan lihat rapor santri.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Input nilai 5 kategori (Harian, Bulanan, UTS, UAS Tulis, UAS Lisan) dan lihat rapor santri.</p>
         </div>
         
         {/* Toggle Mode & Export */}
@@ -336,7 +341,8 @@ export default function NilaiSantri({
           <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500" /><span>Harian</span></span>
           <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span>Bulanan</span></span>
           <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-teal-500" /><span>UTS</span></span>
-          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /><span>UAS</span></span>
+          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /><span>UAS Tulis</span></span>
+          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-fuchsia-500" /><span>UAS Lisan</span></span>
         </div>
       )}
 
@@ -366,7 +372,10 @@ export default function NilaiSantri({
                         <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-teal-500" /><span>UTS</span></span>
                       </th>
                       <th className="px-3 py-3 text-center w-20">
-                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /><span>UAS</span></span>
+                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /><span>UAS Tulis</span></span>
+                      </th>
+                      <th className="px-3 py-3 text-center w-20">
+                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" /><span>UAS Lisan</span></span>
                       </th>
                       <th className="px-3 py-3 text-center w-20">Rata²</th>
                       <th className="px-3 py-3">Catatan</th>
@@ -426,7 +435,7 @@ export default function NilaiSantri({
                             </span>
                           )}
                         </td>
-                        {/* UAS */}
+                        {/* UAS Tulis */}
                         <td className="px-3 py-3 text-center">
                           {isEditing ? (
                             <input type="number" min="0" max="100" value={editUas} onChange={e => setEditUas(e.target.value)}
@@ -434,6 +443,17 @@ export default function NilaiSantri({
                           ) : (
                             <span className={`font-bold text-xs ${n ? scoreColor(n.uas) : 'text-slate-300'}`}>
                               {n && n.uas > 0 ? n.uas : '-'}
+                            </span>
+                          )}
+                        </td>
+                        {/* UAS Lisan */}
+                        <td className="px-3 py-3 text-center">
+                          {isEditing ? (
+                            <input type="number" min="0" max="100" value={editUasLisan} onChange={e => setEditUasLisan(e.target.value)}
+                              placeholder="0" className="w-14 px-1.5 py-1 text-center border border-fuchsia-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-fuchsia-500" />
+                          ) : (
+                            <span className={`font-bold text-xs ${n ? scoreColor(n.uasLisan || 0) : 'text-slate-300'}`}>
+                              {n && n.uasLisan && n.uasLisan > 0 ? n.uasLisan : '-'}
                             </span>
                           )}
                         </td>

@@ -15,7 +15,8 @@ import {
   AdminStats,
   GuruStats
 } from './types';
-import { Bell, Plus } from 'lucide-react';
+import { Bell, Plus, Megaphone } from 'lucide-react';
+import Pengumuman from './components/Pengumuman';
 
 // Component Imports
 import Sidebar from './components/Sidebar';
@@ -48,6 +49,7 @@ export default function App() {
   });
   const [showNotif, setShowNotif] = React.useState(false);
   const notifRef = React.useRef<HTMLDivElement>(null);
+  const [activeToast, setActiveToast] = React.useState<{ title: string; body: string } | null>(null);
 
   // Tutup notif kalau klik di luar
   React.useEffect(() => {
@@ -97,6 +99,45 @@ export default function App() {
       setView(activeUser.role === 'Admin' ? 'admin-dashboard' : 'guru-dashboard');
     }
   }, []);
+
+  // Poller Pengumuman Real-time
+  React.useEffect(() => {
+    if (!user || user.role === 'WaliSantri') return;
+
+    const checkNewAnnouncements = async () => {
+      try {
+        const announcements = await api.getPengumuman();
+        if (announcements && announcements.length > 0) {
+          const newest = announcements[0];
+          const lastNotifiedId = localStorage.getItem('simrpp_last_notified_announcement_id');
+          
+          if (lastNotifiedId !== newest.id) {
+            localStorage.setItem('simrpp_last_notified_announcement_id', newest.id);
+            
+            if (newest.authorId !== user.id) {
+              setActiveToast({
+                title: newest.title,
+                body: newest.content
+              });
+
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(`Pengumuman Baru: ${newest.title}`, {
+                  body: newest.content.substring(0, 100),
+                  icon: '/logo-mqba.png'
+                });
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to poll announcements:', err);
+      }
+    };
+
+    checkNewAnnouncements();
+    const interval = setInterval(checkNewAnnouncements, 15000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   // Fetch all app data when logged in
   const fetchData = async (currentUser: User | null = user) => {
@@ -300,6 +341,9 @@ export default function App() {
       case 'profile-settings':
         return <ProfileSettings onRefresh={fetchData} />;
 
+      case 'pengumuman':
+        return <Pengumuman currentUser={user} />;
+
       case 'wali-kelas':
         return (
           <WaliKelasPage
@@ -354,6 +398,7 @@ export default function App() {
       case 'my-santri-attendance': return 'Absensi Santri';
       case 'wali-kelas': return 'Wali Kelas';
       case 'profile-settings': return 'Pengaturan Profil';
+      case 'pengumuman': return 'Pengumuman Akademik';
       default: return 'Akademik MQBA Isy Karima';
     }
   };
@@ -492,6 +537,32 @@ export default function App() {
             </span>
           </div>
         </footer>
+        {activeToast && (
+          <div className="fixed bottom-5 right-5 z-[9999] p-4 bg-white dark:bg-slate-900 border-l-4 border-indigo-500 rounded-xl shadow-2xl flex items-start space-x-3 max-w-sm border border-slate-100 dark:border-slate-805 transition-all">
+            <div className="p-2 rounded-lg bg-indigo-500 text-white shrink-0 animate-bounce">
+              <Megaphone className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-bold text-sm text-slate-800 dark:text-white">{activeToast.title}</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-405 line-clamp-2">{activeToast.body}</p>
+              <button 
+                onClick={() => {
+                  setView('pengumuman');
+                  setActiveToast(null);
+                }}
+                className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 hover:text-indigo-750 dark:text-indigo-400 block pt-1 cursor-pointer"
+              >
+                Lihat Detail
+              </button>
+            </div>
+            <button 
+              onClick={() => setActiveToast(null)}
+              className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 text-xs shrink-0 pl-2 font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

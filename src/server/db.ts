@@ -169,10 +169,21 @@ export interface Nilai {
   harian: number;    // Nilai Harian
   bulanan: number;   // Nilai Bulanan
   uts: number;       // Ujian Tengah Semester
-  uas: number;       // Ujian Akhir Semester
+  uas: number;       // Ujian Akhir Semester (Tulis)
+  uasLisan: number;  // Ujian Akhir Semester Lisan
   notes: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Pengumuman {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  authorId: string;
+  authorName: string;
 }
 
 export interface DatabaseSchema {
@@ -191,6 +202,7 @@ export interface DatabaseSchema {
   nilai: Nilai[];
   activityLogs: ActivityLog[];
   raporDetails: RaporDetail[];
+  pengumuman: Pengumuman[];
 }
 
 export interface KepribadianItem {
@@ -385,6 +397,11 @@ export function getDatabase(): DatabaseSchema {
       parsed.raporDetails = [];
       saveDatabase(parsed);
     }
+    // Migrate: tambah pengumuman jika belum ada
+    if (!parsed.pengumuman) {
+      parsed.pengumuman = [];
+      saveDatabase(parsed);
+    }
     // Migrate: konversi score tunggal → 4 kategori (harian, bulanan, uts, uas)
     if (parsed.nilai && parsed.nilai.length > 0 && (parsed.nilai[0] as any).score !== undefined) {
       parsed.nilai = parsed.nilai.map((n: any) => ({
@@ -393,11 +410,27 @@ export function getDatabase(): DatabaseSchema {
         bulanan: n.bulanan || 0,
         uts: n.uts || 0,
         uas: n.uas || 0,
+        uasLisan: n.uasLisan || 0,
       }));
       // Remove old score field
       parsed.nilai.forEach((n: any) => { delete n.score; });
       saveDatabase(parsed);
       console.log('Migrated nilai from single score to 4 categories');
+    }
+
+    // Migrate: tambah uasLisan ke nilai jika belum ada
+    if (parsed.nilai && parsed.nilai.length > 0) {
+      let migratedUasLisan = false;
+      parsed.nilai.forEach((n: any) => {
+        if (n.uasLisan === undefined) {
+          n.uasLisan = 0;
+          migratedUasLisan = true;
+        }
+      });
+      if (migratedUasLisan) {
+        saveDatabase(parsed);
+        console.log('Migrated database: added uasLisan to existing grades');
+      }
     }
 
     // Migrate: ganti format penamaan kelas
@@ -814,6 +847,7 @@ function seedDatabase(): DatabaseSchema {
     santri,
     nilai: [],
     activityLogs,
-    raporDetails: []
+    raporDetails: [],
+    pengumuman: []
   };
 }

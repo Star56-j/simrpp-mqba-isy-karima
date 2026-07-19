@@ -50,9 +50,9 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
   }
 
   const getAverage = (n: Nilai): number => {
-    const count = [n.harian, n.bulanan, n.uts, n.uas].filter(v => v > 0).length;
+    const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;
     if (count === 0) return 0;
-    return Math.round((n.harian + n.bulanan + n.uts + n.uas) / count);
+    return Math.round((n.harian + n.bulanan + n.uts + n.uas + (n.uasLisan || 0)) / count);
   };
 
   const avg = nilaiList.length > 0 
@@ -188,7 +188,8 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
                     <th className="px-2 py-3 text-center">Harian</th>
                     <th className="px-2 py-3 text-center">Bulanan</th>
                     <th className="px-2 py-3 text-center">UTS</th>
-                    <th className="px-2 py-3 text-center">UAS</th>
+                    <th className="px-2 py-3 text-center">UAS Tulis</th>
+                    <th className="px-2 py-3 text-center">UAS Lisan</th>
                     <th className="px-3 py-3 text-center">Rata²</th>
                     <th className="px-4 py-3">Catatan</th>
                   </tr>
@@ -205,6 +206,7 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
                         <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.bulanan || '-'}</td>
                         <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uts || '-'}</td>
                         <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uas || '-'}</td>
+                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uasLisan || '-'}</td>
                         <td className="px-3 py-4 text-center">
                           <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-black ${studentAvg < 75 ? 'bg-rose-100 text-rose-700' : 'bg-[#e9dcc5] text-[#402654] dark:bg-[#473428] dark:text-[#dfc88f]'}`}>
                             {studentAvg}

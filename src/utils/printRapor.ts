@@ -12,9 +12,9 @@ export function printRapor(
   ketuaUnitName: string = "Ust. Umar Alamuddin, Lc."
 ) {
   const getAverage = (n: Nilai): number => {
-    const count = [n.harian, n.bulanan, n.uts, n.uas].filter(v => v > 0).length;
+    const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;
     if (count === 0) return 0;
-    return Math.round((n.harian + n.bulanan + n.uts + n.uas) / count);
+    return Math.round((n.harian + n.bulanan + n.uts + n.uas + (n.uasLisan || 0)) / count);
   };
 
   // Compute rata-rata kelas for each subject

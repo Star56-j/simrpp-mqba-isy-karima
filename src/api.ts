@@ -17,7 +17,8 @@ import {
   Nilai,
   AdminStats,
   GuruStats,
-  RaporDetail
+  RaporDetail,
+  Pengumuman
 } from './types';
 
 const getHeaders = () => {
@@ -524,6 +525,22 @@ export const api = {
         reject(new Error('Gagal membaca file'));
       };
       reader.readAsDataURL(file);
+    });
+  },
+
+  // Pengumuman
+  async getPengumuman(): Promise<Pengumuman[]> {
+    return fetchJson<Pengumuman[]>('/api/pengumuman');
+  },
+  async createPengumuman(data: { title: string; content: string }): Promise<Pengumuman> {
+    return fetchJson<Pengumuman>('/api/pengumuman', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async deletePengumuman(id: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`/api/pengumuman/${id}`, {
+      method: 'DELETE',
     });
   }
 };

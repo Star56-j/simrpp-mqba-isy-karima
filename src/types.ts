@@ -220,7 +220,7 @@ export interface Santri {
   class?: SchoolClass;
 }
 
-export type NilaiCategory = 'Harian' | 'Bulanan' | 'UTS' | 'UAS';
+export type NilaiCategory = 'Harian' | 'Bulanan' | 'UTS' | 'UAS' | 'UASLisan';
 
 export interface Nilai {
   id: string;
@@ -232,7 +232,8 @@ export interface Nilai {
   harian: number;    // Nilai Harian
   bulanan: number;   // Nilai Bulanan
   uts: number;       // Ujian Tengah Semester
-  uas: number;       // Ujian Akhir Semester
+  uas: number;       // Ujian Akhir Semester (Tulis)
+  uasLisan: number;  // Ujian Akhir Semester Lisan
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -242,6 +243,16 @@ export interface Nilai {
   academicYear?: AcademicYear;
   semester?: Semester;
   teacher?: Teacher;
+}
+
+export interface Pengumuman {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  authorId: string;
+  authorName: string;
 }
 
 export interface AdminStats {

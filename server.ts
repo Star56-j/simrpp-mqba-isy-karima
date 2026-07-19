@@ -21,7 +21,8 @@ import {
   Santri,
   Nilai,
   RaporDetail,
-  ActivityLog
+  ActivityLog,
+  Pengumuman
 } from './src/server/db.ts';
 
 const app = express();
@@ -1681,7 +1682,7 @@ app.get('/api/nilai', requireAuth(), (req, res) => {
 
 app.post('/api/nilai', requireAuth(), (req, res) => {
   const user = (req as any).user as User;
-  const { santriId, subjectId, academicYearId, semesterId, harian, bulanan, uts, uas, notes } = req.body;
+  const { santriId, subjectId, academicYearId, semesterId, harian, bulanan, uts, uas, uasLisan, notes } = req.body;
 
   if (!santriId || !subjectId || !academicYearId || !semesterId) {
     res.status(400).json({ error: 'Data nilai tidak lengkap' });
@@ -1707,6 +1708,7 @@ app.post('/api/nilai', requireAuth(), (req, res) => {
     if (bulanan !== undefined) nilai.bulanan = Number(bulanan);
     if (uts !== undefined) nilai.uts = Number(uts);
     if (uas !== undefined) nilai.uas = Number(uas);
+    if (uasLisan !== undefined) nilai.uasLisan = Number(uasLisan);
     nilai.notes = notes || '';
     nilai.teacherId = user.teacherId || user.id;
     nilai.updatedAt = new Date().toISOString();
@@ -1721,6 +1723,7 @@ app.post('/api/nilai', requireAuth(), (req, res) => {
       bulanan: Number(bulanan || 0),
       uts: Number(uts || 0),
       uas: Number(uas || 0),
+      uasLisan: Number(uasLisan || 0),
       notes: notes || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -1741,11 +1744,12 @@ app.put('/api/nilai/:id', requireAuth(), (req, res) => {
   const nilai = db.nilai.find(n => n.id === req.params.id);
   if (!nilai) { res.status(404).json({ error: 'Nilai tidak ditemukan' }); return; }
 
-  const { harian, bulanan, uts, uas, notes } = req.body;
+  const { harian, bulanan, uts, uas, uasLisan, notes } = req.body;
   if (harian !== undefined) nilai.harian = Number(harian);
   if (bulanan !== undefined) nilai.bulanan = Number(bulanan);
   if (uts !== undefined) nilai.uts = Number(uts);
   if (uas !== undefined) nilai.uas = Number(uas);
+  if (uasLisan !== undefined) nilai.uasLisan = Number(uasLisan);
   if (notes !== undefined) nilai.notes = notes;
   nilai.teacherId = user.teacherId || user.id; // Mark last editor
   nilai.updatedAt = new Date().toISOString();
@@ -1923,7 +1927,7 @@ app.post('/api/nilai/bulk', requireAuth(), (req, res) => {
   const db = getDatabase();
   let count = 0;
   for (const item of nilaiList) {
-    const { santriId, subjectId, academicYearId, semesterId, harian, bulanan, uts, uas, notes } = item;
+    const { santriId, subjectId, academicYearId, semesterId, harian, bulanan, uts, uas, uasLisan, notes } = item;
     if (!santriId || !subjectId || !academicYearId || !semesterId) continue;
     const existing = db.nilai.find(n => n.santriId === santriId && n.subjectId === subjectId && n.academicYearId === academicYearId && n.semesterId === semesterId);
     if (existing) {
@@ -1931,6 +1935,7 @@ app.post('/api/nilai/bulk', requireAuth(), (req, res) => {
       if (bulanan !== undefined) existing.bulanan = Number(bulanan);
       if (uts !== undefined) existing.uts = Number(uts);
       if (uas !== undefined) existing.uas = Number(uas);
+      if (uasLisan !== undefined) existing.uasLisan = Number(uasLisan);
       existing.notes = notes || '';
       existing.updatedAt = new Date().toISOString();
       existing.teacherId = user.teacherId || user.id;
@@ -1943,6 +1948,7 @@ app.post('/api/nilai/bulk', requireAuth(), (req, res) => {
         bulanan: Number(bulanan || 0),
         uts: Number(uts || 0),
         uas: Number(uas || 0),
+        uasLisan: Number(uasLisan || 0),
         notes: notes || '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -2052,6 +2058,62 @@ app.post('/api/upload', requireAuth(), (req, res) => {
     console.error("Upload error:", error);
     res.status(500).json({ error: 'Gagal mengunggah lampiran: ' + error.message });
   }
+});
+
+
+// 12. Pengumuman API
+app.get('/api/pengumuman', requireAuth(), (req, res) => {
+  const db = getDatabase();
+  const list = (db.pengumuman || []).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  res.json(list);
+});
+
+app.post('/api/pengumuman', requireAuth('Admin'), (req, res) => {
+  const user = (req as any).user as User;
+  const { title, content } = req.body;
+
+  if (!title || !content) {
+    res.status(400).json({ error: 'Judul dan isi pengumuman tidak boleh kosong' });
+    return;
+  }
+
+  const db = getDatabase();
+  if (!db.pengumuman) db.pengumuman = [];
+
+  const newAnn: Pengumuman = {
+    id: `ann-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+    title,
+    content,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    authorId: user.id,
+    authorName: user.name
+  };
+
+  db.pengumuman.push(newAnn);
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Buat Pengumuman', `Membuat pengumuman baru: ${title}`);
+
+  res.status(201).json(newAnn);
+});
+
+app.delete('/api/pengumuman/:id', requireAuth('Admin'), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.pengumuman) db.pengumuman = [];
+
+  const idx = db.pengumuman.findIndex(ann => ann.id === req.params.id);
+  if (idx === -1) {
+    res.status(404).json({ error: 'Pengumuman tidak ditemukan' });
+    return;
+  }
+
+  const ann = db.pengumuman[idx];
+  db.pengumuman.splice(idx, 1);
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Hapus Pengumuman', `Menghapus pengumuman: ${ann.title}`);
+
+  res.json({ message: 'Pengumuman berhasil dihapus' });
 });
 
 

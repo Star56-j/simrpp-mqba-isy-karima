@@ -17,6 +17,7 @@ import {
 } from './types';
 import { Bell, Plus, Megaphone } from 'lucide-react';
 import Pengumuman from './components/Pengumuman';
+import { dailyThemes } from './utils/themes';
 
 // Component Imports
 import Sidebar from './components/Sidebar';
@@ -50,6 +51,7 @@ export default function App() {
   const [showNotif, setShowNotif] = React.useState(false);
   const notifRef = React.useRef<HTMLDivElement>(null);
   const [activeToast, setActiveToast] = React.useState<{ title: string; body: string } | null>(null);
+  const [themeName, setThemeName] = React.useState('');
 
   // Tutup notif kalau klik di luar
   React.useEffect(() => {
@@ -138,6 +140,17 @@ export default function App() {
     const interval = setInterval(checkNewAnnouncements, 15000);
     return () => clearInterval(interval);
   }, [user]);
+
+  // Penerapan Tema Islami Harian
+  React.useEffect(() => {
+    const day = new Date().getDay();
+    const activeTheme = dailyThemes[day];
+    setThemeName(activeTheme.description);
+    
+    Object.entries(activeTheme.colors).forEach(([shade, hex]) => {
+      document.documentElement.style.setProperty(`--islamic-indigo-${shade}`, hex);
+    });
+  }, []);
 
   // Fetch all app data when logged in
   const fetchData = async (currentUser: User | null = user) => {
@@ -528,8 +541,15 @@ export default function App() {
 
         {/* Polish Status Bar Footer */}
         <footer className="h-10 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 lg:px-8 flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 shrink-0 select-none">
-          <div className="truncate">© 2026 Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima. All rights reserved.</div>
-          <div className="flex items-center space-x-4 uppercase tracking-wider font-extrabold">
+          <div className="truncate flex items-center space-x-2">
+            <span>© 2026 Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima. All rights reserved.</span>
+            {themeName && (
+              <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 font-bold uppercase tracking-wider">
+                Tema: {themeName}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center space-x-4 uppercase tracking-wider font-extrabold shrink-0">
             <span>v1.0.4 - React Node</span>
             <span className="text-indigo-500 dark:text-indigo-400 flex items-center space-x-1">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>

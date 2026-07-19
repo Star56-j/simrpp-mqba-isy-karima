@@ -5,6 +5,32 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-arabic: "Amiri", serif;
+  
+  --color-indigo-50: var(--islamic-indigo-50);
+  --color-indigo-100: var(--islamic-indigo-100);
+  --color-indigo-200: var(--islamic-indigo-200);
+  --color-indigo-300: var(--islamic-indigo-300);
+  --color-indigo-400: var(--islamic-indigo-400);
+  --color-indigo-500: var(--islamic-indigo-500);
+  --color-indigo-600: var(--islamic-indigo-600);
+  --color-indigo-700: var(--islamic-indigo-700);
+  --color-indigo-800: var(--islamic-indigo-800);
+  --color-indigo-900: var(--islamic-indigo-900);
+  --color-indigo-950: var(--islamic-indigo-950);
+}
+
+:root {
+  --islamic-indigo-50: #eef2ff;
+  --islamic-indigo-100: #e0e7ff;
+  --islamic-indigo-200: #c7d2fe;
+  --islamic-indigo-300: #a5b4fc;
+  --islamic-indigo-400: #818cf8;
+  --islamic-indigo-500: #6366f1;
+  --islamic-indigo-600: #4f46e5;
+  --islamic-indigo-700: #4338ca;
+  --islamic-indigo-800: #3730a3;
+  --islamic-indigo-900: #312e81;
+  --islamic-indigo-950: #1e1b4b;
 }
 
 /* Tailwind v4: gunakan class strategy untuk dark mode agar toggle manual berfungsi */

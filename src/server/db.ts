@@ -472,13 +472,12 @@ export function getDatabase(): DatabaseSchema {
       console.log(`Migrated database to use the ${newSantriList.length} real santri list`);
     }
 
-    // Migrate: ganti nama admin jika masih "Aidil Ibnu Salam"
     if (parsed.users && parsed.users.length > 0) {
       const adminUser = parsed.users.find(u => u.id === "user-admin-1" || u.email === "aidilibnusalam3@gmail.com");
-      if (adminUser && adminUser.name !== "Aidil Aqli") {
-        adminUser.name = "Aidil Aqli";
+      if (adminUser && adminUser.name !== "Aqli") {
+        adminUser.name = "Aqli";
         saveDatabase(parsed);
-        console.log("Migrated Admin name to Aidil Aqli in active database");
+        console.log("Migrated Admin name to Aqli in active database");
       }
     }
 
@@ -547,7 +546,7 @@ function seedDatabase(): DatabaseSchema {
     // Seeder Admin
     {
       id: "user-admin-1",
-      name: "Aidil Aqli",
+      name: "Aqli",
       email: "aidilibnusalam3@gmail.com",
       passwordHash: hashPassword("parabek123"),
       role: "Admin"
@@ -814,7 +813,7 @@ function seedDatabase(): DatabaseSchema {
     {
       id: "log-seed-1",
       userId: "user-admin-1",
-      userName: "Aidil Aqli",
+      userName: "Aqli",
       userRole: "Admin",
       action: "System Seed",
       details: "Sistem berhasil diinisialisasi dan data master berhasil di-seed.",

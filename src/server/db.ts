@@ -249,6 +249,95 @@ export function hashPassword(password: string): string {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
+export const REAL_SANTRI_DATA = [
+  // cls-3: Kelas VII Putra (19 santri)
+  { name: "Ahmad Ajyad Syamil Sutrisno", classId: "cls-3" },
+  { name: "Ahmad Fakhry Athallah", classId: "cls-3" },
+  { name: "Athilasyah Rifqi Sulistyo", classId: "cls-3" },
+  { name: "Baihaqi Hanif Abrorni", classId: "cls-3" },
+  { name: "Fairuz Fahri Firmansyah", classId: "cls-3" },
+  { name: "Hasbi Nafsi Jalalullah", classId: "cls-3" },
+  { name: "Hisyam Zuhdi", classId: "cls-3" },
+  { name: "Israr At Taufik", classId: "cls-3" },
+  { name: "Keven Maghribi Darmaresta", classId: "cls-3" },
+  { name: "Khoirul Akbar Nur Hidayatulloh", classId: "cls-3" },
+  { name: "M Rajendra Ali Mudzakir", classId: "cls-3" },
+  { name: "Muhammad Fatih Izzan An-Naqy", classId: "cls-3" },
+  { name: "Muhammad Ilyas Anrisyab", classId: "cls-3" },
+  { name: "Muhammad Yahya Izzuddin", classId: "cls-3" },
+  { name: "Muhammad Yusuf Rifa'i", classId: "cls-3" },
+  { name: "Ramdhan Ridhwanullah", classId: "cls-3" },
+  { name: "Shofyan Abdillah Achmad", classId: "cls-3" },
+  { name: "Tsaabit Qawiyyul Himmah", classId: "cls-3" },
+  { name: "Yahya", classId: "cls-3" },
+
+  // cls-4: Kelas VII Putri (11 santri)
+  { name: "Abigail Madhalee Ariya Fatihah", classId: "cls-4" },
+  { name: "Alya Mukhbita", classId: "cls-4" },
+  { name: "Ammara taqiyya khoirunnisa", classId: "cls-4" },
+  { name: "Annisauzzahro as-salamah Parapat", classId: "cls-4" },
+  { name: "Ayesha khayla Salsabila", classId: "cls-4" },
+  { name: "Cataleya Azzahwa Fieary", classId: "cls-4" },
+  { name: "Filzah Taqy Hilmiyah Hanief", classId: "cls-4" },
+  { name: "Marwa Az Zahira Ibrahim Pribadi", classId: "cls-4" },
+  { name: "Maryam Muthiah Tafdlila", classId: "cls-4" },
+  { name: "Shabiha Nadira Azzahra", classId: "cls-4" },
+  { name: "Syakila Nada Salsabila", classId: "cls-4" },
+
+  // cls-1: I'dad Putra (6 santri)
+  { name: "Attahir Zarkasya Ramadhan", classId: "cls-1" },
+  { name: "Bintang Bumi Langit Biru", classId: "cls-1" },
+  { name: "Handade Yonca Satya Harjuna", classId: "cls-1" },
+  { name: "Kenzie Iffat Itoniwa", classId: "cls-1" },
+  { name: "Miqdaad Dzakiyy Hasan Faishal", classId: "cls-1" },
+  { name: "Sae Sibghotallah", classId: "cls-1" },
+
+  // cls-2: I'dad Putri (3 santri)
+  { name: "Imtihan Syarifatul 'Ula", classId: "cls-2" },
+  { name: "Iskanda Aulia Neisya", classId: "cls-2" },
+  { name: "Naura Auni Qonita", classId: "cls-2" },
+
+  // cls-5: Kelas VIII Putra (12 santri)
+  { name: "Adit Wahyu Pratama", classId: "cls-5" },
+  { name: "Azka Rasya Darmawan", classId: "cls-5" },
+  { name: "Badar Farisul Qital", classId: "cls-5" },
+  { name: "Farzan Fiza Ananta", classId: "cls-5" },
+  { name: "Hamidurohman Hudzaifi", classId: "cls-5" },
+  { name: "Hilmi Dzabihulloh", classId: "cls-5" },
+  { name: "Muhammad Faathir Rusyada Azhar", classId: "cls-5" },
+  { name: "Nizar Haidar Rahman", classId: "cls-5" },
+  { name: "Raushan Akhtar Majid", classId: "cls-5" },
+  { name: "Tristan Firafisa Parsa", classId: "cls-5" },
+  { name: "Yafiq Alvaro", classId: "cls-5" },
+  { name: "Yuwhay Haura Anbiiya", classId: "cls-5" },
+
+  // cls-6: Kelas VIII Putri (7 santri)
+  { name: "Raisa Shakila Putri", classId: "cls-6" },
+  { name: "Shofiyyah Afnan", classId: "cls-6" },
+  { name: "Dzakira Tsania Fahmi", classId: "cls-6" },
+  { name: "Rafanda Rayyan Adeeva", classId: "cls-6" },
+  { name: "Hafidzah Mumtaazah Ni'matullah", classId: "cls-6" },
+  { name: "Hurin Iin Luluil Maknun", classId: "cls-6" },
+  { name: "Queena Kayyisa Nararya", classId: "cls-6" },
+
+  // cls-7: Kelas IX Putra (15 santri)
+  { name: "Abdurrahman Az Zubair", classId: "cls-7" },
+  { name: "Achmad Akmal Alhakim", classId: "cls-7" },
+  { name: "Ahza Ibnu Hafiz", classId: "cls-7" },
+  { name: "Albanna Sheeva", classId: "cls-7" },
+  { name: "Arman Abdurrahman Nasution", classId: "cls-7" },
+  { name: "Faiq Kamal Yazid Al-Bara", classId: "cls-7" },
+  { name: "Jaisy Aliy Al Khalil", classId: "cls-7" },
+  { name: "Mirza Alzam Azhari", classId: "cls-7" },
+  { name: "Moh Khalifatullah Rosyad Al Amin", classId: "cls-7" },
+  { name: "Muhammad Faruq Baharta", classId: "cls-7" },
+  { name: "Muhammad Faqih Multazim", classId: "cls-7" },
+  { name: "Muhammad Zidan Dhiyauddin", classId: "cls-7" },
+  { name: "Rafasya Muhammad Firdaus An'Naba", classId: "cls-7" },
+  { name: "Vajradhatu Keinan Noor", classId: "cls-7" },
+  { name: "Ziyad Alhaq", classId: "cls-7" }
+];
+
 export function getDatabase(): DatabaseSchema {
   ensureDbDir();
   if (!fs.existsSync(DB_PATH)) {
@@ -310,6 +399,46 @@ export function getDatabase(): DatabaseSchema {
       saveDatabase(parsed);
       console.log('Migrated nilai from single score to 4 categories');
     }
+
+    // Migrate: ganti format penamaan kelas
+    if (parsed.classes && parsed.classes.length > 0) {
+      const classMap: Record<string, string> = {
+        "cls-1": "I'dad Putra",
+        "cls-2": "I'dad Putri",
+        "cls-3": "Kelas VII Putra",
+        "cls-4": "Kelas VII Putri",
+        "cls-5": "Kelas VIII Putra",
+        "cls-6": "Kelas VIII Putri",
+        "cls-7": "Kelas IX Putra"
+      };
+      let changed = false;
+      parsed.classes.forEach(c => {
+        if (classMap[c.id] && c.name !== classMap[c.id]) {
+          c.name = classMap[c.id];
+          changed = true;
+        }
+      });
+      if (changed) {
+        saveDatabase(parsed);
+        console.log("Migrated class names to new format in database");
+      }
+    }
+
+    // Migrate: masukkan data santri asli (timpa data demo jika isinya hanya demo / sedikit)
+    if (parsed.santri && (parsed.santri.length <= 3 || parsed.santri.some(s => s.name === "Ahmad Abdullah" && s.id === "santri-1"))) {
+      const newSantriList = REAL_SANTRI_DATA.map((s, idx) => ({
+        id: `santri-${idx + 1}`,
+        nis: `2026${String(idx + 1).padStart(3, '0')}`,
+        name: s.name,
+        classId: s.classId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }));
+      parsed.santri = newSantriList;
+      saveDatabase(parsed);
+      console.log(`Migrated database to use the ${newSantriList.length} real santri list`);
+    }
+
     return parsed;
   } catch (error) {
     console.error("Error reading database file, reseeding...", error);
@@ -426,14 +555,14 @@ function seedDatabase(): DatabaseSchema {
   // Classes (Kelas)
   const classes: SchoolClass[] = [
     // I'dad
-    { id: "cls-1", name: "PA", level: "I'dad" },
-    { id: "cls-2", name: "PI", level: "I'dad" },
+    { id: "cls-1", name: "I'dad Putra", level: "I'dad" },
+    { id: "cls-2", name: "I'dad Putri", level: "I'dad" },
     // Wustho
-    { id: "cls-3", name: "1 PA", level: "Wustho" },
-    { id: "cls-4", name: "1 PI", level: "Wustho" },
-    { id: "cls-5", name: "2 PA", level: "Wustho" },
-    { id: "cls-6", name: "2 PI", level: "Wustho" },
-    { id: "cls-7", name: "3", level: "Wustho" }
+    { id: "cls-3", name: "Kelas VII Putra", level: "Wustho" },
+    { id: "cls-4", name: "Kelas VII Putri", level: "Wustho" },
+    { id: "cls-5", name: "Kelas VIII Putra", level: "Wustho" },
+    { id: "cls-6", name: "Kelas VIII Putri", level: "Wustho" },
+    { id: "cls-7", name: "Kelas IX Putra", level: "Wustho" }
   ];
 
   // Academic Years
@@ -651,11 +780,14 @@ function seedDatabase(): DatabaseSchema {
   ];
 
   const waliKelas: WaliKelas[] = [];
-  const santri: Santri[] = [
-    { id: "santri-1", nis: "2026001", name: "Ahmad Abdullah", classId: "cls-3", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "santri-2", nis: "2026002", name: "Muhammad Ibrahim", classId: "cls-3", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "santri-3", nis: "2026003", name: "Ali Ridho", classId: "cls-5", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-  ];
+  const santri: Santri[] = REAL_SANTRI_DATA.map((s, idx) => ({
+    id: `santri-${idx + 1}`,
+    nis: `2026${String(idx + 1).padStart(3, '0')}`,
+    name: s.name,
+    classId: s.classId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }));
 
   return {
     users,

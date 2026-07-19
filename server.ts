@@ -2058,6 +2058,14 @@ app.post('/api/upload', requireAuth(), (req, res) => {
 // ============================================================================
 
 async function startServer() {
+  // Trigger database initialization and migration on startup
+  try {
+    getDatabase();
+    console.log("Database initialized and verified successfully at startup.");
+  } catch (err) {
+    console.error("Failed to initialize database at startup:", err);
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     // Setup Vite as a dev server middleware
     const vite = await createViteServer({

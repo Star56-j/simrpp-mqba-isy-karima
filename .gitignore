@@ -13,3 +13,7 @@ public/uploads/
 # Hanya ignore file upload user, bukan database
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Ignore database files and backups
+data/*
+!data/.gitkeep

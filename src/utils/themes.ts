@@ -113,22 +113,22 @@ export const dailyThemes: Theme[] = [
       "950": "#0a2e19"
     }
   },
-  // 6: Sabtu (Saturday) - Nuansa Sufi (Sufism - Sage Green & Pure Slate)
+  // 6: Sabtu (Saturday) - Nuansa Nusantara (Islam Nusantara - Teakwood & Kawung Cream)
   {
-    name: "Sufi",
-    description: "Harmoni Kedamaian (Hijau Sage & Abu-Abu Sufi)",
+    name: "Nusantara",
+    description: "Islam Nusantara (Cokelat Jati & Krem Kawung)",
     colors: {
-      "50": "#f4f8f4",
-      "100": "#e4ece4",
-      "200": "#ccdccb",
-      "300": "#b0c8b0",
-      "400": "#92b291",
-      "500": "#789c77",
-      "600": "#5d7c5c",
-      "700": "#4a6249",
-      "800": "#384938",
-      "900": "#263226",
-      "950": "#192119"
+      "50": "#faf6f0",
+      "100": "#f3e9db",
+      "200": "#e4cfb4",
+      "300": "#d3b087",
+      "400": "#c1915f",
+      "500": "#a8713f",
+      "600": "#8f582e",
+      "700": "#724121",
+      "800": "#583018",
+      "900": "#3b1f0f",
+      "950": "#261307"
     }
   }
 ];

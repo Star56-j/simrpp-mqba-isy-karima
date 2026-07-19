@@ -229,6 +229,7 @@ app.get('/api/dashboard/stats', requireAuth(), (req, res) => {
   const totalSubjects = db.subjects.length;
   const totalClasses = db.classes.length;
   const totalSchedules = db.teachingSchedules.length;
+  const totalSantri = db.santri.length;
 
   if (user.role === 'Admin') {
     const totalRPP = db.rpps.length;
@@ -242,6 +243,7 @@ app.get('/api/dashboard/stats', requireAuth(), (req, res) => {
       subjects: totalSubjects,
       classes: totalClasses,
       schedules: totalSchedules,
+      santri: totalSantri,
       rpp: {
         total: totalRPP,
         draft: rppDraft,

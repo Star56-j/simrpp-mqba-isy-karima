@@ -162,7 +162,7 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
       </div>
 
       {/* ═══════════ STATS GRID — Aksen Emas Abbasiyah ═══════════ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
           { 
             label: 'Data Guru', 
@@ -172,6 +172,15 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
             glow: 'bg-indigo-500',
             view: 'master-teachers',
             desc: 'Pengajar MQBA'
+          },
+          { 
+            label: 'Data Santri', 
+            val: stats.santri, 
+            icon: Users, 
+            gradient: 'from-amber-500 to-amber-600',
+            glow: 'bg-amber-500',
+            view: 'master-santri',
+            desc: 'Santri aktif'
           },
           { 
             label: 'Mata Pelajaran', 

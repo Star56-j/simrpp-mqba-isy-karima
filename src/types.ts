@@ -249,6 +249,7 @@ export interface AdminStats {
   subjects: number;
   classes: number;
   schedules: number;
+  santri: number;
   rpp: {
     total: number;
     draft: number;

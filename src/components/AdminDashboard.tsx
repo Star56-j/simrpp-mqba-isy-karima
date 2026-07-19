@@ -12,7 +12,9 @@ import {
   ArrowRight,
   Activity,
   User,
-  ExternalLink
+  ExternalLink,
+  Star,
+  Sparkles
 } from 'lucide-react';
 import { AdminStats, RPP } from '../types';
 import { api } from '../api';
@@ -24,50 +26,150 @@ interface AdminDashboardProps {
   rpps: RPP[];
 }
 
+/* ═══ SVG Ornamen Bintang Octagonal Abbasiyah ═══ */
+function OctagonalStar({ className = '', size = 40 }: { className?: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" className={className} fill="none">
+      {/* Bintang octagonal — simbol ilmu pengetahuan era Abbasiyah */}
+      <polygon
+        points="50,2 61,28 90,10 72,39 98,50 72,61 90,90 61,72 50,98 39,72 10,90 28,61 2,50 28,39 10,10 39,28"
+        fill="currentColor"
+        opacity="0.15"
+      />
+      <polygon
+        points="50,15 58,35 80,22 67,42 85,50 67,58 80,78 58,65 50,85 42,65 20,78 33,58 15,50 33,42 20,22 42,35"
+        fill="currentColor"
+        opacity="0.25"
+      />
+    </svg>
+  );
+}
+
+/* ═══ SVG Lengkungan Tapal Kuda (Horseshoe Arch) ═══ */
+function HorseshoeArch({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 200 60" className={className} fill="none" preserveAspectRatio="none">
+      <path
+        d="M0,60 L0,30 Q0,0 30,0 L170,0 Q200,0 200,30 L200,60"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        opacity="0.15"
+      />
+      <path
+        d="M10,60 L10,32 Q10,8 35,8 L165,8 Q190,8 190,32 L190,60"
+        stroke="currentColor"
+        strokeWidth="0.8"
+        opacity="0.08"
+      />
+    </svg>
+  );
+}
+
+/* ═══ Dekoratif border emas di bawah header ═══ */
+function GoldDivider() {
+  return (
+    <div className="flex items-center justify-center space-x-2 py-1">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+      <svg width="16" height="16" viewBox="0 0 100 100" className="text-amber-500/40 flex-shrink-0">
+        <polygon
+          points="50,0 61,28 93,10 72,39 100,50 72,61 93,90 61,72 50,100 39,72 7,90 28,61 0,50 28,39 7,10 39,28"
+          fill="currentColor"
+        />
+      </svg>
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+    </div>
+  );
+}
+
 export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboardProps) {
   const pendingRpps = rpps.filter(r => r.status === 'Menunggu Persetujuan').slice(0, 5);
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Title Header with Islamic Ornament & Clock */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl p-6 lg:p-8 shadow-lg border border-indigo-700/50">
-        {/* Ornament Background: The 3 Holy Mosques */}
+      {/* ═══════════ HERO HEADER — Tema Dinasti Abbasiyah ═══════════ */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-950 rounded-2xl shadow-2xl shadow-indigo-950/40 border border-indigo-800/40">
+        {/* Layer 1: Background Image — Baghdad / Baitul Hikmah */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-2xl">
           <img 
-            src="/mosques-bg.png" 
-            alt="Masjidil Haram, Nabawi, Baitul Maqdis" 
-            className="w-full h-full object-cover object-center opacity-40 mix-blend-screen"
+            src="/abbasid-bg.png" 
+            alt="Kejayaan Dinasti Abbasiyah — Baghdad" 
+            className="w-full h-full object-cover object-center opacity-30 mix-blend-screen"
           />
-          {/* Gradient overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-transparent"></div>
         </div>
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="w-8 h-1 bg-amber-400 rounded-full"></span>
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Akademik MQBA Isy Karima</span>
+
+        {/* Layer 2: Pola Geometris Abbasiyah */}
+        <div className="absolute inset-0 z-[1] abbasid-geometric pointer-events-none" />
+
+        {/* Layer 3: Gradient Overlay */}
+        <div className="absolute inset-0 z-[2] bg-gradient-to-r from-indigo-950/95 via-indigo-900/70 to-indigo-950/50 pointer-events-none" />
+        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-indigo-950/80 via-transparent to-transparent pointer-events-none" />
+
+        {/* Layer 4: Decorative Stars */}
+        <OctagonalStar className="absolute top-3 right-8 z-[3] text-amber-400 animate-twinkle" size={32} />
+        <OctagonalStar className="absolute top-12 right-32 z-[3] text-amber-400 animate-twinkle-delay" size={20} />
+        <OctagonalStar className="absolute bottom-8 right-16 z-[3] text-amber-400 animate-twinkle-slow" size={24} />
+        <OctagonalStar className="absolute top-6 right-56 z-[3] text-amber-300 animate-twinkle-slow" size={14} />
+
+        {/* Gold shimmer line di atas */}
+        <div className="absolute top-0 left-0 right-0 h-1 z-[4] gold-shimmer" />
+
+        {/* Konten Header */}
+        <div className="relative z-10 p-6 lg:p-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3">
+              {/* Label & Ornamen */}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1.5">
+                  <svg width="14" height="14" viewBox="0 0 100 100" className="text-amber-400">
+                    <polygon points="50,0 61,28 93,10 72,39 100,50 72,61 93,90 61,72 50,100 39,72 7,90 28,61 0,50 28,39 7,10 39,28" fill="currentColor" />
+                  </svg>
+                  <span className="w-8 h-0.5 bg-amber-400 rounded-full" />
+                </div>
+                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-[0.2em]">
+                  Akademik MQBA Isy Karima
+                </span>
+              </div>
+
+              {/* Judul */}
+              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                Dashboard Administrasi
+              </h1>
+
+              {/* Deskripsi */}
+              <p className="text-indigo-200/80 text-sm max-w-lg leading-relaxed">
+                Ringkasan data akademik dan status rencana pembelajaran
+                Markaz Qur'an dan Bahasa Arab Isy Karima.
+              </p>
+
+              {/* Quote Inspiratif */}
+              <div className="flex items-start space-x-2 mt-1 pt-3 border-t border-amber-400/10">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400/60 mt-0.5 flex-shrink-0" />
+                <p className="text-[11px] text-amber-200/50 italic leading-relaxed max-w-md font-arabic">
+                  "Tuntutlah ilmu walau sampai ke negeri Tiongkok."
+                  <span className="not-italic text-[10px] text-amber-400/40 ml-1.5 font-sans">— HR. Ibnu Majah</span>
+                </p>
+              </div>
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-              Dashboard Administrasi
-            </h1>
-            <p className="text-indigo-200 text-sm mt-2 max-w-lg">
-              Berikut adalah ringkasan data akademik dan status rencana pembelajaran.
-            </p>
+            
+            <RealTimeClock />
           </div>
-          
-          <RealTimeClock />
+
+          {/* Gold Divider di bawah */}
+          <div className="mt-6">
+            <GoldDivider />
+          </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* ═══════════ STATS GRID — Aksen Emas Abbasiyah ═══════════ */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { 
             label: 'Data Guru', 
             val: stats.teachers, 
             icon: Users, 
-            color: 'bg-indigo-500', 
+            gradient: 'from-indigo-600 to-indigo-700',
+            glow: 'bg-indigo-500',
             view: 'master-teachers',
             desc: 'Pengajar MQBA'
           },
@@ -75,7 +177,8 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
             label: 'Mata Pelajaran', 
             val: stats.subjects, 
             icon: BookOpen, 
-            color: 'bg-teal-500', 
+            gradient: 'from-teal-500 to-teal-600',
+            glow: 'bg-teal-500',
             view: 'master-subjects',
             desc: 'Mapel terdaftar'
           },
@@ -83,7 +186,8 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
             label: 'Data Kelas', 
             val: stats.classes, 
             icon: GraduationCap, 
-            color: 'bg-indigo-600', 
+            gradient: 'from-indigo-700 to-indigo-800',
+            glow: 'bg-indigo-600',
             view: 'master-classes',
             desc: 'I\'dad & Wustho'
           },
@@ -91,7 +195,8 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
             label: 'Jadwal KBM', 
             val: stats.schedules, 
             icon: Calendar, 
-            color: 'bg-teal-600', 
+            gradient: 'from-teal-600 to-teal-700',
+            glow: 'bg-teal-600',
             view: 'master-schedules',
             desc: 'Sesi aktif mengajar'
           },
@@ -99,20 +204,22 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
           <div 
             key={idx} 
             onClick={() => onNavigate(item.view)}
-            className="group relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden"
+            className="group relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden abbasid-border-top"
           >
-            <div className={`absolute top-0 right-0 w-24 h-24 ${item.color} opacity-5 blur-2xl rounded-full transition-all group-hover:scale-150`}></div>
-            <div className="flex items-start justify-between">
+            {/* Decorative glow */}
+            <div className={`absolute top-0 right-0 w-28 h-28 ${item.glow} opacity-[0.04] blur-2xl rounded-full transition-all duration-300 group-hover:scale-150 group-hover:opacity-[0.08]`} />
+            
+            <div className="flex items-start justify-between relative z-10">
               <div className="space-y-1">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{item.label}</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</span>
                 <p className="text-3xl font-black text-slate-800 dark:text-white">{item.val}</p>
                 <span className="text-[11px] text-slate-400 dark:text-slate-500 block">{item.desc}</span>
               </div>
-              <div className={`p-3 rounded-xl ${item.color} text-white shadow-sm shadow-indigo-950/10`}>
+              <div className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-md shadow-indigo-950/10`}>
                 <item.icon className="w-5 h-5" />
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800/50 flex items-center text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+            <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800/50 flex items-center text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-1 transition-transform duration-200">
               <span>Kelola data</span>
               <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </div>
@@ -120,10 +227,10 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
         ))}
       </div>
 
-      {/* RPP Status Breakdown */}
+      {/* ═══════════ RPP STATUS — Alur Persetujuan ═══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* RPP Overview Circular Chart */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs flex flex-col justify-between abbasid-border-top">
           <div className="border-b border-slate-100 dark:border-slate-800/60 pb-4">
             <h3 className="font-bold text-slate-800 dark:text-white text-base">Alur Persetujuan RPP</h3>
             <p className="text-slate-400 text-xs mt-0.5">Statistik sebaran status RPP</p>
@@ -133,15 +240,17 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
             {/* Visual Progress Doughnut Ring using SVG */}
             <svg className="w-36 h-36 transform -rotate-90">
               <circle cx="72" cy="72" r="60" className="stroke-slate-100 dark:stroke-slate-800 fill-none" strokeWidth="12" />
-              {/* Approved (Green) */}
+              {/* Approved Arc */}
               <circle 
                 cx="72" 
                 cy="72" 
                 r="60" 
                 className="stroke-indigo-500 fill-none" 
-                strokeWidth="12" 
+                strokeWidth="12"
+                strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 60}`}
                 strokeDashoffset={`${2 * Math.PI * 60 * (1 - (stats.rpp.approved / (stats.rpp.total || 1)))}`}
+                style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
               />
             </svg>
             <div className="absolute text-center">
@@ -183,7 +292,7 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
         </div>
 
         {/* Pending Approval List */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs flex flex-col justify-between abbasid-border-top">
           <div>
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-4">
               <div>
@@ -214,7 +323,7 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
                   >
                     <div className="flex items-start space-x-3.5 min-w-0">
                       <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold flex-shrink-0 text-sm">
-                        {rpp.teacher?.name.replace(/Ust\.\s*|Usth\.\s*/g, '').charAt(0)}
+                        {rpp.teacher?.name.replace(/Ust\.?\s*|Usth\.?\s*/g, '').charAt(0)}
                       </div>
                       <div className="min-w-0">
                         <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rpp.teacher?.name}</span>
@@ -247,14 +356,16 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
         </div>
       </div>
 
-      {/* Activity Logs Section */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs">
+      {/* ═══════════ ACTIVITY LOGS ═══════════ */}
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs abbasid-border-top">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-4">
           <div>
             <h3 className="font-bold text-slate-800 dark:text-white text-base">Log Aktivitas Terbaru</h3>
             <p className="text-slate-400 text-xs mt-0.5">Rekam jejak tindakan admin dan pengajar secara real-time</p>
           </div>
-          <Activity className="w-5 h-5 text-indigo-600" />
+          <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/30">
+            <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          </div>
         </div>
 
         <div className="overflow-x-auto">

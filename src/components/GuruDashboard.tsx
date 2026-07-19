@@ -9,7 +9,8 @@ import {
   ArrowRight,
   PlusCircle,
   FileWarning,
-  Crown
+  Crown,
+  Sparkles
 } from 'lucide-react';
 import { GuruStats, RPP, TeachingSchedule, WaliKelas } from '../types';
 import RealTimeClock from './RealTimeClock';
@@ -21,6 +22,48 @@ interface GuruDashboardProps {
   waliKelas: WaliKelas[];
   onNavigate: (view: string, targetTab?: string) => void;
 }
+
+/* ═══ SVG Ornamen Bintang Octagonal Abbasiyah ═══ */
+function OctagonalStar({ className = '', size = 40 }: { className?: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" className={className} fill="none">
+      <polygon
+        points="50,2 61,28 90,10 72,39 98,50 72,61 90,90 61,72 50,98 39,72 10,90 28,61 2,50 28,39 10,10 39,28"
+        fill="currentColor"
+        opacity="0.15"
+      />
+      <polygon
+        points="50,15 58,35 80,22 67,42 85,50 67,58 80,78 58,65 50,85 42,65 20,78 33,58 15,50 33,42 20,22 42,35"
+        fill="currentColor"
+        opacity="0.25"
+      />
+    </svg>
+  );
+}
+
+/* ═══ Dekoratif border emas ═══ */
+function GoldDivider() {
+  return (
+    <div className="flex items-center justify-center space-x-2 py-1">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+      <svg width="16" height="16" viewBox="0 0 100 100" className="text-amber-500/40 flex-shrink-0">
+        <polygon
+          points="50,0 61,28 93,10 72,39 100,50 72,61 93,90 61,72 50,100 39,72 7,90 28,61 0,50 28,39 7,10 39,28"
+          fill="currentColor"
+        />
+      </svg>
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+    </div>
+  );
+}
+
+// Array kutipan ulama / ilmuwan era Abbasiyah
+const ABBASID_QUOTES = [
+  { text: "Barang siapa menempuh jalan untuk menuntut ilmu, Allah memudahkan baginya jalan menuju surga.", source: "HR. Muslim" },
+  { text: "Ilmu itu lebih baik daripada harta. Ilmu menjaga engkau dan engkau menjaga harta.", source: "Ali bin Abi Thalib" },
+  { text: "Tinta para ulama lebih berharga dari darah para syuhada.", source: "Pepatah Islam" },
+  { text: "Belajarlah, karena seseorang tidak dilahirkan dalam keadaan berilmu.", source: "Imam Al-Bukhari" },
+];
 
 export default function GuruDashboard({ 
   stats, 
@@ -40,45 +83,92 @@ export default function GuruDashboard({
   // Find RPPs in "Revisi" state
   const revisionRpps = myRpps.filter(r => r.status === 'Revisi');
 
+  // Pilih kutipan berdasarkan hari
+  const todayQuote = ABBASID_QUOTES[new Date().getDay() % ABBASID_QUOTES.length];
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Title Header with Islamic Ornament & Clock */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl p-6 lg:p-8 shadow-lg border border-indigo-700/50">
-        {/* Ornament Background: The 3 Holy Mosques */}
+      {/* ═══════════ HERO HEADER — Tema Dinasti Abbasiyah ═══════════ */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-950 rounded-2xl shadow-2xl shadow-indigo-950/40 border border-indigo-800/40">
+        {/* Layer 1: Background Image */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-2xl">
           <img 
-            src="/mosques-bg.png" 
-            alt="Masjidil Haram, Nabawi, Baitul Maqdis" 
-            className="w-full h-full object-cover object-center opacity-40 mix-blend-screen"
+            src="/abbasid-bg.png" 
+            alt="Kejayaan Dinasti Abbasiyah — Baghdad" 
+            className="w-full h-full object-cover object-center opacity-30 mix-blend-screen"
           />
-          {/* Gradient overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-transparent"></div>
         </div>
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="w-8 h-1 bg-amber-400 rounded-full"></span>
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Akademik MQBA Isy Karima</span>
+
+        {/* Layer 2: Pola Geometris Abbasiyah */}
+        <div className="absolute inset-0 z-[1] abbasid-geometric pointer-events-none" />
+
+        {/* Layer 3: Gradient Overlay */}
+        <div className="absolute inset-0 z-[2] bg-gradient-to-r from-indigo-950/95 via-indigo-900/70 to-indigo-950/50 pointer-events-none" />
+        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-indigo-950/80 via-transparent to-transparent pointer-events-none" />
+
+        {/* Layer 4: Decorative Stars */}
+        <OctagonalStar className="absolute top-3 right-8 z-[3] text-amber-400 animate-twinkle" size={32} />
+        <OctagonalStar className="absolute top-12 right-32 z-[3] text-amber-400 animate-twinkle-delay" size={20} />
+        <OctagonalStar className="absolute bottom-8 right-16 z-[3] text-amber-400 animate-twinkle-slow" size={24} />
+        <OctagonalStar className="absolute top-6 right-56 z-[3] text-amber-300 animate-twinkle-slow" size={14} />
+
+        {/* Gold shimmer line di atas */}
+        <div className="absolute top-0 left-0 right-0 h-1 z-[4] gold-shimmer" />
+
+        {/* Konten Header */}
+        <div className="relative z-10 p-6 lg:p-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3">
+              {/* Label & Ornamen */}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1.5">
+                  <svg width="14" height="14" viewBox="0 0 100 100" className="text-amber-400">
+                    <polygon points="50,0 61,28 93,10 72,39 100,50 72,61 93,90 61,72 50,100 39,72 7,90 28,61 0,50 28,39 7,10 39,28" fill="currentColor" />
+                  </svg>
+                  <span className="w-8 h-0.5 bg-amber-400 rounded-full" />
+                </div>
+                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-[0.2em]">
+                  Akademik MQBA Isy Karima
+                </span>
+              </div>
+
+              {/* Judul */}
+              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                Dashboard Pengajar
+              </h1>
+
+              {/* Sapaan */}
+              <p className="text-indigo-200/80 text-sm max-w-lg leading-relaxed">
+                Ahlan wa sahlan, <strong className="text-amber-400 font-extrabold">{myUser.name}</strong>. 
+                Kelola dan susun rencana pembelajaran (RPP) harian Anda dengan mudah.
+              </p>
+
+              {/* Quote Inspiratif era Abbasiyah */}
+              <div className="flex items-start space-x-2 mt-1 pt-3 border-t border-amber-400/10">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400/60 mt-0.5 flex-shrink-0" />
+                <p className="text-[11px] text-amber-200/50 italic leading-relaxed max-w-md font-arabic">
+                  "{todayQuote.text}"
+                  <span className="not-italic text-[10px] text-amber-400/40 ml-1.5 font-sans">— {todayQuote.source}</span>
+                </p>
+              </div>
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-              Dashboard Pengajar
-            </h1>
-            <p className="text-indigo-200 text-sm mt-2 max-w-lg leading-relaxed">
-              Ahlan wa sahlan, <strong className="text-amber-400 font-extrabold">{myUser.name}</strong>. Kelola dan susun rencana pembelajaran (RPP) harian Anda dengan mudah.
-            </p>
+            
+            <RealTimeClock />
           </div>
-          
-          <RealTimeClock />
+
+          {/* Gold Divider */}
+          <div className="mt-6">
+            <GoldDivider />
+          </div>
         </div>
       </div>
 
-      {/* Widget Wali Kelas — tampil jika guru adalah wali kelas */}
+      {/* ═══════════ WIDGET WALI KELAS ═══════════ */}
       {myWaliKelas.length > 0 && (
         <div className="space-y-2">
           {myWaliKelas.map(w => (
             <div key={w.id}
-              className="relative overflow-hidden flex items-center space-x-4 bg-gradient-to-r from-amber-50 to-amber-50/40 dark:from-amber-950/30 dark:to-amber-950/10 border border-amber-200/60 dark:border-amber-800/40 rounded-2xl p-4 shadow-xs">
+              className="relative overflow-hidden flex items-center space-x-4 bg-gradient-to-r from-amber-50 to-amber-50/40 dark:from-amber-950/30 dark:to-amber-950/10 border border-amber-200/60 dark:border-amber-800/40 rounded-2xl p-4 shadow-xs abbasid-border-top">
               {/* Glow accent */}
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-l-2xl" />
               <div className="ml-2 w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
@@ -108,62 +198,59 @@ export default function GuruDashboard({
         </div>
       )}
 
-      {/* RPP Dashboard Metrics */}
+      {/* ═══════════ RPP METRICS — Aksen Emas ═══════════ */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {[
           { 
             label: 'Draft RPP', 
             val: stats.rpp.draft, 
             icon: FileEdit, 
-            color: 'bg-slate-500',
+            gradient: 'from-slate-500 to-slate-600',
             bg: 'bg-slate-50 dark:bg-slate-900/40',
             border: 'border-slate-100 dark:border-slate-800',
-            textColor: 'text-slate-700 dark:text-slate-300'
           },
           { 
             label: 'Menunggu Review', 
             val: stats.rpp.pending, 
             icon: Clock, 
-            color: 'bg-amber-500',
+            gradient: 'from-amber-500 to-amber-600',
             bg: 'bg-amber-50/40 dark:bg-amber-950/20',
             border: 'border-amber-100/50 dark:border-amber-900/30',
-            textColor: 'text-amber-700 dark:text-amber-400'
           },
           { 
             label: 'Disetujui', 
             val: stats.rpp.approved, 
             icon: CheckCircle, 
-            color: 'bg-indigo-600',
+            gradient: 'from-indigo-600 to-indigo-700',
             bg: 'bg-indigo-50/40 dark:bg-indigo-950/20',
             border: 'border-indigo-100/50 dark:border-indigo-900/30',
-            textColor: 'text-indigo-700 dark:text-indigo-400'
           },
           { 
             label: 'Perlu Revisi', 
             val: stats.rpp.revision, 
             icon: AlertCircle, 
-            color: 'bg-rose-500',
+            gradient: 'from-rose-500 to-rose-600',
             bg: 'bg-rose-50/40 dark:bg-rose-950/20',
             border: 'border-rose-100/50 dark:border-rose-900/30',
-            textColor: 'text-rose-700 dark:text-rose-400'
           },
           { 
             label: 'Total RPP Saya', 
             val: stats.rpp.total, 
             icon: FileText, 
-            color: 'bg-indigo-800',
+            gradient: 'from-indigo-800 to-indigo-900',
             bg: 'bg-indigo-900/10 dark:bg-indigo-950/20',
             border: 'border-indigo-800/20 dark:border-indigo-900/30',
-            textColor: 'text-indigo-800 dark:text-indigo-400'
           },
         ].map((item, idx) => (
           <div 
             key={idx} 
-            className={`p-5 rounded-2xl border ${item.border} ${item.bg} shadow-xs flex flex-col justify-between`}
+            className={`p-5 rounded-2xl border ${item.border} ${item.bg} shadow-xs flex flex-col justify-between abbasid-border-top`}
           >
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</span>
-              <item.icon className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
+              <div className={`p-1.5 rounded-lg bg-gradient-to-br ${item.gradient} text-white`}>
+                <item.icon className="w-3.5 h-3.5" />
+              </div>
             </div>
             <div className="mt-4">
               <span className="text-3xl font-black text-slate-800 dark:text-white leading-none">{item.val}</span>
@@ -172,9 +259,9 @@ export default function GuruDashboard({
         ))}
       </div>
 
-      {/* Action Items: Revisions and Pending Work */}
+      {/* ═══════════ REVISION ACTION ═══════════ */}
       {revisionRpps.length > 0 && (
-        <div className="p-5 rounded-2xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/15 space-y-4">
+        <div className="p-5 rounded-2xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/15 space-y-4 abbasid-border-top">
           <div className="flex items-center space-x-3 text-rose-800 dark:text-rose-400">
             <FileWarning className="w-6 h-6 flex-shrink-0" />
             <div>
@@ -210,8 +297,8 @@ export default function GuruDashboard({
         </div>
       )}
 
-      {/* Teaching Schedules Quick-add Module */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs">
+      {/* ═══════════ JADWAL MENGAJAR ═══════════ */}
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs abbasid-border-top">
         <div className="border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-5">
           <h3 className="font-bold text-slate-800 dark:text-white text-base">Jadwal Mengajar Saya</h3>
           <p className="text-slate-400 text-xs mt-0.5">Pilih jadwal mengajar aktif untuk membuat RPP pembelajaran.</p>

@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Amiri:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-arabic: "Amiri", serif;
 }
 
 /* Tailwind v4: gunakan class strategy untuk dark mode agar toggle manual berfungsi */
@@ -25,6 +26,122 @@
     radial-gradient(ellipse at 100% 50%, transparent 38%, rgba(53, 32, 79, 0.16) 40%, rgba(53, 32, 79, 0.16) 43%, transparent 45%),
     radial-gradient(circle at 50% 50%, rgba(184, 138, 68, 0.35) 0 3%, transparent 4%);
   background-size: 72px 72px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DINASTI ABBASIYAH — Islamic Geometric Ornaments
+   Terinspirasi dari pola geometris era kejayaan Islam (750–1258 M)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Pola bintang octagonal — khas ornamen Abbasiyah */
+.abbasid-geometric {
+  background-color: transparent;
+  background-image:
+    /* Octagonal star pattern */
+    linear-gradient(45deg, rgba(245, 158, 11, 0.06) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(245, 158, 11, 0.06) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(245, 158, 11, 0.06) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(245, 158, 11, 0.06) 75%),
+    /* Inner diamond */
+    linear-gradient(45deg, rgba(245, 158, 11, 0.03) 50%, transparent 50%),
+    linear-gradient(-45deg, rgba(245, 158, 11, 0.03) 50%, transparent 50%);
+  background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 20px 20px, 20px 20px;
+  background-position: 0 0, 0 0, 20px 20px, 20px 20px, 0 0, 20px 0;
+}
+
+/* Pola interlacing lines — arabesque */
+.abbasid-arabesque {
+  background-color: transparent;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(245, 158, 11, 0.04) 28px,
+      rgba(245, 158, 11, 0.04) 30px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 28px,
+      rgba(245, 158, 11, 0.04) 28px,
+      rgba(245, 158, 11, 0.04) 30px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 39px,
+      rgba(245, 158, 11, 0.03) 39px,
+      rgba(245, 158, 11, 0.03) 40px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 39px,
+      rgba(245, 158, 11, 0.03) 39px,
+      rgba(245, 158, 11, 0.03) 40px
+    );
+}
+
+/* Border ornamen emas khas Abbasiyah */
+.abbasid-border-top {
+  position: relative;
+}
+.abbasid-border-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 158, 11, 0.1) 10%,
+    rgba(245, 158, 11, 0.5) 30%,
+    rgba(217, 169, 62, 0.8) 50%,
+    rgba(245, 158, 11, 0.5) 70%,
+    rgba(245, 158, 11, 0.1) 90%,
+    transparent 100%
+  );
+  border-radius: 0 0 4px 4px;
+}
+
+/* Animasi shimmer emas */
+@keyframes goldShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0) 0%,
+    rgba(245, 158, 11, 0.15) 25%,
+    rgba(217, 169, 62, 0.3) 50%,
+    rgba(245, 158, 11, 0.15) 75%,
+    rgba(245, 158, 11, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: goldShimmer 4s ease-in-out infinite;
+}
+
+/* Animasi twinkle bintang */
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.animate-twinkle {
+  animation: starTwinkle 3s ease-in-out infinite;
+}
+
+.animate-twinkle-delay {
+  animation: starTwinkle 3s ease-in-out 1.5s infinite;
+}
+
+.animate-twinkle-slow {
+  animation: starTwinkle 5s ease-in-out 0.8s infinite;
 }
 
 /* Sidebar scrollbar — sesuaikan warna dengan background indigo-900 */
@@ -55,4 +172,14 @@ aside nav {
 
 .animate-fade-in {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Floating animation for decorative elements */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: floatSlow 6s ease-in-out infinite;
 }

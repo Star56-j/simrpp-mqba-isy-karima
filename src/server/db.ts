@@ -570,10 +570,8 @@ function seedDatabase(): DatabaseSchema {
   // Subjects (Mata Pelajaran)
   const subjects: Subject[] = [
     // Al-Qur'an
-    { id: "sub-1", name: "Halaqah Qur'an", category: "Al-Qur'an" },
     { id: "sub-2", name: "Tahsin", category: "Al-Qur'an" },
     { id: "sub-3", name: "Tajwid", category: "Al-Qur'an" },
-    { id: "sub-4", name: "Muroja'ah Hafalan", category: "Al-Qur'an" },
     // Diniyah
     { id: "sub-5", name: "Aqidah", category: "Diniyah" },
     { id: "sub-6", name: "Akhlaq", category: "Diniyah" },
@@ -589,9 +587,7 @@ function seedDatabase(): DatabaseSchema {
     { id: "sub-15", name: "Bahasa Inggris", category: "Bahasa" },
     // Umum
     { id: "sub-16", name: "Matematika", category: "Umum" },
-    { id: "sub-17", name: "IPA", category: "Umum" },
-    { id: "sub-18", name: "Olahraga", category: "Umum" },
-    { id: "sub-19", name: "Tai Chi", category: "Umum" }
+    { id: "sub-17", name: "IPA", category: "Umum" }
   ];
 
   // Classes (Kelas)

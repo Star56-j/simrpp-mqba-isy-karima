@@ -524,7 +524,7 @@ function seedDatabase(): DatabaseSchema {
     "Ust. Abdullah", "Ust. Yunan", "Usth. Anim", "Usth. Azizah", "Ust. Aidil",
     "Usth. Saiba Musyaiya", "Ust. Arya", "Ust. Kholif", "Ust. Faqih", "Usth. Nurika",
     "Ust. Hafizh", "Ust. Farhan", "Ust. Tubagus", "Usth. Bela", "Usth. Dila",
-    "Usth. Ramiza", "Ust. Musthofa", "Usth. Ilfah", "Usth. Hasri", "Ust. Latief",
+    "Usth. Ilfah", "Usth. Hasri", "Ust. Latief",
     "Ust. Zain", "Ust. Akmal", "Ust. Rezkidori", "Usth. Lina",
     "Ust. Agib", "Usth. Rahmah", "Ust. Azri"
   ];

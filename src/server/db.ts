@@ -481,6 +481,23 @@ export function getDatabase(): DatabaseSchema {
       }
     }
 
+    // Purge unwanted subjects (Halaqah Qur'an, Muroja'ah Hafalan, Olahraga, Tai Chi)
+    if (parsed.subjects && parsed.subjects.length > 0) {
+      const unwantedIds = ["sub-1", "sub-4", "sub-18", "sub-19"];
+      const filtered = parsed.subjects.filter(s => !unwantedIds.includes(s.id));
+      if (filtered.length !== parsed.subjects.length) {
+        parsed.subjects = filtered;
+        
+        // Also clean up any demo RPP referencing sub-1
+        if (parsed.rpps && parsed.rpps.length > 0) {
+          parsed.rpps = parsed.rpps.map(r => r.subjectId === "sub-1" ? { ...r, subjectId: "sub-2" } : r);
+        }
+        
+        saveDatabase(parsed);
+        console.log("Migrated subjects by purging unwanted ones in active database");
+      }
+    }
+
     return parsed;
   } catch (error) {
     console.error("Error reading database file, reseeding...", error);

@@ -117,7 +117,7 @@ export default function Sidebar({
             <img
               src="/logo-mqba.png"
               alt="Logo MQBA Isy Karima"
-              className="w-20 h-20 object-contain drop-shadow-lg"
+              className="w-20 h-20 object-contain drop-shadow-lg animate-float"
             />
             <div>
               <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-tight">Akademik MQBA Isy Karima</h2>
@@ -127,32 +127,40 @@ export default function Sidebar({
         </div>
 
         {/* User Info Card + Actions */}
-        <div className="px-6 py-4 border-b border-indigo-800/40 bg-indigo-950/30">
+        <div className="px-4 py-4.5 border-b border-indigo-800/40 bg-indigo-950/40 m-3 rounded-2xl border border-indigo-700/20 shadow-inner">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white shadow-sm border border-indigo-500 flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-indigo-700 flex items-center justify-center font-black text-sm text-white shadow-md border border-indigo-400/30 flex-shrink-0">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-              <span className="inline-flex items-center px-2 py-0.5 mt-0.5 rounded-full text-[10px] font-bold bg-indigo-700 text-indigo-100 uppercase tracking-wide border border-indigo-600">
-                {user.role}
+              <p className="text-xs font-black text-white truncate tracking-wide leading-tight">{user.name}</p>
+              <span className="inline-flex items-center px-2 py-0.5 mt-1 rounded text-[8px] font-black bg-indigo-800/80 text-amber-300 uppercase tracking-widest border border-indigo-700/50">
+                {user.role === 'WaliSantri' ? 'Wali Santri' : user.role}
               </span>
             </div>
+          </div>
+          <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-indigo-800/30">
             {/* Dark mode toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-lg hover:bg-indigo-800/50 transition flex-shrink-0"
+              className="p-2 rounded-xl bg-indigo-900/50 hover:bg-indigo-800 text-indigo-100 transition cursor-pointer"
               title={darkMode ? 'Mode Terang' : 'Mode Gelap'}
             >
-              {darkMode ? <Sun className="w-4.5 h-4.5 text-amber-300" /> : <Moon className="w-4.5 h-4.5 text-indigo-300" />}
+              {darkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-indigo-300" />}
             </button>
+            
+            {/* Quick dashboard shortcut */}
+            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">
+              MQBA SYS
+            </span>
+
             {/* Logout */}
             <button
               onClick={() => { if (window.confirm('Apakah Anda yakin ingin keluar dari sistem?')) onLogout(); }}
-              className="p-2 rounded-lg hover:bg-rose-950/40 transition flex-shrink-0"
+              className="p-2 rounded-xl bg-rose-950/20 hover:bg-rose-900/30 text-rose-300 hover:text-rose-200 transition cursor-pointer"
               title="Keluar Sistem"
             >
-              <LogOut className="w-4.5 h-4.5 text-rose-300" />
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -170,10 +178,10 @@ export default function Sidebar({
                   setIsOpen(false);
                 }}
                 className={`
-                  w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200
+                  w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-xs uppercase tracking-wider transition-all duration-250 cursor-pointer hover:scale-[1.02] active:scale-[0.98]
                   ${isActive 
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/20 font-semibold' 
-                    : 'text-indigo-100 hover:bg-indigo-800/50 hover:text-white'
+                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-950/40 border border-indigo-500/20' 
+                    : 'text-indigo-200/90 hover:bg-indigo-800/40 hover:text-white'
                   }
                 `}
               >

@@ -244,16 +244,16 @@ export default function GuruDashboard({
         ].map((item, idx) => (
           <div 
             key={idx} 
-            className={`p-5 rounded-2xl border ${item.border} ${item.bg} shadow-xs flex flex-col justify-between abbasid-border-top`}
+            className={`p-5 rounded-2xl border ${item.border} ${item.bg} shadow-sm flex flex-col justify-between abbasid-border-top premium-card`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</span>
-              <div className={`p-1.5 rounded-lg bg-gradient-to-br ${item.gradient} text-white`}>
-                <item.icon className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{item.label}</span>
+              <div className={`p-2 rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-md`}>
+                <item.icon className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-4">
-              <span className="text-3xl font-black text-slate-800 dark:text-white leading-none">{item.val}</span>
+              <span className="text-3xl font-black text-slate-800 dark:text-white leading-none tracking-tight">{item.val}</span>
             </div>
           </div>
         ))}

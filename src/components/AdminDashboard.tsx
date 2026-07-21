@@ -213,7 +213,7 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
           <div 
             key={idx} 
             onClick={() => onNavigate(item.view)}
-            className="group relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden abbasid-border-top"
+            className="group relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm transition-all duration-300 cursor-pointer overflow-hidden abbasid-border-top premium-card"
           >
             {/* Decorative glow */}
             <div className={`absolute top-0 right-0 w-28 h-28 ${item.glow} opacity-[0.04] blur-2xl rounded-full transition-all duration-300 group-hover:scale-150 group-hover:opacity-[0.08]`} />

@@ -60,19 +60,19 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
     : 0;
 
   return (
-    <div className="min-h-screen bg-[#f3ead7] dark:bg-[#17120f] font-sans selection:bg-[#6f2f22] selection:text-white pb-12">
+    <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0f0b09] font-sans selection:bg-[#6f2f22] selection:text-white pb-16 transition-colors duration-300">
       {/* Navbar */}
-      <nav className="bg-[#402654] text-[#fff8e8] shadow-lg sticky top-0 z-50">
+      <nav className="bg-[#331c44] text-[#fff8e8] shadow-md sticky top-0 z-50 border-b border-[#dfc88f]/20 backdrop-blur-md bg-opacity-95">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src="/logo-mqba.png" alt="Logo" className="h-8 w-8 bg-white/10 rounded p-1" />
+            <img src="/logo-mqba.png" alt="Logo" className="h-9 w-9 bg-white/10 rounded-xl p-1.5 shadow-inner border border-white/5" />
             <div>
               <h1 className="font-black text-sm uppercase tracking-widest text-[#dfc88f]">Portal Wali Santri</h1>
-              <p className="text-[10px] text-[#efe2c5]/70">Akademik MQBA Isy Karima</p>
+              <p className="text-[9px] text-[#efe2c5]/75 font-bold uppercase tracking-wider mt-0.5">Akademik MQBA Isy Karima</p>
             </div>
           </div>
           <button onClick={onLogout}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 transition text-xs font-bold uppercase tracking-wider">
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/25 text-rose-200 transition text-[10px] font-black uppercase tracking-wider cursor-pointer active:scale-95 border border-rose-500/10">
             <LogOut className="w-3.5 h-3.5" /><span>Keluar</span>
           </button>
         </div>
@@ -80,23 +80,23 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
 
       <main className="max-w-5xl mx-auto px-4 mt-8 space-y-6">
         {/* Profile Card */}
-        <div className="bg-[#fffdf8] dark:bg-[#251c18] border border-[#c7a86a]/30 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-[#402654]/5 rounded-bl-full" />
+        <div className="bg-[#fffdf8] dark:bg-[#1a1310] border border-[#c7a86a]/20 dark:border-[#c7a86a]/10 rounded-[2rem] p-6 shadow-lg shadow-[#79462e]/5 dark:shadow-black/40 relative overflow-hidden premium-card">
+          <div className="absolute right-0 top-0 w-36 h-36 bg-[#331c44]/5 dark:bg-[#dfc88f]/5 rounded-bl-full" />
           <div className="flex items-start space-x-4 relative z-10">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c7a86a] to-[#8f6b39] flex items-center justify-center shadow-lg text-white">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c7a86a] to-[#8f6b39] flex items-center justify-center shadow-lg shadow-[#8f6b39]/20 text-white animate-float">
               <GraduationCap className="w-8 h-8" />
             </div>
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#79462e] dark:text-[#dfc88f] mb-1">
-                Data Santri
+            <div className="space-y-1.5">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#79462e] dark:text-[#dfc88f]">
+                Santri Terdaftar
               </p>
-              <h2 className="text-2xl font-black text-[#30211b] dark:text-[#fff8e8]">{santri?.name}</h2>
-              <div className="flex items-center space-x-4 mt-2 text-xs font-semibold text-[#826f64] dark:text-[#bdaea4]">
-                <span className="flex items-center space-x-1">
+              <h2 className="text-2xl font-black text-[#30211b] dark:text-[#fff8e8] tracking-tight">{santri?.name}</h2>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-bold text-[#826f64] dark:text-[#bdaea4]">
+                <span className="flex items-center space-x-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#6f2f22] dark:bg-[#c7a86a]" />
                   <span>NIS: {santri?.nis}</span>
                 </span>
-                <span className="flex items-center space-x-1">
+                <span className="flex items-center space-x-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#6f2f22] dark:bg-[#c7a86a]" />
                   <span>Kelas: {santri?.class?.name || santri?.classId}</span>
                 </span>
@@ -107,34 +107,34 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
 
         {/* Filter */}
         <div className="flex flex-wrap gap-4 items-center">
-          <div className="space-y-1 w-40">
-            <label className="text-[10px] font-bold text-[#79462e] dark:text-[#dfc88f] uppercase tracking-wider block">Tahun Ajaran</label>
+          <div className="space-y-1 w-44">
+            <label className="text-[9px] font-black text-[#79462e] dark:text-[#dfc88f] uppercase tracking-wider block">Tahun Ajaran</label>
             <select value={filterAY} onChange={e => setFilterAY(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[#c7a86a]/50 bg-[#fffdf8] dark:bg-[#251c18] dark:text-[#fff8e8] text-xs focus:outline-none focus:ring-2 focus:ring-[#8f6b39]">
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#c7a86a]/40 dark:border-[#c7a86a]/20 bg-white dark:bg-[#1a1310] dark:text-[#fff8e8] text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-[#8f6b39]/20 transition-all cursor-pointer">
               {academicYears.map(y => <option key={y.id} value={y.id}>TA {y.name}</option>)}
             </select>
           </div>
-          <div className="space-y-1 w-40">
-            <label className="text-[10px] font-bold text-[#79462e] dark:text-[#dfc88f] uppercase tracking-wider block">Semester</label>
+          <div className="space-y-1 w-44">
+            <label className="text-[9px] font-black text-[#79462e] dark:text-[#dfc88f] uppercase tracking-wider block">Semester</label>
             <select value={filterSem} onChange={e => setFilterSem(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[#c7a86a]/50 bg-[#fffdf8] dark:bg-[#251c18] dark:text-[#fff8e8] text-xs focus:outline-none focus:ring-2 focus:ring-[#8f6b39]">
+              className="w-full px-3.5 py-2.5 rounded-xl border border-[#c7a86a]/40 dark:border-[#c7a86a]/20 bg-white dark:bg-[#1a1310] dark:text-[#fff8e8] text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-[#8f6b39]/20 transition-all cursor-pointer">
               {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
         </div>
 
         {/* Rapor Section */}
-        <div className="bg-[#fffdf8] dark:bg-[#251c18] rounded-3xl border border-[#c7a86a]/30 shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#c7a86a]/20 bg-gradient-to-r from-[#402654]/5 to-transparent flex items-center justify-between flex-wrap gap-4">
-            <h3 className="text-sm font-extrabold text-[#30211b] dark:text-[#dfc88f] uppercase tracking-wider flex items-center space-x-2">
+        <div className="bg-[#fffdf8] dark:bg-[#1a1310] rounded-[2rem] border border-[#c7a86a]/20 dark:border-[#c7a86a]/15 shadow-xl shadow-[#79462e]/5 dark:shadow-black/50 overflow-hidden">
+          <div className="px-6 py-5 border-b border-[#c7a86a]/10 bg-gradient-to-r from-[#331c44]/5 to-transparent flex items-center justify-between flex-wrap gap-4">
+            <h3 className="text-xs font-black text-[#30211b] dark:text-[#dfc88f] uppercase tracking-wider flex items-center space-x-2">
               <BookOpen className="w-4 h-4 text-[#8f6b39]" />
               <span>Rapor Hasil Belajar</span>
             </h3>
             {nilaiList.length > 0 && (
               <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#826f64] dark:text-[#bdaea4]">Rata-rata</p>
-                  <p className="text-xl font-black text-[#6f2f22] dark:text-[#c7a86a]">{avg}</p>
+                  <p className="text-[9px] font-black uppercase tracking-wider text-[#826f64] dark:text-[#bdaea4] leading-none">Rata-rata</p>
+                  <p className="text-2xl font-black text-[#6f2f22] dark:text-[#dfc88f] mt-1 tracking-tight">{avg}</p>
                 </div>
                 <button
                   onClick={async () => {
@@ -164,7 +164,7 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
                     }
                   }}
                   disabled={printing}
-                  className="px-4 py-2 bg-[#402654] hover:bg-[#2c1a3b] text-[#dfc88f] rounded-lg text-xs font-bold uppercase tracking-wider shadow-md transition-colors flex items-center gap-2 disabled:opacity-50"
+                  className="px-4 py-2.5 bg-gradient-to-r from-[#4d3266] to-[#331c44] hover:from-[#3f2555] hover:to-[#221030] text-[#dfc88f] rounded-xl text-xs font-black uppercase tracking-wider shadow-md shadow-[#331c44]/10 hover:shadow-[#331c44]/20 transition-all duration-300 flex items-center gap-2 disabled:opacity-50 cursor-pointer active:scale-95 border border-[#dfc88f]/10"
                 >
                   <Printer className="w-4 h-4"/> {printing ? 'Menyiapkan...' : 'Cetak Rapor'}
                 </button>
@@ -176,44 +176,44 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
             <div className="p-12 text-center text-[#826f64] text-sm animate-pulse">Memuat nilai...</div>
           ) : nilaiList.length === 0 ? (
             <div className="p-16 text-center text-[#826f64] space-y-3">
-              <Calendar className="w-12 h-12 mx-auto text-[#c7a86a]/50" />
+              <Calendar className="w-12 h-12 mx-auto text-[#c7a86a]/50 animate-float" />
               <p className="text-sm font-bold">Belum ada nilai untuk semester ini.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs sm:text-sm">
-                <thead className="text-[10px] font-black text-[#79462e] dark:text-[#dfc88f] uppercase tracking-[0.1em] bg-[#f8eed9] dark:bg-[#342720]">
+                <thead className="text-[9px] font-black text-[#79462e] dark:text-[#dfc88f] uppercase tracking-widest bg-[#f6ebdc]/80 dark:bg-[#271e19]/80 border-b border-[#c7a86a]/15">
                   <tr>
-                    <th className="px-4 py-3">Mata Pelajaran</th>
-                    <th className="px-2 py-3 text-center">Harian</th>
-                    <th className="px-2 py-3 text-center">Bulanan</th>
-                    <th className="px-2 py-3 text-center">UTS</th>
-                    <th className="px-2 py-3 text-center">UAS Tulis</th>
-                    <th className="px-2 py-3 text-center">UAS Lisan</th>
-                    <th className="px-3 py-3 text-center">Rata²</th>
-                    <th className="px-4 py-3">Catatan</th>
+                    <th className="px-6 py-3.5">Mata Pelajaran</th>
+                    <th className="px-3 py-3.5 text-center">Harian</th>
+                    <th className="px-3 py-3.5 text-center">Bulanan</th>
+                    <th className="px-3 py-3.5 text-center">UTS</th>
+                    <th className="px-3 py-3.5 text-center">UAS Tulis</th>
+                    <th className="px-3 py-3.5 text-center">UAS Lisan</th>
+                    <th className="px-4 py-3.5 text-center">Rata²</th>
+                    <th className="px-6 py-3.5">Catatan</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#c7a86a]/10 text-xs sm:text-sm">
                   {nilaiList.map(n => {
                     const studentAvg = getAverage(n);
                     return (
-                      <tr key={n.id} className="hover:bg-[#402654]/5 transition-colors">
-                        <td className="px-4 py-4 font-bold text-[#30211b] dark:text-[#fff8e8]">
+                      <tr key={n.id} className="hover:bg-[#331c44]/5 dark:hover:bg-[#dfc88f]/5 transition-colors duration-200">
+                        <td className="px-6 py-4.5 font-bold text-[#30211b] dark:text-[#fff8e8]">
                           {(n as any).subject?.name || n.subjectId}
                         </td>
-                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.harian || '-'}</td>
-                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.bulanan || '-'}</td>
-                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uts || '-'}</td>
-                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uas || '-'}</td>
-                        <td className="px-2 py-4 text-center font-semibold text-[#826f64] dark:text-[#bdaea4]">{n.uasLisan || '-'}</td>
-                        <td className="px-3 py-4 text-center">
-                          <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-black ${studentAvg < 75 ? 'bg-rose-100 text-rose-700' : 'bg-[#e9dcc5] text-[#402654] dark:bg-[#473428] dark:text-[#dfc88f]'}`}>
+                        <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.harian || '-'}</td>
+                        <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.bulanan || '-'}</td>
+                        <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.uts || '-'}</td>
+                        <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.uas || '-'}</td>
+                        <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.uasLisan || '-'}</td>
+                        <td className="px-4 py-4.5 text-center">
+                          <span className={`inline-flex items-center justify-center w-8 h-8 rounded-xl font-black text-xs ${studentAvg < 75 ? 'bg-rose-100 dark:bg-rose-950/30 text-rose-700 dark:text-rose-450 border border-rose-200/50' : 'bg-[#e9dcc5] text-[#402654] dark:bg-[#2c2018] dark:text-[#dfc88f] border border-[#c7a86a]/20'}`}>
                             {studentAvg}
                           </span>
                         </td>
-                        <td className="px-4 py-4 text-xs leading-5 text-[#826f64] dark:text-[#bdaea4]">
-                          {n.notes || <span className="italic opacity-50">Tidak ada catatan</span>}
+                        <td className="px-6 py-4.5 text-xs leading-relaxed text-[#826f64] dark:text-[#bdaea4] max-w-xs truncate">
+                          {n.notes || <span className="italic opacity-45">Tidak ada catatan</span>}
                         </td>
                       </tr>
                     );

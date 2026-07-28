@@ -481,21 +481,14 @@ export function getDatabase(): DatabaseSchema {
       }
     }
 
-    // Purge unwanted subjects (Halaqah Qur'an, Muroja'ah Hafalan, Olahraga, Tai Chi)
-    if (parsed.subjects && parsed.subjects.length > 0) {
-      const unwantedIds = ["sub-1", "sub-4", "sub-18", "sub-19"];
-      const filtered = parsed.subjects.filter(s => !unwantedIds.includes(s.id));
-      if (filtered.length !== parsed.subjects.length) {
-        parsed.subjects = filtered;
-        
-        // Also clean up any demo RPP referencing sub-1
-        if (parsed.rpps && parsed.rpps.length > 0) {
-          parsed.rpps = parsed.rpps.map(r => r.subjectId === "sub-1" ? { ...r, subjectId: "sub-2" } : r);
-        }
-        
-        saveDatabase(parsed);
-        console.log("Migrated subjects by purging unwanted ones in active database");
-      }
+    // Migrate: Update teachingSchedules, teachers, and subjects to latest schedule PDF
+    const freshData = seedDatabase();
+    if (!parsed.teachingSchedules || parsed.teachingSchedules.length !== freshData.teachingSchedules.length || parsed.teachingSchedules[0]?.id !== "sch-1") {
+      parsed.teachingSchedules = freshData.teachingSchedules;
+      parsed.teachers = freshData.teachers;
+      parsed.subjects = freshData.subjects;
+      saveDatabase(parsed);
+      console.log("Migrated active database to latest 2026-2027 KBM Teaching Schedules");
     }
 
     return parsed;
@@ -536,13 +529,13 @@ function seedDatabase(): DatabaseSchema {
   
   // Teachers list
   const teacherNames = [
-    "Ust. Abdul Malik", "Ust. Umar", "Ust. Zulfikar", "Ust. Karim", "Ust. Fredy",
+    "Ust. Abdul Malik", "Ust. Umar", "Ust. Dzulfikar", "Ust. Karim", "Ust. Fredy",
     "Ust. Abdullah", "Ust. Yunan", "Usth. Anim", "Usth. Azizah", "Ust. Aidil",
     "Usth. Saiba Musyaiya", "Ust. Arya", "Ust. Kholif", "Ust. Faqih", "Usth. Nurika",
     "Ust. Hafizh", "Ust. Farhan", "Ust. Tubagus", "Usth. Bela", "Usth. Dila",
-    "Usth. Ilfah", "Usth. Hasri", "Ust. Latief",
+    "Usth. Iffah", "Usth. Hasri", "Ust. Latief",
     "Ust. Akmal", "Ust. Rezkidar", "Usth. Lina",
-    "Ust. Agib", "Usth. Rahmah", "Ust. Azri"
+    "Ust. Agib", "Usth. Rahmah", "Ust. Azri", "Usth. Indri"
   ];
 
   const teachers: Teacher[] = teacherNames.map((name, index) => {
@@ -589,12 +582,13 @@ function seedDatabase(): DatabaseSchema {
     // Al-Qur'an
     { id: "sub-2", name: "Tahsin", category: "Al-Qur'an" },
     { id: "sub-3", name: "Tajwid", category: "Al-Qur'an" },
+    { id: "sub-20", name: "Muraja'ah Hafalan", category: "Al-Qur'an" },
     // Diniyah
     { id: "sub-5", name: "Aqidah", category: "Diniyah" },
     { id: "sub-6", name: "Akhlaq", category: "Diniyah" },
     { id: "sub-7", name: "Fiqih", category: "Diniyah" },
     { id: "sub-8", name: "Adab wa Tarbiyah", category: "Diniyah" },
-    { id: "sub-9", name: "Sirah", category: "Diniyah" },
+    { id: "sub-9", name: "Siroh", category: "Diniyah" },
     { id: "sub-10", name: "Manhaji", category: "Diniyah" },
     { id: "sub-11", name: "Jazary", category: "Diniyah" },
     { id: "sub-12", name: "Khot", category: "Diniyah" },
@@ -604,7 +598,9 @@ function seedDatabase(): DatabaseSchema {
     { id: "sub-15", name: "Bahasa Inggris", category: "Bahasa" },
     // Umum
     { id: "sub-16", name: "Matematika", category: "Umum" },
-    { id: "sub-17", name: "IPA", category: "Umum" }
+    { id: "sub-17", name: "IPA", category: "Umum" },
+    { id: "sub-18", name: "Furusiyah", category: "Umum" },
+    { id: "sub-19", name: "Tai Chi / Olah Raga", category: "Umum" }
   ];
 
   // Classes (Kelas)
@@ -631,116 +627,123 @@ function seedDatabase(): DatabaseSchema {
     { id: "sem-2", name: "Genap" }
   ];
 
-  // Teaching Schedules (Jadwal KBM)
-  // Let's seed schedules for the first few teachers to allow immediate testing!
+  // Teaching Schedules (Jadwal KBM Terbaru Semester Ganjil 2026 - 2027)
   const teachingSchedules: TeachingSchedule[] = [
     // === SABTU ===
-    // Waktu: 10.00 - 11.30
-    { id: "sch-1", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-1", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PA - Khot
-    { id: "sch-2", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-2", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PI - Aqidah
-    { id: "sch-3", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-3", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PA - Bhs. Inggris
-    { id: "sch-4", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-4", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PI - Fiqih
-    { id: "sch-5", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 3 - ABY
-    { id: "sch-6", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // PA (Idad) - ABY
-    { id: "sch-7", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // PI (Idad) - ABY
-
-    // Waktu: 12.30 - 13.30
-    { id: "sch-8", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-30", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PA - Matematika
-    { id: "sch-9", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-1", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PI - Khot
-    { id: "sch-10", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PA - ABY
-    { id: "sch-11", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-31", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PI - Bhs. Inggris
-    { id: "sch-12", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-3", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },  // 3 - Bhs. Inggris
-    { id: "sch-13", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PA (Idad) - ABY
+    // 10:00 - 11:30
+    { id: "sch-1", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-1", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-2", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-2", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-3", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-3", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-4", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-4", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-5", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-6", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-7", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    // 12:30 - 13:30
+    { id: "sch-8", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-27", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-9", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-1", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-10", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-11", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-12", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-3", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-13", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-14", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
 
     // === AHAD ===
-    // Waktu: 10.00 - 11.30
-    { id: "sch-14", day: "Ahad", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-7", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PA - Tajwid
-    { id: "sch-15", day: "Ahad", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PI - ABY
-    { id: "sch-16", day: "Ahad", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-14", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PA - Aqidah
-    { id: "sch-17", day: "Ahad", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-15", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PI - Siroh
-    { id: "sch-18", day: "Ahad", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // 3 - ABY
-    { id: "sch-19", day: "Ahad", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-7", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },  // PA (Idad) - Tajwid
-    { id: "sch-20", day: "Ahad", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - ABY
-
-    // Waktu: 12.30 - 13.30
-    { id: "sch-21", day: "Ahad", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-10", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PA - Akhlaq
-    { id: "sch-22", day: "Ahad", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PI - Tahsin
-    { id: "sch-23", day: "Ahad", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-18", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PA - Siroh
-    { id: "sch-24", day: "Ahad", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PI - Tahsin
-    { id: "sch-25", day: "Ahad", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // 3 - Tahsin
-    { id: "sch-26", day: "Ahad", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // PA (Idad) - Tahsin
-    { id: "sch-27", day: "Ahad", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // PI (Idad) - Tahsin
+    // 10:00 - 11:30
+    { id: "sch-15", day: "Ahad", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-7", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-16", day: "Ahad", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-17", day: "Ahad", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-14", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-18", day: "Ahad", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-15", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-19", day: "Ahad", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-20", day: "Ahad", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-7", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-21", day: "Ahad", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    // 12:30 - 13:30
+    { id: "sch-22", day: "Ahad", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-10", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-23", day: "Ahad", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-24", day: "Ahad", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-18", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-25", day: "Ahad", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-26", day: "Ahad", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-27", day: "Ahad", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-28", day: "Ahad", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
 
     // === SENIN ===
-    // Waktu: 10.00 - 11.30
-    { id: "sch-28", day: "Senin", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-14", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PA - Aqidah
-    { id: "sch-29", day: "Senin", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PI - ABY
-    { id: "sch-30", day: "Senin", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-13", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PA - Tahsin
-    { id: "sch-31", day: "Senin", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-17", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },  // 3 - Fiqih
-    { id: "sch-32", day: "Senin", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PA (Idad) - ABY
-    { id: "sch-33", day: "Senin", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - ABY
-
-    // Waktu: 12.30 - 13.30
-    { id: "sch-34", day: "Senin", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PA - ABY
-    { id: "sch-35", day: "Senin", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PI - Tahsin
-    { id: "sch-36", day: "Senin", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PA - Tahsin
-    { id: "sch-37", day: "Senin", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PI - ABY
-    { id: "sch-38", day: "Senin", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-16", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" }, // 3 - IPA
-    { id: "sch-39", day: "Senin", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // PA (Idad) - Tahsin
-    { id: "sch-40", day: "Senin", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - Tahsin
+    // 10:00 - 11:30
+    { id: "sch-29", day: "Senin", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-14", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-30", day: "Senin", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-31", day: "Senin", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-13", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-32", day: "Senin", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-30", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-33", day: "Senin", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-17", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-34", day: "Senin", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-35", day: "Senin", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    // 12:30 - 13:30
+    { id: "sch-36", day: "Senin", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-37", day: "Senin", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-38", day: "Senin", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-39", day: "Senin", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-40", day: "Senin", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-16", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-41", day: "Senin", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-42", day: "Senin", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
 
     // === SELASA ===
-    // Waktu: 10.00 - 11.30
-    { id: "sch-41", day: "Selasa", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PA - ABY
-    { id: "sch-42", day: "Selasa", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PI - ABY
-    { id: "sch-43", day: "Selasa", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-19", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PI - Matematika
-    { id: "sch-44", day: "Selasa", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // 3 - ABY
-    { id: "sch-45", day: "Selasa", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PA (Idad) - ABY
-    { id: "sch-46", day: "Selasa", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - ABY
-
-    // Waktu: 12.30 - 13.30
-    { id: "sch-47", day: "Selasa", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-32", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PA - Tahsin
-    { id: "sch-48", day: "Selasa", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PI - Tajwid
-    { id: "sch-49", day: "Selasa", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-16", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PA - IPA
-    { id: "sch-50", day: "Selasa", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-9", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PI - IPA
-    { id: "sch-51", day: "Selasa", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-10", subjectId: "sub-14", academicYearId: "ay-1", semesterId: "sem-1" }, // 3 - Bhs. Indonesia
-    { id: "sch-52", day: "Selasa", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - Tajwid
+    // 10:00 - 11:30
+    { id: "sch-43", day: "Selasa", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-44", day: "Selasa", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-45", day: "Selasa", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-10", subjectId: "sub-18", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-46", day: "Selasa", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-19", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-47", day: "Selasa", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-48", day: "Selasa", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-49", day: "Selasa", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    // 12:30 - 13:30
+    { id: "sch-50", day: "Selasa", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-29", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-51", day: "Selasa", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-52", day: "Selasa", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-16", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-53", day: "Selasa", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-9", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-54", day: "Selasa", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-10", subjectId: "sub-14", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-55", day: "Selasa", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-56", day: "Selasa", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
 
     // === RABU ===
-    // Waktu: 10.00 - 11.30
-    { id: "sch-53", day: "Rabu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PA - ABY
-    { id: "sch-54", day: "Rabu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PI - Tahsin
-    { id: "sch-55", day: "Rabu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },   // 2 PA - ABY
-    { id: "sch-56", day: "Rabu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PI - Tahsin
-    { id: "sch-57", day: "Rabu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 3 - Tahsin
-    { id: "sch-58", day: "Rabu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PA (Idad) - ABY
-    { id: "sch-59", day: "Rabu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - Tahsin
-
-    // Waktu: 12.30 - 13.30
-    { id: "sch-60", day: "Rabu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PA - ABY
-    { id: "sch-61", day: "Rabu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PI - Tajwid
-    { id: "sch-62", day: "Rabu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-13", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PA - Tahsin
-    { id: "sch-63", day: "Rabu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PI - ABY
-    { id: "sch-64", day: "Rabu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-18", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },  // 3 - Siroh
-    { id: "sch-65", day: "Rabu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PA (Idad) - ABY
-    { id: "sch-66", day: "Rabu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - Tajwid
+    // 07:30 - 08:45
+    { id: "sch-57", day: "Rabu", time: "07:30 - 08:45", classId: "cls-3", teacherId: "teacher-10", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-58", day: "Rabu", time: "07:30 - 08:45", classId: "cls-4", teacherId: "teacher-21", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-59", day: "Rabu", time: "07:30 - 08:45", classId: "cls-5", teacherId: "teacher-10", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-60", day: "Rabu", time: "07:30 - 08:45", classId: "cls-6", teacherId: "teacher-21", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-61", day: "Rabu", time: "07:30 - 08:45", classId: "cls-7", teacherId: "teacher-10", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-62", day: "Rabu", time: "07:30 - 08:45", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-63", day: "Rabu", time: "07:30 - 08:45", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+    // 10:00 - 11:30
+    { id: "sch-64", day: "Rabu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-65", day: "Rabu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-66", day: "Rabu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-67", day: "Rabu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-68", day: "Rabu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-69", day: "Rabu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-70", day: "Rabu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-11", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    // 12:30 - 13:30
+    { id: "sch-71", day: "Rabu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-72", day: "Rabu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-73", day: "Rabu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-13", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-74", day: "Rabu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-75", day: "Rabu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-18", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-76", day: "Rabu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-77", day: "Rabu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-20", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
 
     // === KAMIS ===
-    // Waktu: 10.00 - 11.30
-    { id: "sch-67", day: "Kamis", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-32", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PA - Tahsin
-    { id: "sch-68", day: "Kamis", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-24", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PI - Matematika
-    { id: "sch-69", day: "Kamis", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-25", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PA - Matematika
-    { id: "sch-70", day: "Kamis", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-2", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },   // 2 PI - Aqidah
-    { id: "sch-71", day: "Kamis", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-27", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" }, // 3 - Matematika
-    { id: "sch-72", day: "Kamis", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-32", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // PA (Idad) - Tahsin
-    { id: "sch-73", day: "Kamis", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },  // PI (Idad) - ABY
-
-    // Waktu: 12.30 - 13.30
-    { id: "sch-74", day: "Kamis", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-32", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" }, // 1 PA - Tahsin
-    { id: "sch-75", day: "Kamis", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-29", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },  // 1 PI - Akhlaq
-    { id: "sch-76", day: "Kamis", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-28", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },  // 2 PA - Fiqih
-    { id: "sch-77", day: "Kamis", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" }, // 2 PI - ABY
-    { id: "sch-78", day: "Kamis", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-4", subjectId: "sub-8", academicYearId: "ay-1", semesterId: "sem-1" }    // 3 - Adab / Tarbiyyah
+    // 10:00 - 11:30
+    { id: "sch-78", day: "Kamis", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-29", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-79", day: "Kamis", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-22", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-80", day: "Kamis", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-23", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-81", day: "Kamis", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-2", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-82", day: "Kamis", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-24", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-83", day: "Kamis", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-29", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-84", day: "Kamis", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    // 12:30 - 13:30
+    { id: "sch-85", day: "Kamis", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-29", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-86", day: "Kamis", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-26", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-87", day: "Kamis", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-25", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-88", day: "Kamis", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-89", day: "Kamis", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-4", subjectId: "sub-8", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-90", day: "Kamis", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-91", day: "Kamis", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" }
   ];
 
   // Seed 2 initial RPP items for immediate demonstration

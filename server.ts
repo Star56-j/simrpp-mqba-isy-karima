@@ -2121,16 +2121,15 @@ app.delete('/api/pengumuman/:id', requireAuth('Admin'), (req, res) => {
 // FRONTEND INTEGRATION & MIDDLEWARE
 // ============================================================================
 
-async function startServer() {
-  // Trigger database initialization and migration on startup
-  try {
-    getDatabase();
-    console.log("Database initialized and verified successfully at startup.");
-  } catch (err) {
-    console.error("Failed to initialize database at startup:", err);
-  }
+// Trigger database initialization on load
+try {
+  getDatabase();
+} catch (err) {
+  console.error("Failed to initialize database at startup:", err);
+}
 
-  if (process.env.NODE_ENV !== 'production') {
+async function startServer() {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     // Setup Vite as a dev server middleware
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -2148,9 +2147,13 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`SIMRPP MQBA Isy Karima server is running on http://localhost:${PORT}`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`SIMRPP MQBA Isy Karima server is running on http://localhost:${PORT}`);
+    });
+  }
 }
 
 startServer();
+
+export default app;

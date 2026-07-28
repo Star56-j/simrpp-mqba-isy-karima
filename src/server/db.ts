@@ -244,16 +244,25 @@ export interface RaporDetail {
   updatedAt: string;
 }
 
-// Gunakan DATA_PATH dari environment variable (Railway persistent volume)
-// atau fallback ke folder data/ lokal
-const DATA_DIR = process.env.DATA_PATH || path.join(process.cwd(), 'data');
+// Gunakan DATA_PATH dari environment variable (Railway persistent volume),
+// /tmp jika di Vercel Serverless, atau fallback ke folder data/ lokal
+const IS_VERCEL = !!process.env.VERCEL;
+const DATA_DIR = IS_VERCEL ? '/tmp' : (process.env.DATA_PATH || path.join(process.cwd(), 'data'));
 const DB_PATH = path.join(DATA_DIR, 'database.json');
+const DEFAULT_DB_PATH = path.join(process.cwd(), 'data', 'database.json');
 
 // Ensure database directory exists
 function ensureDbDir() {
   const dir = path.dirname(DB_PATH);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
+  }
+  if (IS_VERCEL && !fs.existsSync(DB_PATH) && fs.existsSync(DEFAULT_DB_PATH)) {
+    try {
+      fs.copyFileSync(DEFAULT_DB_PATH, DB_PATH);
+    } catch (e) {
+      console.error("Failed to copy default database.json to /tmp:", e);
+    }
   }
 }
 

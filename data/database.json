@@ -9,119 +9,119 @@
     },
     {
       "id": "user-guru-teacher-1",
-      "name": "Ust. Abdul Malik",
-      "email": "abdulmalik@mqba.sch.id",
+      "name": "Ustadz Muhammad Arya Mukti, Al Hafizh",
+      "email": "aryamukti@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-1"
     },
     {
       "id": "user-guru-teacher-2",
-      "name": "Ust. Umar",
-      "email": "umar@mqba.sch.id",
+      "name": "Ustadz Akmal Firmana, ST.",
+      "email": "akmal@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-2"
     },
     {
       "id": "user-guru-teacher-3",
-      "name": "Ust. Zulfikar",
-      "email": "zulfikar@mqba.sch.id",
+      "name": "Ustadz Abdul Kholif",
+      "email": "abdulkholif@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-3"
     },
     {
       "id": "user-guru-teacher-4",
-      "name": "Ust. Karim",
-      "email": "karim@mqba.sch.id",
+      "name": "Ustadz Sahmura Maula Maghribi, S.Mat.",
+      "email": "sahmura@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-4"
     },
     {
       "id": "user-guru-teacher-5",
-      "name": "Ust. Fredy",
-      "email": "fredy@mqba.sch.id",
+      "name": "Ustadz Muhammad Hafizh Hibatullah, S.Si.",
+      "email": "hafizh@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-5"
     },
     {
       "id": "user-guru-teacher-6",
-      "name": "Ust. Abdullah",
-      "email": "abdullah@mqba.sch.id",
+      "name": "Ustadz Faqih Hidayat, Lc.",
+      "email": "faqih@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-6"
     },
     {
       "id": "user-guru-teacher-7",
-      "name": "Ust. Yunan",
-      "email": "yunan@mqba.sch.id",
+      "name": "Ustadz Muhammad Abdul Malik Ibrahim, S.Kom.",
+      "email": "abdulmalik@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-7"
     },
     {
       "id": "user-guru-teacher-8",
-      "name": "Usth. Anim",
-      "email": "anim@mqba.sch.id",
+      "name": "Ustadz Dzulfikar Tri Bagaskara, S.Ag., M.Pd.",
+      "email": "dzulfikar@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-8"
     },
     {
       "id": "user-guru-teacher-9",
-      "name": "Usth. Azizah",
-      "email": "azizah@mqba.sch.id",
+      "name": "Ustadzah Hasri Haryani Direja, S.Ds.",
+      "email": "hasri@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-9"
     },
     {
       "id": "user-guru-teacher-10",
-      "name": "Ust. Aidil",
-      "email": "aidil@mqba.sch.id",
+      "name": "Ustadzah Saiba Musyayia",
+      "email": "saibamusyayia@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-10"
     },
     {
       "id": "user-guru-teacher-11",
-      "name": "Usth. Saiba Musyaiya",
-      "email": "saibamusyaiya@mqba.sch.id",
+      "name": "Ustadz Rezkidar",
+      "email": "rezkidar@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-11"
     },
     {
       "id": "user-guru-teacher-12",
-      "name": "Ust. Arya",
-      "email": "arya@mqba.sch.id",
+      "name": "Ustadz Azri Robani Indra Robbi, S.Ag.",
+      "email": "azri@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-12"
     },
     {
       "id": "user-guru-teacher-13",
-      "name": "Ust. Kholif",
-      "email": "kholif@mqba.sch.id",
+      "name": "Ustadzah Indri Nurbidari, S.Si",
+      "email": "indri@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-13"
     },
     {
       "id": "user-guru-teacher-14",
-      "name": "Ust. Faqih",
-      "email": "faqih@mqba.sch.id",
+      "name": "Ustadzah Bela Dwi Lestari, S.Pd.",
+      "email": "bela@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-14"
     },
     {
       "id": "user-guru-teacher-15",
-      "name": "Usth. Nurika",
+      "name": "Ustadzah Nurika Nuralifah, S.Ag.",
       "email": "nurika@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
@@ -129,267 +129,93 @@
     },
     {
       "id": "user-guru-teacher-16",
-      "name": "Ust. Hafizh",
-      "email": "hafizh@mqba.sch.id",
+      "name": "Ustadzah Azizah Nur Aini, S.Pd.",
+      "email": "azizah@mqba.sch.id",
       "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
       "role": "Guru",
       "teacherId": "teacher-16"
-    },
-    {
-      "id": "user-guru-teacher-17",
-      "name": "Ust. Farhan",
-      "email": "farhan@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-17"
-    },
-    {
-      "id": "user-guru-teacher-18",
-      "name": "Ust. Tubagus",
-      "email": "tubagus@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-18"
-    },
-    {
-      "id": "user-guru-teacher-19",
-      "name": "Usth. Bela",
-      "email": "bela@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-19"
-    },
-    {
-      "id": "user-guru-teacher-20",
-      "name": "Usth. Dila",
-      "email": "dila@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-20"
-    },
-    {
-      "id": "user-guru-teacher-23",
-      "name": "Usth. Ilfah",
-      "email": "ilfah@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-23"
-    },
-    {
-      "id": "user-guru-teacher-24",
-      "name": "Usth. Hasri",
-      "email": "hasri@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-24"
-    },
-    {
-      "id": "user-guru-teacher-25",
-      "name": "Ust. Latief",
-      "email": "latief@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-25"
-    },
-    {
-      "id": "user-guru-teacher-27",
-      "name": "Ust. Akmal",
-      "email": "akmal@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-27"
-    },
-    {
-      "id": "user-guru-teacher-28",
-      "name": "Ust. Rezkidar",
-      "email": "rezkidar@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-28"
-    },
-    {
-      "id": "user-guru-teacher-29",
-      "name": "Usth. Lina",
-      "email": "lina@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-29"
-    },
-    {
-      "id": "user-guru-teacher-30",
-      "name": "Ust. Agib",
-      "email": "agib@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-30"
-    },
-    {
-      "id": "user-guru-teacher-31",
-      "name": "Usth. Rahmah",
-      "email": "rahmah@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-31"
-    },
-    {
-      "id": "user-guru-teacher-32",
-      "name": "Ust. Azri",
-      "email": "azri@mqba.sch.id",
-      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-      "role": "Guru",
-      "teacherId": "teacher-32"
     }
   ],
   "teachers": [
     {
       "id": "teacher-1",
-      "name": "Ust. Abdul Malik",
-      "email": "abdulmalik@mqba.sch.id"
+      "name": "Ustadz Muhammad Arya Mukti, Al Hafizh",
+      "email": "aryamukti@mqba.sch.id"
     },
     {
       "id": "teacher-2",
-      "name": "Ust. Umar",
-      "email": "umar@mqba.sch.id"
+      "name": "Ustadz Akmal Firmana, ST.",
+      "email": "akmal@mqba.sch.id"
     },
     {
       "id": "teacher-3",
-      "name": "Ust. Dzulfikar",
-      "email": "dzulfikar@mqba.sch.id"
+      "name": "Ustadz Abdul Kholif",
+      "email": "abdulkholif@mqba.sch.id"
     },
     {
       "id": "teacher-4",
-      "name": "Ust. Karim",
-      "email": "karim@mqba.sch.id"
+      "name": "Ustadz Sahmura Maula Maghribi, S.Mat.",
+      "email": "sahmura@mqba.sch.id"
     },
     {
       "id": "teacher-5",
-      "name": "Ust. Fredy",
-      "email": "fredy@mqba.sch.id"
+      "name": "Ustadz Muhammad Hafizh Hibatullah, S.Si.",
+      "email": "hafizh@mqba.sch.id"
     },
     {
       "id": "teacher-6",
-      "name": "Ust. Abdullah",
-      "email": "abdullah@mqba.sch.id"
-    },
-    {
-      "id": "teacher-7",
-      "name": "Ust. Yunan",
-      "email": "yunan@mqba.sch.id"
-    },
-    {
-      "id": "teacher-8",
-      "name": "Usth. Anim",
-      "email": "anim@mqba.sch.id"
-    },
-    {
-      "id": "teacher-9",
-      "name": "Usth. Azizah",
-      "email": "azizah@mqba.sch.id"
-    },
-    {
-      "id": "teacher-10",
-      "name": "Ust. Aidil",
-      "email": "aidil@mqba.sch.id"
-    },
-    {
-      "id": "teacher-11",
-      "name": "Usth. Saiba Musyaiya",
-      "email": "saibamusyaiya@mqba.sch.id"
-    },
-    {
-      "id": "teacher-12",
-      "name": "Ust. Arya",
-      "email": "arya@mqba.sch.id"
-    },
-    {
-      "id": "teacher-13",
-      "name": "Ust. Kholif",
-      "email": "kholif@mqba.sch.id"
-    },
-    {
-      "id": "teacher-14",
-      "name": "Ust. Faqih",
+      "name": "Ustadz Faqih Hidayat, Lc.",
       "email": "faqih@mqba.sch.id"
     },
     {
+      "id": "teacher-7",
+      "name": "Ustadz Muhammad Abdul Malik Ibrahim, S.Kom.",
+      "email": "abdulmalik@mqba.sch.id"
+    },
+    {
+      "id": "teacher-8",
+      "name": "Ustadz Dzulfikar Tri Bagaskara, S.Ag., M.Pd.",
+      "email": "dzulfikar@mqba.sch.id"
+    },
+    {
+      "id": "teacher-9",
+      "name": "Ustadzah Hasri Haryani Direja, S.Ds.",
+      "email": "hasri@mqba.sch.id"
+    },
+    {
+      "id": "teacher-10",
+      "name": "Ustadzah Saiba Musyayia",
+      "email": "saibamusyayia@mqba.sch.id"
+    },
+    {
+      "id": "teacher-11",
+      "name": "Ustadz Rezkidar",
+      "email": "rezkidar@mqba.sch.id"
+    },
+    {
+      "id": "teacher-12",
+      "name": "Ustadz Azri Robani Indra Robbi, S.Ag.",
+      "email": "azri@mqba.sch.id"
+    },
+    {
+      "id": "teacher-13",
+      "name": "Ustadzah Indri Nurbidari, S.Si",
+      "email": "indri@mqba.sch.id"
+    },
+    {
+      "id": "teacher-14",
+      "name": "Ustadzah Bela Dwi Lestari, S.Pd.",
+      "email": "bela@mqba.sch.id"
+    },
+    {
       "id": "teacher-15",
-      "name": "Usth. Nurika",
+      "name": "Ustadzah Nurika Nuralifah, S.Ag.",
       "email": "nurika@mqba.sch.id"
     },
     {
       "id": "teacher-16",
-      "name": "Ust. Hafizh",
-      "email": "hafizh@mqba.sch.id"
-    },
-    {
-      "id": "teacher-17",
-      "name": "Ust. Farhan",
-      "email": "farhan@mqba.sch.id"
-    },
-    {
-      "id": "teacher-18",
-      "name": "Ust. Tubagus",
-      "email": "tubagus@mqba.sch.id"
-    },
-    {
-      "id": "teacher-19",
-      "name": "Usth. Bela",
-      "email": "bela@mqba.sch.id"
-    },
-    {
-      "id": "teacher-20",
-      "name": "Usth. Dila",
-      "email": "dila@mqba.sch.id"
-    },
-    {
-      "id": "teacher-21",
-      "name": "Usth. Iffah",
-      "email": "iffah@mqba.sch.id"
-    },
-    {
-      "id": "teacher-22",
-      "name": "Usth. Hasri",
-      "email": "hasri@mqba.sch.id"
-    },
-    {
-      "id": "teacher-23",
-      "name": "Ust. Latief",
-      "email": "latief@mqba.sch.id"
-    },
-    {
-      "id": "teacher-24",
-      "name": "Ust. Akmal",
-      "email": "akmal@mqba.sch.id"
-    },
-    {
-      "id": "teacher-25",
-      "name": "Ust. Rezkidar",
-      "email": "rezkidar@mqba.sch.id"
-    },
-    {
-      "id": "teacher-26",
-      "name": "Usth. Lina",
-      "email": "lina@mqba.sch.id"
-    },
-    {
-      "id": "teacher-27",
-      "name": "Ust. Agib",
-      "email": "agib@mqba.sch.id"
-    },
-    {
-      "id": "teacher-28",
-      "name": "Usth. Rahmah",
-      "email": "rahmah@mqba.sch.id"
-    },
-    {
-      "id": "teacher-29",
-      "name": "Ust. Azri",
-      "email": "azri@mqba.sch.id"
-    },
-    {
-      "id": "teacher-30",
-      "name": "Usth. Indri",
-      "email": "indri@mqba.sch.id"
+      "name": "Ustadzah Azizah Nur Aini, S.Pd.",
+      "email": "azizah@mqba.sch.id"
     }
   ],
   "subjects": [
@@ -613,7 +439,7 @@
       "day": "Sabtu",
       "time": "12:30 - 13:30",
       "classId": "cls-3",
-      "teacherId": "teacher-27",
+      "teacherId": "teacher-2",
       "subjectId": "sub-16",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -643,7 +469,7 @@
       "day": "Sabtu",
       "time": "12:30 - 13:30",
       "classId": "cls-6",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -673,7 +499,7 @@
       "day": "Sabtu",
       "time": "12:30 - 13:30",
       "classId": "cls-2",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-20",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -693,7 +519,7 @@
       "day": "Ahad",
       "time": "10:00 - 11:30",
       "classId": "cls-4",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -743,7 +569,7 @@
       "day": "Ahad",
       "time": "10:00 - 11:30",
       "classId": "cls-2",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -773,7 +599,7 @@
       "day": "Ahad",
       "time": "12:30 - 13:30",
       "classId": "cls-5",
-      "teacherId": "teacher-18",
+      "teacherId": "teacher-15",
       "subjectId": "sub-9",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -833,7 +659,7 @@
       "day": "Senin",
       "time": "10:00 - 11:30",
       "classId": "cls-4",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -853,7 +679,7 @@
       "day": "Senin",
       "time": "10:00 - 11:30",
       "classId": "cls-6",
-      "teacherId": "teacher-30",
+      "teacherId": "teacher-13",
       "subjectId": "sub-15",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -863,7 +689,7 @@
       "day": "Senin",
       "time": "10:00 - 11:30",
       "classId": "cls-7",
-      "teacherId": "teacher-17",
+      "teacherId": "teacher-11",
       "subjectId": "sub-7",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -883,7 +709,7 @@
       "day": "Senin",
       "time": "10:00 - 11:30",
       "classId": "cls-2",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -923,7 +749,7 @@
       "day": "Senin",
       "time": "12:30 - 13:30",
       "classId": "cls-6",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -973,7 +799,7 @@
       "day": "Selasa",
       "time": "10:00 - 11:30",
       "classId": "cls-4",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -993,7 +819,7 @@
       "day": "Selasa",
       "time": "10:00 - 11:30",
       "classId": "cls-6",
-      "teacherId": "teacher-19",
+      "teacherId": "teacher-14",
       "subjectId": "sub-16",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1023,7 +849,7 @@
       "day": "Selasa",
       "time": "10:00 - 11:30",
       "classId": "cls-2",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1033,7 +859,7 @@
       "day": "Selasa",
       "time": "12:30 - 13:30",
       "classId": "cls-3",
-      "teacherId": "teacher-29",
+      "teacherId": "teacher-12",
       "subjectId": "sub-2",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1043,7 +869,7 @@
       "day": "Selasa",
       "time": "12:30 - 13:30",
       "classId": "cls-4",
-      "teacherId": "teacher-20",
+      "teacherId": "teacher-10",
       "subjectId": "sub-3",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1093,7 +919,7 @@
       "day": "Selasa",
       "time": "12:30 - 13:30",
       "classId": "cls-2",
-      "teacherId": "teacher-20",
+      "teacherId": "teacher-10",
       "subjectId": "sub-3",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1113,7 +939,7 @@
       "day": "Rabu",
       "time": "07:30 - 08:45",
       "classId": "cls-4",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-19",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1133,7 +959,7 @@
       "day": "Rabu",
       "time": "07:30 - 08:45",
       "classId": "cls-6",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-19",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1163,7 +989,7 @@
       "day": "Rabu",
       "time": "07:30 - 08:45",
       "classId": "cls-2",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-19",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1253,7 +1079,7 @@
       "day": "Rabu",
       "time": "12:30 - 13:30",
       "classId": "cls-4",
-      "teacherId": "teacher-20",
+      "teacherId": "teacher-10",
       "subjectId": "sub-3",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1273,7 +1099,7 @@
       "day": "Rabu",
       "time": "12:30 - 13:30",
       "classId": "cls-6",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1283,7 +1109,7 @@
       "day": "Rabu",
       "time": "12:30 - 13:30",
       "classId": "cls-7",
-      "teacherId": "teacher-18",
+      "teacherId": "teacher-15",
       "subjectId": "sub-9",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1303,7 +1129,7 @@
       "day": "Rabu",
       "time": "12:30 - 13:30",
       "classId": "cls-2",
-      "teacherId": "teacher-20",
+      "teacherId": "teacher-10",
       "subjectId": "sub-3",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1313,7 +1139,7 @@
       "day": "Kamis",
       "time": "10:00 - 11:30",
       "classId": "cls-3",
-      "teacherId": "teacher-29",
+      "teacherId": "teacher-12",
       "subjectId": "sub-2",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1323,7 +1149,7 @@
       "day": "Kamis",
       "time": "10:00 - 11:30",
       "classId": "cls-4",
-      "teacherId": "teacher-22",
+      "teacherId": "teacher-9",
       "subjectId": "sub-16",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1333,7 +1159,7 @@
       "day": "Kamis",
       "time": "10:00 - 11:30",
       "classId": "cls-5",
-      "teacherId": "teacher-23",
+      "teacherId": "teacher-4",
       "subjectId": "sub-16",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1353,7 +1179,7 @@
       "day": "Kamis",
       "time": "10:00 - 11:30",
       "classId": "cls-7",
-      "teacherId": "teacher-24",
+      "teacherId": "teacher-2",
       "subjectId": "sub-16",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1363,7 +1189,7 @@
       "day": "Kamis",
       "time": "10:00 - 11:30",
       "classId": "cls-1",
-      "teacherId": "teacher-29",
+      "teacherId": "teacher-12",
       "subjectId": "sub-2",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1383,7 +1209,7 @@
       "day": "Kamis",
       "time": "12:30 - 13:30",
       "classId": "cls-3",
-      "teacherId": "teacher-29",
+      "teacherId": "teacher-12",
       "subjectId": "sub-2",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1393,7 +1219,7 @@
       "day": "Kamis",
       "time": "12:30 - 13:30",
       "classId": "cls-4",
-      "teacherId": "teacher-26",
+      "teacherId": "teacher-6",
       "subjectId": "sub-6",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1403,7 +1229,7 @@
       "day": "Kamis",
       "time": "12:30 - 13:30",
       "classId": "cls-5",
-      "teacherId": "teacher-25",
+      "teacherId": "teacher-11",
       "subjectId": "sub-7",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -1413,7 +1239,7 @@
       "day": "Kamis",
       "time": "12:30 - 13:30",
       "classId": "cls-6",
-      "teacherId": "teacher-21",
+      "teacherId": "teacher-7",
       "subjectId": "sub-13",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
@@ -2186,5 +2012,6 @@
     }
   ],
   "raporDetails": [],
-  "pengumuman": []
+  "pengumuman": [],
+  "evaluasiPembelajaran": []
 }

@@ -533,14 +533,38 @@ export function getDatabase(): DatabaseSchema {
       }
     }
 
-    // Migrate: Update teachingSchedules, teachers, and subjects to latest schedule PDF
-    const freshData = seedDatabase();
-    if (!parsed.teachingSchedules || parsed.teachingSchedules.length !== freshData.teachingSchedules.length || parsed.teachingSchedules[6]?.teacherId !== "teacher-8") {
-      parsed.teachingSchedules = freshData.teachingSchedules;
-      parsed.teachers = freshData.teachers;
-      parsed.subjects = freshData.subjects;
+    // Migrate: Update active teachers and users to official 16 Asatidzah list
+    if (!parsed.teachers || parsed.teachers.length !== OFFICIAL_TEACHERS.length || parsed.teachers[0]?.name !== OFFICIAL_TEACHERS[0].name) {
+      parsed.teachers = OFFICIAL_TEACHERS;
+      // Remap teacher IDs in schedules if any schedule has teacherId > 16
+      const teacherMap: Record<string, string> = {
+        "teacher-17": "teacher-11", "teacher-18": "teacher-15", "teacher-19": "teacher-14",
+        "teacher-20": "teacher-10", "teacher-21": "teacher-7",  "teacher-22": "teacher-9",
+        "teacher-23": "teacher-4",  "teacher-24": "teacher-2",  "teacher-25": "teacher-11",
+        "teacher-26": "teacher-6",  "teacher-27": "teacher-2",  "teacher-28": "teacher-10",
+        "teacher-29": "teacher-12", "teacher-30": "teacher-13"
+      };
+      if (parsed.teachingSchedules) {
+        parsed.teachingSchedules.forEach(s => {
+          if (teacherMap[s.teacherId]) {
+            s.teacherId = teacherMap[s.teacherId];
+          }
+        });
+      }
+      // Re-build Guru users to match official teachers
+      const adminUsers = (parsed.users || []).filter(u => u.role !== "Guru");
+      const defaultGuruPasswordHash = hashPassword("guru123");
+      const newGuruUsers = OFFICIAL_TEACHERS.map(t => ({
+        id: `user-guru-${t.id}`,
+        name: t.name,
+        email: t.email,
+        passwordHash: defaultGuruPasswordHash,
+        role: "Guru" as const,
+        teacherId: t.id
+      }));
+      parsed.users = [...adminUsers, ...newGuruUsers];
       saveDatabase(parsed);
-      console.log("Migrated active database to latest 2026-2027 KBM Teaching Schedules");
+      console.log(`Migrated database to ${OFFICIAL_TEACHERS.length} official Asatidzah list & user accounts`);
     }
 
     return parsed;
@@ -576,32 +600,29 @@ export function logActivity(userId: string, userName: string, userRole: string, 
   saveDatabase(db);
 }
 
+export const OFFICIAL_TEACHERS: Teacher[] = [
+  { id: "teacher-1", name: "Ustadz Muhammad Arya Mukti, Al Hafizh", email: "aryamukti@mqba.sch.id" },
+  { id: "teacher-2", name: "Ustadz Akmal Firmana, ST.", email: "akmal@mqba.sch.id" },
+  { id: "teacher-3", name: "Ustadz Abdul Kholif", email: "abdulkholif@mqba.sch.id" },
+  { id: "teacher-4", name: "Ustadz Sahmura Maula Maghribi, S.Mat.", email: "sahmura@mqba.sch.id" },
+  { id: "teacher-5", name: "Ustadz Muhammad Hafizh Hibatullah, S.Si.", email: "hafizh@mqba.sch.id" },
+  { id: "teacher-6", name: "Ustadz Faqih Hidayat, Lc.", email: "faqih@mqba.sch.id" },
+  { id: "teacher-7", name: "Ustadz Muhammad Abdul Malik Ibrahim, S.Kom.", email: "abdulmalik@mqba.sch.id" },
+  { id: "teacher-8", name: "Ustadz Dzulfikar Tri Bagaskara, S.Ag., M.Pd.", email: "dzulfikar@mqba.sch.id" },
+  { id: "teacher-9", name: "Ustadzah Hasri Haryani Direja, S.Ds.", email: "hasri@mqba.sch.id" },
+  { id: "teacher-10", name: "Ustadzah Saiba Musyayia", email: "saibamusyayia@mqba.sch.id" },
+  { id: "teacher-11", name: "Ustadz Rezkidar", email: "rezkidar@mqba.sch.id" },
+  { id: "teacher-12", name: "Ustadz Azri Robani Indra Robbi, S.Ag.", email: "azri@mqba.sch.id" },
+  { id: "teacher-13", name: "Ustadzah Indri Nurbidari, S.Si", email: "indri@mqba.sch.id" },
+  { id: "teacher-14", name: "Ustadzah Bela Dwi Lestari, S.Pd.", email: "bela@mqba.sch.id" },
+  { id: "teacher-15", name: "Ustadzah Nurika Nuralifah, S.Ag.", email: "nurika@mqba.sch.id" },
+  { id: "teacher-16", name: "Ustadzah Azizah Nur Aini, S.Pd.", email: "azizah@mqba.sch.id" }
+];
+
 function seedDatabase(): DatabaseSchema {
   console.log("Seeding fresh database...");
   
-  // Teachers list
-  const teacherNames = [
-    "Ust. Abdul Malik", "Ust. Umar", "Ust. Dzulfikar", "Ust. Karim", "Ust. Fredy",
-    "Ust. Abdullah", "Ust. Yunan", "Usth. Anim", "Usth. Azizah", "Ust. Aidil",
-    "Usth. Saiba Musyaiya", "Ust. Arya", "Ust. Kholif", "Ust. Faqih", "Usth. Nurika",
-    "Ust. Hafizh", "Ust. Farhan", "Ust. Tubagus", "Usth. Bela", "Usth. Dila",
-    "Usth. Iffah", "Usth. Hasri", "Ust. Latief",
-    "Ust. Akmal", "Ust. Rezkidar", "Usth. Lina",
-    "Ust. Agib", "Usth. Rahmah", "Ust. Azri", "Usth. Indri"
-  ];
-
-  const teachers: Teacher[] = teacherNames.map((name, index) => {
-    // Generate clean slug email
-    const slug = name.toLowerCase()
-      .replace(/ust\.\s*/g, '')
-      .replace(/usth\.\s*/g, '')
-      .replace(/[^a-z]/g, '');
-    return {
-      id: `teacher-${index + 1}`,
-      name,
-      email: `${slug}@mqba.sch.id`
-    };
-  });
+  const teachers: Teacher[] = OFFICIAL_TEACHERS;
 
   // Create Users (Default credentials)
   const users: User[] = [

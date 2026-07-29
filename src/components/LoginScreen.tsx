@@ -115,18 +115,18 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 <button
                   type="button"
                   onClick={() => { setLoginType('guru'); setError(''); }}
-                  className={`flex-1 rounded-lg py-2 text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${loginType === 'guru' ? 'bg-white dark:bg-slate-800 text-indigo-700 dark:text-white shadow-md' : 'text-slate-500 hover:text-indigo-700 dark:text-slate-400 dark:hover:text-white'}`}
+                  className={`flex-1 rounded-lg py-2.5 text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${loginType === 'guru' ? 'bg-white dark:bg-slate-800 text-indigo-700 dark:text-white shadow-md' : 'text-slate-500 hover:text-indigo-700 dark:text-slate-400 dark:hover:text-white'}`}
                 >
                   <Users className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5" />
-                  Asatidzah
+                  Ustadz / Ustadzah
                 </button>
                 <button
                   type="button"
                   onClick={() => { setLoginType('wali'); setError(''); }}
-                  className={`flex-1 rounded-lg py-2 text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${loginType === 'wali' ? 'bg-white dark:bg-slate-800 text-indigo-700 dark:text-white shadow-md' : 'text-slate-500 hover:text-indigo-700 dark:text-slate-400 dark:hover:text-white'}`}
+                  className={`flex-1 rounded-lg py-2.5 text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${loginType === 'wali' ? 'bg-white dark:bg-slate-800 text-indigo-700 dark:text-white shadow-md' : 'text-slate-500 hover:text-indigo-700 dark:text-slate-400 dark:hover:text-white'}`}
                 >
                   <GraduationCap className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5" />
-                  Wali Santri
+                  Login Wali Santri
                 </button>
               </div>
  

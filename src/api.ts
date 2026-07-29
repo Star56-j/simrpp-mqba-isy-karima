@@ -268,46 +268,79 @@ export const api = {
 
   // Subjects (Admin)
   async getSubjects(): Promise<Subject[]> {
-    return fetchJson<Subject[]>('/api/subjects').catch(() => [
-      { id: "sub-2", name: "Tahsin", category: "Al-Qur'an" },
-      { id: "sub-3", name: "Tajwid", category: "Al-Qur'an" },
-      { id: "sub-20", name: "Muraja'ah Hafalan", category: "Al-Qur'an" },
-      { id: "sub-5", name: "Aqidah", category: "Diniyah" },
-      { id: "sub-6", name: "Akhlaq", category: "Diniyah" },
-      { id: "sub-7", name: "Fiqih", category: "Diniyah" },
-      { id: "sub-8", name: "Adab wa Tarbiyah", category: "Diniyah" },
-      { id: "sub-9", name: "Siroh", category: "Diniyah" },
-      { id: "sub-10", name: "Manhaji", category: "Diniyah" },
-      { id: "sub-11", name: "Jazary", category: "Diniyah" },
-      { id: "sub-12", name: "Khot", category: "Diniyah" },
-      { id: "sub-13", name: "Arabiyah Baina Yadaik (ABY)", category: "Bahasa" },
-      { id: "sub-14", name: "Bahasa Indonesia", category: "Bahasa" },
-      { id: "sub-15", name: "Bahasa Inggris", category: "Bahasa" },
-      { id: "sub-16", name: "Matematika", category: "Umum" },
-      { id: "sub-17", name: "IPA", category: "Umum" },
-      { id: "sub-18", name: "Furusiyah", category: "Umum" },
-      { id: "sub-19", name: "Tai Chi / Olah Raga", category: "Umum" }
-    ]);
+    return fetchJson<Subject[]>('/api/subjects').catch(() => {
+      const stored = localStorage.getItem('simrpp_subjects');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      const defaultSubs: Subject[] = [
+        { id: "sub-2", name: "Tahsin", category: "Al-Qur'an" },
+        { id: "sub-3", name: "Tajwid", category: "Al-Qur'an" },
+        { id: "sub-20", name: "Muraja'ah Hafalan", category: "Al-Qur'an" },
+        { id: "sub-5", name: "Aqidah", category: "Diniyah" },
+        { id: "sub-6", name: "Akhlaq", category: "Diniyah" },
+        { id: "sub-7", name: "Fiqih", category: "Diniyah" },
+        { id: "sub-8", name: "Adab wa Tarbiyah", category: "Diniyah" },
+        { id: "sub-9", name: "Siroh", category: "Diniyah" },
+        { id: "sub-10", name: "Manhaji", category: "Diniyah" },
+        { id: "sub-11", name: "Jazary", category: "Diniyah" },
+        { id: "sub-12", name: "Khot", category: "Diniyah" },
+        { id: "sub-13", name: "Arabiyah Baina Yadaik (ABY)", category: "Bahasa" },
+        { id: "sub-14", name: "Bahasa Indonesia", category: "Bahasa" },
+        { id: "sub-15", name: "Bahasa Inggris", category: "Bahasa" },
+        { id: "sub-16", name: "Matematika", category: "Umum" },
+        { id: "sub-17", name: "IPA", category: "Umum" },
+        { id: "sub-18", name: "Furusiyah", category: "Umum" },
+        { id: "sub-19", name: "Tai Chi / Olah Raga", category: "Umum" }
+      ];
+      localStorage.setItem('simrpp_subjects', JSON.stringify(defaultSubs));
+      return defaultSubs;
+    });
   },
 
   async createSubject(subject: Omit<Subject, 'id'>): Promise<Subject> {
-    return fetchJson<Subject>('/api/subjects', {
-      method: 'POST',
-      body: JSON.stringify(subject)
-    });
+    try {
+      return await fetchJson<Subject>('/api/subjects', {
+        method: 'POST',
+        body: JSON.stringify(subject)
+      });
+    } catch {
+      const existing = await this.getSubjects();
+      const newSub: Subject = { ...subject, id: `sub-${Date.now()}` };
+      const updated = [...existing, newSub];
+      localStorage.setItem('simrpp_subjects', JSON.stringify(updated));
+      return newSub;
+    }
   },
 
   async updateSubject(id: string, subject: Partial<Subject>): Promise<Subject> {
-    return fetchJson<Subject>(`/api/subjects/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(subject)
-    });
+    try {
+      return await fetchJson<Subject>(`/api/subjects/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(subject)
+      });
+    } catch {
+      const existing = await this.getSubjects();
+      const updated = existing.map(s => s.id === id ? { ...s, ...subject } : s);
+      localStorage.setItem('simrpp_subjects', JSON.stringify(updated));
+      return updated.find(s => s.id === id) || existing[0];
+    }
   },
 
   async deleteSubject(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/subjects/${id}`, {
-      method: 'DELETE'
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/subjects/${id}`, {
+        method: 'DELETE'
+      });
+    } catch {
+      const existing = await this.getSubjects();
+      const updated = existing.filter(s => s.id !== id);
+      localStorage.setItem('simrpp_subjects', JSON.stringify(updated));
+      return { message: 'Mata pelajaran berhasil dihapus' };
+    }
   },
 
   // Classes (Admin)
@@ -374,7 +407,110 @@ export const api = {
 
   // Teaching Schedules (Jadwal KBM)
   async getSchedules(): Promise<TeachingSchedule[]> {
-    return fetchJson<TeachingSchedule[]>('/api/schedules');
+    return fetchJson<TeachingSchedule[]>('/api/schedules').catch(() => {
+      const stored = localStorage.getItem('simrpp_schedules');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      const defaultSchedules: TeachingSchedule[] = [
+        { id: "sch-1", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-7", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-2", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-3", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-8", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-4", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-11", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-5", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-6", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-7", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-8", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-2", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-9", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-10", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-11", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-12", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-8", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-13", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-14", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-15", day: "Ahad", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-3", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-16", day: "Ahad", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-17", day: "Ahad", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-18", day: "Ahad", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-15", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-19", day: "Ahad", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-20", day: "Ahad", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-3", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-21", day: "Ahad", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-22", day: "Ahad", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-24", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-23", day: "Ahad", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-24", day: "Ahad", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-22", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-25", day: "Ahad", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-26", day: "Ahad", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-27", day: "Ahad", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-28", day: "Ahad", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-29", day: "Senin", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-30", day: "Senin", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-31", day: "Senin", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-1", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-32", day: "Senin", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-13", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-33", day: "Senin", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-11", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-34", day: "Senin", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-35", day: "Senin", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-36", day: "Senin", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-37", day: "Senin", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-38", day: "Senin", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-39", day: "Senin", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-40", day: "Senin", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-41", day: "Senin", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-42", day: "Senin", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-43", day: "Selasa", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-44", day: "Selasa", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-45", day: "Selasa", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-24", subjectId: "sub-18", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-46", day: "Selasa", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-14", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-47", day: "Selasa", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-48", day: "Selasa", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-49", day: "Selasa", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-50", day: "Selasa", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-51", day: "Selasa", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-52", day: "Selasa", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-5", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-53", day: "Selasa", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-16", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-54", day: "Selasa", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-24", subjectId: "sub-14", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-55", day: "Selasa", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-56", day: "Selasa", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-57", day: "Rabu", time: "07:30 - 08:45", classId: "cls-3", teacherId: "teacher-24", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-58", day: "Rabu", time: "07:30 - 08:45", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-59", day: "Rabu", time: "07:30 - 08:45", classId: "cls-5", teacherId: "teacher-24", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-60", day: "Rabu", time: "07:30 - 08:45", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-61", day: "Rabu", time: "07:30 - 08:45", classId: "cls-7", teacherId: "teacher-24", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-62", day: "Rabu", time: "07:30 - 08:45", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-63", day: "Rabu", time: "07:30 - 08:45", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-64", day: "Rabu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-65", day: "Rabu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-66", day: "Rabu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-67", day: "Rabu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-68", day: "Rabu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-69", day: "Rabu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-70", day: "Rabu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-71", day: "Rabu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-72", day: "Rabu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-73", day: "Rabu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-3", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-74", day: "Rabu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-75", day: "Rabu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-22", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-76", day: "Rabu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-77", day: "Rabu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-78", day: "Kamis", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-79", day: "Kamis", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-9", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-80", day: "Kamis", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-4", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-81", day: "Kamis", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-82", day: "Kamis", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-2", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-83", day: "Kamis", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-84", day: "Kamis", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-85", day: "Kamis", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-86", day: "Kamis", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-6", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-87", day: "Kamis", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-11", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-88", day: "Kamis", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-89", day: "Kamis", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-18", subjectId: "sub-8", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-90", day: "Kamis", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-91", day: "Kamis", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" }
+      ];
+      localStorage.setItem('simrpp_schedules', JSON.stringify(defaultSchedules));
+      return defaultSchedules;
+    });
   },
 
   async createSchedule(schedule: Omit<TeachingSchedule, 'id'>): Promise<TeachingSchedule> {

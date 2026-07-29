@@ -76,6 +76,7 @@ export default function App() {
   const [attendances, setAttendances] = React.useState<Attendance[]>([]);
   const [activityLogs, setActivityLogs] = React.useState<ActivityLog[]>([]);
   const [waliKelas, setWaliKelas] = React.useState<WaliKelas[]>([]);
+  const [santriList, setSantriList] = React.useState<Santri[]>([]);
 
   // Statistics
   const [adminStats, setAdminStats] = React.useState<AdminStats | null>(null);
@@ -178,6 +179,10 @@ export default function App() {
       setRpps(r);
       setAttendances(att);
 
+      // Fetch santri
+      const santriRes = await api.getSantri().catch(() => []);
+      setSantriList(santriRes);
+
       // Fetch wali kelas
       const waliRes = await api.getWaliKelas().catch(() => []);
       setWaliKelas(waliRes);
@@ -255,7 +260,7 @@ export default function App() {
       subjects: subjects.length || 18,
       classes: classes.length || 7,
       schedules: schedules.length || 91,
-      santri: 50,
+      santri: santriList.length || 73,
       rpp: {
         total: rpps.length || 2,
         draft: rpps.filter(r => r.status === 'Draft').length,

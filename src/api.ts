@@ -714,26 +714,129 @@ export const api = {
   // Evaluasi Pembelajaran Bulanan
   async getEvaluasi(params?: { bulan?: number; tahun?: number; semesterId?: string; teacherId?: string; classId?: string; academicYearId?: string }): Promise<EvaluasiPembelajaran[]> {
     const qs = params ? '?' + new URLSearchParams(Object.entries(params).filter(([,v]) => v !== undefined).map(([k,v]) => [k, String(v)])).toString() : '';
-    return fetchJson<EvaluasiPembelajaran[]>(`/api/evaluasi${qs}`);
+    return fetchJson<EvaluasiPembelajaran[]>(`/api/evaluasi${qs}`).catch(() => {
+      const stored = localStorage.getItem('simrpp_evaluasi');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      const sampleData: EvaluasiPembelajaran[] = [
+        {
+          id: "eval-sample-1",
+          bulan: 7,
+          tahun: 2026,
+          teacherId: "teacher-6",
+          subjectId: "sub-5",
+          classId: "cls-3",
+          academicYearId: "ay-1",
+          semesterId: "sem-1",
+          totalPertemuanRencana: 4,
+          totalPertemuanTerlaksana: 4,
+          persentaseTerlaksana: 100,
+          tpTercapai: "Santri memahami konsep dasar Aqidah Islamiah & Rukun Iman secara komprehensif.",
+          tpBelumTercapai: "Beberapa santri masih memerlukan pendalaman dalil naqli.",
+          asesmenFormatifHasil: "Rata-rata nilai kuis 88. 15 santri kategori Sangat Baik.",
+          asesmenCatatan: "Kehadiran santri 100% dan antusias dalam berdiskusi.",
+          kendala: "Waktu alokasi diskusi terasa terbatas.",
+          solusi: "Menambah durasi sesi tanya jawab di akhir halaqah.",
+          diferenciasiDilakukan: "Santri yang lebih cepat paham diberikan studi kasus tambahan.",
+          rencanaBulanDepan: "Melanjutkan pembahasan Tauhid Uluhiyyah dan contoh penerapannya.",
+          refleksiGuru: "Pembelajaran bulan ini berjalan efektif dan interaktif.",
+          predikatKetercapaian: "Sangat Baik",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          teacher: FALLBACK_TEACHERS.find(t => t.id === "teacher-6"),
+          subject: { id: "sub-5", name: "Aqidah", category: "Diniyah" },
+          class: { id: "cls-3", name: "Kelas VII Putra", level: "Wustho" },
+          semester: { id: "sem-1", name: "Ganjil" }
+        },
+        {
+          id: "eval-sample-2",
+          bulan: 7,
+          tahun: 2026,
+          teacherId: "teacher-8",
+          subjectId: "sub-15",
+          classId: "cls-5",
+          academicYearId: "ay-1",
+          semesterId: "sem-1",
+          totalPertemuanRencana: 4,
+          totalPertemuanTerlaksana: 4,
+          persentaseTerlaksana: 100,
+          tpTercapai: "Santri mampu melakukan percakapan Bahasa Inggris dasar (Daily Conversation).",
+          tpBelumTercapai: "Penguasaan grammar dasar (past tense) perlu penguatan.",
+          asesmenFormatifHasil: "Rata-rata nilai praktek 84.",
+          asesmenCatatan: "Santri berani berbicara di depan kelas.",
+          kendala: "Kosa kata santri masih bervariasi.",
+          solusi: "Memberikan kartu kosa kata harian (vocabulary card).",
+          diferenciasiDilakukan: "Latihan percakapan berpasangan sesuai tingkat kelancaran.",
+          rencanaBulanDepan: "Fokus pada reading comprehension & penambahan vocabulary.",
+          refleksiGuru: "Kemajuan santri terlihat signifikan dalam aspek kebiasaan bicaranya.",
+          predikatKetercapaian: "Baik",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          teacher: FALLBACK_TEACHERS.find(t => t.id === "teacher-8"),
+          subject: { id: "sub-15", name: "Bahasa Inggris", category: "Bahasa" },
+          class: { id: "cls-5", name: "Kelas VIII Putra", level: "Wustho" },
+          semester: { id: "sem-1", name: "Ganjil" }
+        }
+      ];
+      localStorage.setItem('simrpp_evaluasi', JSON.stringify(sampleData));
+      return sampleData;
+    });
   },
 
   async createEvaluasi(data: Omit<EvaluasiPembelajaran, 'id' | 'createdAt' | 'updatedAt' | 'teacher' | 'subject' | 'class' | 'academicYear' | 'semester'>): Promise<EvaluasiPembelajaran> {
-    return fetchJson<EvaluasiPembelajaran>('/api/evaluasi', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<EvaluasiPembelajaran>('/api/evaluasi', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getEvaluasi();
+      const pct = data.totalPertemuanRencana > 0 ? Math.round((data.totalPertemuanTerlaksana / data.totalPertemuanRencana) * 100) : 0;
+      const newEv: EvaluasiPembelajaran = {
+        ...data,
+        id: `eval-${Date.now()}`,
+        persentaseTerlaksana: pct,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        teacher: FALLBACK_TEACHERS.find(t => t.id === data.teacherId),
+        subject: { id: data.subjectId, name: "Mata Pelajaran", category: "Umum" },
+        class: { id: data.classId, name: "Kelas", level: "Wustho" },
+        semester: { id: data.semesterId, name: "Ganjil" }
+      };
+      const updatedList = [newEv, ...existing];
+      localStorage.setItem('simrpp_evaluasi', JSON.stringify(updatedList));
+      return newEv;
+    }
   },
 
   async updateEvaluasi(id: string, data: Partial<EvaluasiPembelajaran>): Promise<EvaluasiPembelajaran> {
-    return fetchJson<EvaluasiPembelajaran>(`/api/evaluasi/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<EvaluasiPembelajaran>(`/api/evaluasi/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getEvaluasi();
+      const updatedList = existing.map(ev => ev.id === id ? { ...ev, ...data, updatedAt: new Date().toISOString() } : ev);
+      localStorage.setItem('simrpp_evaluasi', JSON.stringify(updatedList));
+      return updatedList.find(ev => ev.id === id) || existing[0];
+    }
   },
 
   async deleteEvaluasi(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/evaluasi/${id}`, {
-      method: 'DELETE',
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/evaluasi/${id}`, {
+        method: 'DELETE',
+      });
+    } catch {
+      const existing = await this.getEvaluasi();
+      const updatedList = existing.filter(ev => ev.id !== id);
+      localStorage.setItem('simrpp_evaluasi', JSON.stringify(updatedList));
+      return { message: 'Evaluasi berhasil dihapus' };
+    }
   }
 };

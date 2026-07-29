@@ -1,6 +1,6 @@
 {
-  "name": "SIMRPP MQBA ISY KARIMA",
-  "description": "Sistem Informasi Rencana Pelaksanaan Pembelajaran (SIMRPP) Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima untuk mengelola RPP secara digital.",
+  "name": "Akademik MQBA Isy Karima",
+  "description": "Sistem Informasi Akademik & Rencana Pelaksanaan Pembelajaran (RPP) Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

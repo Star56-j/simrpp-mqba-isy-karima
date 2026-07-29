@@ -192,7 +192,7 @@ export const api = {
 
   // Teachers (Admin)
   async getTeachers(): Promise<Teacher[]> {
-    return fetchJson<Teacher[]>('/api/teachers');
+    return fetchJson<Teacher[]>('/api/teachers').catch(() => FALLBACK_TEACHERS);
   },
 
   async createTeacher(teacher: Omit<Teacher, 'id'> & { password?: string }): Promise<Teacher> {
@@ -217,7 +217,26 @@ export const api = {
 
   // Subjects (Admin)
   async getSubjects(): Promise<Subject[]> {
-    return fetchJson<Subject[]>('/api/subjects');
+    return fetchJson<Subject[]>('/api/subjects').catch(() => [
+      { id: "sub-2", name: "Tahsin", category: "Al-Qur'an" },
+      { id: "sub-3", name: "Tajwid", category: "Al-Qur'an" },
+      { id: "sub-20", name: "Muraja'ah Hafalan", category: "Al-Qur'an" },
+      { id: "sub-5", name: "Aqidah", category: "Diniyah" },
+      { id: "sub-6", name: "Akhlaq", category: "Diniyah" },
+      { id: "sub-7", name: "Fiqih", category: "Diniyah" },
+      { id: "sub-8", name: "Adab wa Tarbiyah", category: "Diniyah" },
+      { id: "sub-9", name: "Siroh", category: "Diniyah" },
+      { id: "sub-10", name: "Manhaji", category: "Diniyah" },
+      { id: "sub-11", name: "Jazary", category: "Diniyah" },
+      { id: "sub-12", name: "Khot", category: "Diniyah" },
+      { id: "sub-13", name: "Arabiyah Baina Yadaik (ABY)", category: "Bahasa" },
+      { id: "sub-14", name: "Bahasa Indonesia", category: "Bahasa" },
+      { id: "sub-15", name: "Bahasa Inggris", category: "Bahasa" },
+      { id: "sub-16", name: "Matematika", category: "Umum" },
+      { id: "sub-17", name: "IPA", category: "Umum" },
+      { id: "sub-18", name: "Furusiyah", category: "Umum" },
+      { id: "sub-19", name: "Tai Chi / Olah Raga", category: "Umum" }
+    ]);
   },
 
   async createSubject(subject: Omit<Subject, 'id'>): Promise<Subject> {
@@ -242,7 +261,15 @@ export const api = {
 
   // Classes (Admin)
   async getClasses(): Promise<SchoolClass[]> {
-    return fetchJson<SchoolClass[]>('/api/classes');
+    return fetchJson<SchoolClass[]>('/api/classes').catch(() => [
+      { id: "cls-1", name: "I'dad Putra", level: "I'dad" },
+      { id: "cls-2", name: "I'dad Putri", level: "I'dad" },
+      { id: "cls-3", name: "Kelas VII Putra", level: "Wustho" },
+      { id: "cls-4", name: "Kelas VII Putri", level: "Wustho" },
+      { id: "cls-5", name: "Kelas VIII Putra", level: "Wustho" },
+      { id: "cls-6", name: "Kelas VIII Putri", level: "Wustho" },
+      { id: "cls-7", name: "Kelas IX Putra", level: "Wustho" }
+    ]);
   },
 
   async createClass(cls: Omit<SchoolClass, 'id'>): Promise<SchoolClass> {
@@ -267,7 +294,7 @@ export const api = {
 
   // Academic Years & Semesters
   async getAcademicYears(): Promise<AcademicYear[]> {
-    return fetchJson<AcademicYear[]>('/api/academic-years');
+    return fetchJson<AcademicYear[]>('/api/academic-years').catch(() => [{ id: "ay-1", name: "2026 / 2027" }]);
   },
 
   async createAcademicYear(name: string): Promise<AcademicYear> {
@@ -291,7 +318,7 @@ export const api = {
   },
 
   async getSemesters(): Promise<Semester[]> {
-    return fetchJson<Semester[]>('/api/semesters');
+    return fetchJson<Semester[]>('/api/semesters').catch(() => [{ id: "sem-1", name: "Ganjil" }, { id: "sem-2", name: "Genap" }]);
   },
 
   // Teaching Schedules (Jadwal KBM)

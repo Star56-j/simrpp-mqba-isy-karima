@@ -320,3 +320,46 @@ export interface RaporDetail {
   createdAt: string;
   updatedAt: string;
 }
+
+export type PredikatKetercapaian = 'Sangat Baik' | 'Baik' | 'Cukup' | 'Perlu Perbaikan';
+
+export interface EvaluasiPembelajaran {
+  id: string;
+  bulan: number;
+  tahun: number;
+  teacherId: string;
+  subjectId: string;
+  classId: string;
+  academicYearId: string;
+  semesterId: string;
+  // A. Keterlaksanaan Pembelajaran
+  totalPertemuanRencana: number;
+  totalPertemuanTerlaksana: number;
+  persentaseTerlaksana: number;
+  // B. Capaian Tujuan Pembelajaran (TP)
+  tpTercapai: string;
+  tpBelumTercapai: string;
+  // C. Asesmen Formatif
+  asesmenFormatifHasil: string;
+  asesmenCatatan: string;
+  // D. Kendala & Solusi
+  kendala: string;
+  solusi: string;
+  // E. Diferensiasi
+  diferenciasiDilakukan: string;
+  // F. Rencana Bulan Depan
+  rencanaBulanDepan: string;
+  // G. Refleksi Guru
+  refleksiGuru: string;
+  // H. Predikat Ketercapaian
+  predikatKetercapaian: PredikatKetercapaian;
+  createdAt: string;
+  updatedAt: string;
+  // Decorated
+  teacher?: Teacher;
+  subject?: Subject;
+  class?: SchoolClass;
+  academicYear?: AcademicYear;
+  semester?: Semester;
+}
+

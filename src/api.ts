@@ -18,7 +18,8 @@ import {
   AdminStats,
   GuruStats,
   RaporDetail,
-  Pengumuman
+  Pengumuman,
+  EvaluasiPembelajaran
 } from './types';
 
 const getHeaders = () => {
@@ -540,6 +541,32 @@ export const api = {
   },
   async deletePengumuman(id: string): Promise<{ message: string }> {
     return fetchJson<{ message: string }>(`/api/pengumuman/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Evaluasi Pembelajaran Bulanan
+  async getEvaluasi(params?: { bulan?: number; tahun?: number; semesterId?: string; teacherId?: string; classId?: string; academicYearId?: string }): Promise<EvaluasiPembelajaran[]> {
+    const qs = params ? '?' + new URLSearchParams(Object.entries(params).filter(([,v]) => v !== undefined).map(([k,v]) => [k, String(v)])).toString() : '';
+    return fetchJson<EvaluasiPembelajaran[]>(`/api/evaluasi${qs}`);
+  },
+
+  async createEvaluasi(data: Omit<EvaluasiPembelajaran, 'id' | 'createdAt' | 'updatedAt' | 'teacher' | 'subject' | 'class' | 'academicYear' | 'semester'>): Promise<EvaluasiPembelajaran> {
+    return fetchJson<EvaluasiPembelajaran>('/api/evaluasi', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateEvaluasi(id: string, data: Partial<EvaluasiPembelajaran>): Promise<EvaluasiPembelajaran> {
+    return fetchJson<EvaluasiPembelajaran>(`/api/evaluasi/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteEvaluasi(id: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`/api/evaluasi/${id}`, {
       method: 'DELETE',
     });
   }

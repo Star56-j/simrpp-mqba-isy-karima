@@ -186,6 +186,42 @@ export interface Pengumuman {
   authorName: string;
 }
 
+export type PredikatKetercapaian = 'Sangat Baik' | 'Baik' | 'Cukup' | 'Perlu Perbaikan';
+
+export interface EvaluasiPembelajaran {
+  id: string;
+  bulan: number;                        // 1-12
+  tahun: number;                        // e.g. 2026
+  teacherId: string;
+  subjectId: string;
+  classId: string;
+  academicYearId: string;
+  semesterId: string;
+  // A. Keterlaksanaan Pembelajaran
+  totalPertemuanRencana: number;
+  totalPertemuanTerlaksana: number;
+  persentaseTerlaksana: number;
+  // B. Capaian Tujuan Pembelajaran (TP)
+  tpTercapai: string;
+  tpBelumTercapai: string;
+  // C. Asesmen Formatif
+  asesmenFormatifHasil: string;
+  asesmenCatatan: string;
+  // D. Kendala & Solusi
+  kendala: string;
+  solusi: string;
+  // E. Diferensiasi
+  diferenciasiDilakukan: string;
+  // F. Rencana Bulan Depan
+  rencanaBulanDepan: string;
+  // G. Refleksi Guru
+  refleksiGuru: string;
+  // H. Predikat Ketercapaian
+  predikatKetercapaian: PredikatKetercapaian;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface DatabaseSchema {
   users: User[];
   teachers: Teacher[];
@@ -203,6 +239,7 @@ export interface DatabaseSchema {
   activityLogs: ActivityLog[];
   raporDetails: RaporDetail[];
   pengumuman: Pengumuman[];
+  evaluasiPembelajaran: EvaluasiPembelajaran[];
 }
 
 export interface KepribadianItem {
@@ -410,6 +447,12 @@ export function getDatabase(): DatabaseSchema {
     if (!parsed.pengumuman) {
       parsed.pengumuman = [];
       saveDatabase(parsed);
+    }
+    // Migrate: tambah evaluasiPembelajaran jika belum ada
+    if (!parsed.evaluasiPembelajaran) {
+      parsed.evaluasiPembelajaran = [];
+      saveDatabase(parsed);
+      console.log('Migrated database: added evaluasiPembelajaran collection');
     }
     // Migrate: konversi score tunggal → 4 kategori (harian, bulanan, uts, uas)
     if (parsed.nilai && parsed.nilai.length > 0 && (parsed.nilai[0] as any).score !== undefined) {
@@ -872,6 +915,7 @@ function seedDatabase(): DatabaseSchema {
     nilai: [],
     activityLogs,
     raporDetails: [],
-    pengumuman: []
+    pengumuman: [],
+    evaluasiPembelajaran: []
   };
 }

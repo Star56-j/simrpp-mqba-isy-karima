@@ -40,6 +40,7 @@ import WaliKelasPage from './components/WaliKelas';
 import MasterSantri from './components/MasterSantri';
 import NilaiSantri from './components/NilaiSantri';
 import WaliDashboard from './components/WaliDashboard';
+import EvaluasiPembelajaranPage from './components/EvaluasiPembelajaran';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -385,6 +386,19 @@ export default function App() {
           />
         );
 
+      case 'evaluasi-pembelajaran':
+        return (
+          <EvaluasiPembelajaranPage
+            teachers={teachers}
+            subjects={subjects}
+            classes={classes}
+            academicYears={academicYears}
+            semesters={semesters}
+            schedules={schedules}
+            currentUser={user}
+          />
+        );
+
       default:
         return (
           <div className="p-8 text-center text-slate-400">
@@ -412,6 +426,7 @@ export default function App() {
       case 'wali-kelas': return 'Wali Kelas';
       case 'profile-settings': return 'Pengaturan Profil';
       case 'pengumuman': return 'Pengumuman Akademik';
+      case 'evaluasi-pembelajaran': return 'Evaluasi Pembelajaran Bulanan';
       default: return 'Akademik MQBA Isy Karima';
     }
   };

@@ -56,6 +56,7 @@ export default function Sidebar({
     { id: 'my-santri-attendance', label: 'Isi Absensi Santri', icon: Users2 },
     { id: 'wali-kelas', label: 'Wali Kelas', icon: Crown },
     { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
+    { id: 'evaluasi-pembelajaran', label: 'Evaluasi Bulanan', icon: Activity },
     { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
     { id: 'activity-logs', label: 'Activity Log', icon: Activity },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
@@ -65,6 +66,7 @@ export default function Sidebar({
     { id: 'my-attendance', label: 'Absensi Saya', icon: FileSpreadsheet },
     { id: 'my-santri-attendance', label: 'Absensi Santri', icon: Users2 },
     { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
+    { id: 'evaluasi-pembelajaran', label: 'Evaluasi Bulanan', icon: Activity },
     { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ];

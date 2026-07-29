@@ -22,7 +22,8 @@ import {
   Nilai,
   RaporDetail,
   ActivityLog,
-  Pengumuman
+  Pengumuman,
+  EvaluasiPembelajaran
 } from './src/server/db.ts';
 
 const app = express();
@@ -2114,6 +2115,163 @@ app.delete('/api/pengumuman/:id', requireAuth('Admin'), (req, res) => {
   logActivity(user.id, user.name, user.role, 'Hapus Pengumuman', `Menghapus pengumuman: ${ann.title}`);
 
   res.json({ message: 'Pengumuman berhasil dihapus' });
+});
+
+
+// 13. Evaluasi Pembelajaran Bulanan API
+app.get('/api/evaluasi', requireAuth(), (req, res) => {
+  const authUser = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.evaluasiPembelajaran) db.evaluasiPembelajaran = [];
+
+  const { bulan, tahun, semesterId, teacherId, classId, academicYearId } = req.query as Record<string, string>;
+
+  let list = db.evaluasiPembelajaran;
+
+  // Guru hanya bisa lihat evaluasi miliknya sendiri
+  if (authUser.role === 'Guru' && authUser.teacherId) {
+    list = list.filter(e => e.teacherId === authUser.teacherId);
+  }
+
+  if (bulan) list = list.filter(e => e.bulan === parseInt(bulan));
+  if (tahun) list = list.filter(e => e.tahun === parseInt(tahun));
+  if (semesterId) list = list.filter(e => e.semesterId === semesterId);
+  if (teacherId) list = list.filter(e => e.teacherId === teacherId);
+  if (classId) list = list.filter(e => e.classId === classId);
+  if (academicYearId) list = list.filter(e => e.academicYearId === academicYearId);
+
+  // Decorate with relations
+  const decorated = list.map(e => ({
+    ...e,
+    teacher: db.teachers.find(t => t.id === e.teacherId),
+    subject: db.subjects.find(s => s.id === e.subjectId),
+    class: db.classes.find(c => c.id === e.classId),
+    academicYear: db.academicYears.find(a => a.id === e.academicYearId),
+    semester: db.semesters.find(s => s.id === e.semesterId),
+  }));
+
+  res.json(decorated.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+});
+
+app.post('/api/evaluasi', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.evaluasiPembelajaran) db.evaluasiPembelajaran = [];
+
+  const data = req.body;
+
+  if (!data.bulan || !data.tahun || !data.teacherId || !data.subjectId || !data.classId) {
+    res.status(400).json({ error: 'Data evaluasi tidak lengkap. Pastikan bulan, tahun, guru, mapel, dan kelas diisi.' });
+    return;
+  }
+
+  // Cek duplikasi evaluasi (bulan+tahun+teacherId+subjectId+classId+semesterId)
+  const existing = db.evaluasiPembelajaran.find(e =>
+    e.bulan === data.bulan &&
+    e.tahun === data.tahun &&
+    e.teacherId === data.teacherId &&
+    e.subjectId === data.subjectId &&
+    e.classId === data.classId &&
+    e.semesterId === data.semesterId
+  );
+  if (existing) {
+    res.status(409).json({ error: 'Evaluasi untuk bulan, guru, mata pelajaran, dan kelas ini sudah ada. Silakan edit yang sudah ada.' });
+    return;
+  }
+
+  const persentase = data.totalPertemuanRencana > 0
+    ? Math.round((data.totalPertemuanTerlaksana / data.totalPertemuanRencana) * 100)
+    : 0;
+
+  const newEval: EvaluasiPembelajaran = {
+    id: `eval-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    bulan: Number(data.bulan),
+    tahun: Number(data.tahun),
+    teacherId: data.teacherId,
+    subjectId: data.subjectId,
+    classId: data.classId,
+    academicYearId: data.academicYearId,
+    semesterId: data.semesterId,
+    totalPertemuanRencana: Number(data.totalPertemuanRencana) || 0,
+    totalPertemuanTerlaksana: Number(data.totalPertemuanTerlaksana) || 0,
+    persentaseTerlaksana: persentase,
+    tpTercapai: data.tpTercapai || '',
+    tpBelumTercapai: data.tpBelumTercapai || '',
+    asesmenFormatifHasil: data.asesmenFormatifHasil || '',
+    asesmenCatatan: data.asesmenCatatan || '',
+    kendala: data.kendala || '',
+    solusi: data.solusi || '',
+    diferenciasiDilakukan: data.diferenciasiDilakukan || '',
+    rencanaBulanDepan: data.rencanaBulanDepan || '',
+    refleksiGuru: data.refleksiGuru || '',
+    predikatKetercapaian: data.predikatKetercapaian || 'Baik',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  db.evaluasiPembelajaran.push(newEval);
+  saveDatabase(db);
+
+  const teacher = db.teachers.find(t => t.id === data.teacherId);
+  const subject = db.subjects.find(s => s.id === data.subjectId);
+  logActivity(user.id, user.name, user.role, 'Buat Evaluasi', `Menambah evaluasi pembelajaran bulan ${data.bulan}/${data.tahun} - ${teacher?.name} - ${subject?.name}`);
+
+  res.status(201).json(newEval);
+});
+
+app.put('/api/evaluasi/:id', requireAuth(), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.evaluasiPembelajaran) db.evaluasiPembelajaran = [];
+
+  const idx = db.evaluasiPembelajaran.findIndex(e => e.id === req.params.id);
+  if (idx === -1) {
+    res.status(404).json({ error: 'Evaluasi tidak ditemukan' });
+    return;
+  }
+
+  // Guru hanya bisa edit miliknya
+  if (user.role === 'Guru' && db.evaluasiPembelajaran[idx].teacherId !== user.teacherId) {
+    res.status(403).json({ error: 'Anda tidak memiliki akses untuk mengedit evaluasi ini.' });
+    return;
+  }
+
+  const data = req.body;
+  const persentase = (data.totalPertemuanRencana || db.evaluasiPembelajaran[idx].totalPertemuanRencana) > 0
+    ? Math.round(((data.totalPertemuanTerlaksana ?? db.evaluasiPembelajaran[idx].totalPertemuanTerlaksana) / (data.totalPertemuanRencana ?? db.evaluasiPembelajaran[idx].totalPertemuanRencana)) * 100)
+    : 0;
+
+  const updated: EvaluasiPembelajaran = {
+    ...db.evaluasiPembelajaran[idx],
+    ...data,
+    persentaseTerlaksana: persentase,
+    updatedAt: new Date().toISOString(),
+  };
+
+  db.evaluasiPembelajaran[idx] = updated;
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Edit Evaluasi', `Memperbarui evaluasi ID ${req.params.id}`);
+
+  res.json(updated);
+});
+
+app.delete('/api/evaluasi/:id', requireAuth('Admin'), (req, res) => {
+  const user = (req as any).user as User;
+  const db = getDatabase();
+  if (!db.evaluasiPembelajaran) db.evaluasiPembelajaran = [];
+
+  const idx = db.evaluasiPembelajaran.findIndex(e => e.id === req.params.id);
+  if (idx === -1) {
+    res.status(404).json({ error: 'Evaluasi tidak ditemukan' });
+    return;
+  }
+
+  const ev = db.evaluasiPembelajaran[idx];
+  db.evaluasiPembelajaran.splice(idx, 1);
+  saveDatabase(db);
+  logActivity(user.id, user.name, user.role, 'Hapus Evaluasi', `Menghapus evaluasi ID ${ev.id}`);
+
+  res.json({ message: 'Evaluasi berhasil dihapus' });
 });
 
 

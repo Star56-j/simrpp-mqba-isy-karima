@@ -601,6 +601,7 @@ export function logActivity(userId: string, userName: string, userRole: string, 
 }
 
 export const OFFICIAL_TEACHERS: Teacher[] = [
+  // 16 Asatidzah Pertama
   { id: "teacher-1", name: "Ustadz Muhammad Arya Mukti, Al Hafizh", email: "aryamukti@mqba.sch.id" },
   { id: "teacher-2", name: "Ustadz Akmal Firmana, ST.", email: "akmal@mqba.sch.id" },
   { id: "teacher-3", name: "Ustadz Abdul Kholif", email: "abdulkholif@mqba.sch.id" },
@@ -616,8 +617,21 @@ export const OFFICIAL_TEACHERS: Teacher[] = [
   { id: "teacher-13", name: "Ustadzah Indri Nurbidari, S.Si", email: "indri@mqba.sch.id" },
   { id: "teacher-14", name: "Ustadzah Bela Dwi Lestari, S.Pd.", email: "bela@mqba.sch.id" },
   { id: "teacher-15", name: "Ustadzah Nurika Nuralifah, S.Ag.", email: "nurika@mqba.sch.id" },
-  { id: "teacher-16", name: "Ustadzah Azizah Nur Aini, S.Pd.", email: "azizah@mqba.sch.id" }
+  { id: "teacher-16", name: "Ustadzah Azizah Nur Aini, S.Pd.", email: "azizah@mqba.sch.id" },
+  // 11 Asatidzah Tambahan
+  { id: "teacher-17", name: "Ustadz Umar Alamuddin, Lc., Al-Hafizh", email: "umar@mqba.sch.id" },
+  { id: "teacher-18", name: "Ustadz Nashiruddin Karim, Lc., Al-Hafizh", email: "karim@mqba.sch.id" },
+  { id: "teacher-19", name: "Ustadz Yunan Hidayat, Al Hafizh", email: "yunan@mqba.sch.id" },
+  { id: "teacher-20", name: "Ustadz Muhammad Latief Amiruddin, S.T.", email: "latief@mqba.sch.id" },
+  { id: "teacher-21", name: "Ustadzah Hasna Halimatun Basyaria, S.Ag., Al Hafizhah", email: "hasna@mqba.sch.id" },
+  { id: "teacher-22", name: "Ustadz Tubagus Ahadiyat Rachmadi Luhur, S. Ag.", email: "tubagus@mqba.sch.id" },
+  { id: "teacher-23", name: "Ustadz Fredy Susilo Supriyanto, S.Ag., Al Hafizh", email: "fredy@mqba.sch.id" },
+  { id: "teacher-24", name: "Ustadz Aidil Aqli, S.Ag.", email: "aidil@mqba.sch.id" },
+  { id: "teacher-25", name: "Ustadzah Aulia Anim Amanillah", email: "anim@mqba.sch.id" },
+  { id: "teacher-26", name: "Ustadzah Lina Ayu Fitriyyah, S. Ag.", email: "lina@mqba.sch.id" },
+  { id: "teacher-27", name: "Ustadz Farhan Akhandi", email: "farhan@mqba.sch.id" }
 ];
+
 
 function seedDatabase(): DatabaseSchema {
   console.log("Seeding fresh database...");

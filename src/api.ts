@@ -47,6 +47,57 @@ async function fetchJson<T>(url: string, options: RequestInit = {}): Promise<T> 
   return response.json() as Promise<T>;
 }
 
+const FALLBACK_SANTRI_DATA = [
+  { name: "Ahmad Ajyad Syamil Sutrisno", classId: "cls-3" }, { name: "Ahmad Fakhry Athallah", classId: "cls-3" },
+  { name: "Athilasyah Rifqi Sulistyo", classId: "cls-3" }, { name: "Baihaqi Hanif Abrorni", classId: "cls-3" },
+  { name: "Fairuz Fahri Firmansyah", classId: "cls-3" }, { name: "Hasbi Nafsi Jalalullah", classId: "cls-3" },
+  { name: "Hisyam Zuhdi", classId: "cls-3" }, { name: "Israr At Taufik", classId: "cls-3" },
+  { name: "Keven Maghribi Darmaresta", classId: "cls-3" }, { name: "Khoirul Akbar Nur Hidayatulloh", classId: "cls-3" },
+  { name: "M Rajendra Ali Mudzakir", classId: "cls-3" }, { name: "Muhammad Fatih Izzan An-Naqy", classId: "cls-3" },
+  { name: "Muhammad Ilyas Anrisyab", classId: "cls-3" }, { name: "Muhammad Yahya Izzuddin", classId: "cls-3" },
+  { name: "Muhammad Yusuf Rifa'i", classId: "cls-3" }, { name: "Ramdhan Ridhwanullah", classId: "cls-3" },
+  { name: "Shofyan Abdillah Achmad", classId: "cls-3" }, { name: "Tsaabit Qawiyyul Himmah", classId: "cls-3" },
+  { name: "Yahya", classId: "cls-3" },
+  { name: "Abigail Madhalee Ariya Fatihah", classId: "cls-4" }, { name: "Alya Mukhbita", classId: "cls-4" },
+  { name: "Ammara taqiyya khoirunnisa", classId: "cls-4" }, { name: "Annisauzzahro as-salamah Parapat", classId: "cls-4" },
+  { name: "Ayesha khayla Salsabila", classId: "cls-4" }, { name: "Cataleya Azzahwa Fieary", classId: "cls-4" },
+  { name: "Filzah Taqy Hilmiyah Hanief", classId: "cls-4" }, { name: "Marwa Az Zahira Ibrahim Pribadi", classId: "cls-4" },
+  { name: "Maryam Muthiah Tafdlila", classId: "cls-4" }, { name: "Shabiha Nadira Azzahra", classId: "cls-4" },
+  { name: "Syakila Nada Salsabila", classId: "cls-4" },
+  { name: "Attahir Zarkasya Ramadhan", classId: "cls-1" }, { name: "Bintang Bumi Langit Biru", classId: "cls-1" },
+  { name: "Handade Yonca Satya Harjuna", classId: "cls-1" }, { name: "Kenzie Iffat Itoniwa", classId: "cls-1" },
+  { name: "Miqdaad Dzakiyy Hasan Faishal", classId: "cls-1" }, { name: "Sae Sibghotallah", classId: "cls-1" },
+  { name: "Imtihan Syarifatul 'Ula", classId: "cls-2" }, { name: "Iskanda Aulia Neisya", classId: "cls-2" },
+  { name: "Naura Auni Qonita", classId: "cls-2" },
+  { name: "Adit Wahyu Pratama", classId: "cls-5" }, { name: "Azka Rasya Darmawan", classId: "cls-5" },
+  { name: "Badar Farisul Qital", classId: "cls-5" }, { name: "Farzan Fiza Ananta", classId: "cls-5" },
+  { name: "Hamidurohman Hudzaifi", classId: "cls-5" }, { name: "Hilmi Dzabihulloh", classId: "cls-5" },
+  { name: "Muhammad Faathir Rusyada Azhar", classId: "cls-5" }, { name: "Nizar Haidar Rahman", classId: "cls-5" },
+  { name: "Raushan Akhtar Majid", classId: "cls-5" }, { name: "Tristan Firafisa Parsa", classId: "cls-5" },
+  { name: "Yafiq Alvaro", classId: "cls-5" }, { name: "Yuwhay Haura Anbiiya", classId: "cls-5" },
+  { name: "Raisa Shakila Putri", classId: "cls-6" }, { name: "Shofiyyah Afnan", classId: "cls-6" },
+  { name: "Dzakira Tsania Fahmi", classId: "cls-6" }, { name: "Rafanda Rayyan Adeeva", classId: "cls-6" },
+  { name: "Hafidzah Mumtaazah Ni'matullah", classId: "cls-6" }, { name: "Hurin Iin Luluil Maknun", classId: "cls-6" },
+  { name: "Queena Kayyisa Nararya", classId: "cls-6" },
+  { name: "Abdurrahman Az Zubair", classId: "cls-7" }, { name: "Achmad Akmal Alhakim", classId: "cls-7" },
+  { name: "Ahza Ibnu Hafiz", classId: "cls-7" }, { name: "Albanna Sheeva", classId: "cls-7" },
+  { name: "Arman Abdurrahman Nasution", classId: "cls-7" }, { name: "Faiq Kamal Yazid Al-Bara", classId: "cls-7" },
+  { name: "Jaisy Aliy Al Khalil", classId: "cls-7" }, { name: "Mirza Alzam Azhari", classId: "cls-7" },
+  { name: "Moh Khalifatullah Rosyad Al Amin", classId: "cls-7" }, { name: "Muhammad Faruq Baharta", classId: "cls-7" },
+  { name: "Muhammad Faqih Multazim", classId: "cls-7" }, { name: "Muhammad Zidan Dhiyauddin", classId: "cls-7" },
+  { name: "Rafasya Muhammad Firdaus An'Naba", classId: "cls-7" }, { name: "Vajradhatu Keinan Noor", classId: "cls-7" },
+  { name: "Ziyad Alhaq", classId: "cls-7" }
+];
+
+const FALLBACK_SANTRI_LIST: Santri[] = FALLBACK_SANTRI_DATA.map((s, idx) => ({
+  id: `santri-${idx + 1}`,
+  nis: `2026${String(idx + 1).padStart(3, '0')}`,
+  name: s.name,
+  classId: s.classId,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+}));
+
 const FALLBACK_TEACHERS: Teacher[] = [
   { id: "teacher-1", name: "Ustadz Muhammad Arya Mukti, Al Hafizh", email: "aryamukti@mqba.sch.id" },
   { id: "teacher-2", name: "Ustadz Akmal Firmana, ST.", email: "akmal@mqba.sch.id" },
@@ -535,7 +586,10 @@ export const api = {
 
   // Santri
   async getSantri(classId?: string): Promise<Santri[]> {
-    return fetchJson<Santri[]>(`/api/santri${classId ? `?classId=${classId}` : ''}`);
+    return fetchJson<Santri[]>(`/api/santri${classId ? `?classId=${classId}` : ''}`).catch(() => {
+      if (classId) return FALLBACK_SANTRI_LIST.filter(s => s.classId === classId);
+      return FALLBACK_SANTRI_LIST;
+    });
   },
 
   async createSantri(data: Omit<Santri, 'id' | 'createdAt' | 'updatedAt'>): Promise<Santri> {

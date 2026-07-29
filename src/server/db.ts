@@ -492,7 +492,7 @@ export function getDatabase(): DatabaseSchema {
 
     // Migrate: Update teachingSchedules, teachers, and subjects to latest schedule PDF
     const freshData = seedDatabase();
-    if (!parsed.teachingSchedules || parsed.teachingSchedules.length !== freshData.teachingSchedules.length || parsed.teachingSchedules[0]?.id !== "sch-1") {
+    if (!parsed.teachingSchedules || parsed.teachingSchedules.length !== freshData.teachingSchedules.length || parsed.teachingSchedules[6]?.teacherId !== "teacher-8") {
       parsed.teachingSchedules = freshData.teachingSchedules;
       parsed.teachers = freshData.teachers;
       parsed.subjects = freshData.subjects;
@@ -646,7 +646,7 @@ function seedDatabase(): DatabaseSchema {
     { id: "sch-4", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-4", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-5", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-6", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-    { id: "sch-7", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-7", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
     // 12:30 - 13:30
     { id: "sch-8", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-27", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-9", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-1", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },
@@ -744,7 +744,7 @@ function seedDatabase(): DatabaseSchema {
     { id: "sch-81", day: "Kamis", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-2", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-82", day: "Kamis", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-24", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-83", day: "Kamis", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-29", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-    { id: "sch-84", day: "Kamis", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+    { id: "sch-84", day: "Kamis", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
     // 12:30 - 13:30
     { id: "sch-85", day: "Kamis", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-29", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-86", day: "Kamis", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-26", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
@@ -752,7 +752,7 @@ function seedDatabase(): DatabaseSchema {
     { id: "sch-88", day: "Kamis", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-21", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-89", day: "Kamis", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-4", subjectId: "sub-8", academicYearId: "ay-1", semesterId: "sem-1" },
     { id: "sch-90", day: "Kamis", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
-    { id: "sch-91", day: "Kamis", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-21", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" }
+    { id: "sch-91", day: "Kamis", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" }
   ];
 
   // Seed 2 initial RPP items for immediate demonstration

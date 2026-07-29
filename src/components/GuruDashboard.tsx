@@ -330,8 +330,12 @@ export default function GuruDashboard({
                     </div>
 
                     <div>
-                      <h4 className="font-extrabold text-sm text-slate-800 dark:text-slate-100 truncate">{sch.subject?.name}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5 uppercase tracking-wider font-semibold">Kelas {sch.class?.name}</p>
+                      <h4 className="font-extrabold text-sm text-slate-800 dark:text-slate-100 truncate">
+                        {sch.subject?.name || subjects?.find(s => s.id === sch.subjectId)?.name || 'Mata Pelajaran'}
+                      </h4>
+                      <p className="text-xs text-slate-400 mt-0.5 uppercase tracking-wider font-semibold">
+                        Kelas {sch.class?.name || classes?.find(c => c.id === sch.classId)?.name || sch.classId}
+                      </p>
                     </div>
                   </div>
 

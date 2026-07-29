@@ -434,13 +434,13 @@ export default function MasterSchedules({
                       {sch.time}
                     </td>
                     <td className="p-4 font-bold text-slate-700 dark:text-slate-300 uppercase">
-                      Kelas {sch.class?.name}
+                      Kelas {sch.class?.name || classes.find(c => c.id === sch.classId)?.name || sch.classId}
                     </td>
                     <td className="p-4 font-extrabold text-slate-800 dark:text-slate-100">
-                      {sch.teacher?.name}
+                      {sch.teacher?.name || teachers.find(t => t.id === sch.teacherId)?.name || sch.teacherId}
                     </td>
                     <td className="p-4 text-indigo-800 dark:text-indigo-400 font-bold">
-                      {sch.subject?.name}
+                      {sch.subject?.name || subjects.find(s => s.id === sch.subjectId)?.name || sch.subjectId}
                     </td>
                     <td className="p-4 text-center no-print">
                       <div className="flex items-center justify-center space-x-1.5">

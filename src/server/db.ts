@@ -647,8 +647,16 @@ function seedDatabase(): DatabaseSchema {
       email: "aidilibnusalam3@gmail.com",
       passwordHash: hashPassword("parabek123"),
       role: "Admin"
+    },
+    {
+      id: "user-admin-2",
+      name: "Admin MQBA",
+      email: "admin@mqba.sch.id",
+      passwordHash: hashPassword("parabek123"),
+      role: "Admin"
     }
   ];
+
 
   // Seed standard guru password "guru123"
   const defaultGuruPasswordHash = hashPassword("guru123");

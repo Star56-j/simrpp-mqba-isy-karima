@@ -162,9 +162,9 @@ export const api = {
         const teacherEmailClean = t.email.toLowerCase();
         const teacherPrefix = teacherEmailClean.split('@')[0];
         const teacherNameClean = t.name.toLowerCase();
-        return teacherEmailClean === cleanEmail || teacherPrefix === inputPrefix || teacherNameClean.includes(inputPrefix);
+        return teacherEmailClean === cleanEmail || teacherPrefix === inputPrefix || (inputPrefix.length >= 3 && teacherNameClean.includes(inputPrefix));
       });
-      if (guru) {
+      if (guru && (password === 'guru123' || password === 'parabek123')) {
         const guruUser: User = {
           id: `user-guru-${guru.id}`,
           name: guru.name,

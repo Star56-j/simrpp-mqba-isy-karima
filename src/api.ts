@@ -157,7 +157,13 @@ export const api = {
       }
 
       // Check Guru fallback
-      const guru = FALLBACK_TEACHERS.find(t => t.email.toLowerCase() === cleanEmail || t.name.toLowerCase().includes(cleanEmail));
+      const inputPrefix = cleanEmail.includes('@') ? cleanEmail.split('@')[0] : cleanEmail;
+      const guru = FALLBACK_TEACHERS.find(t => {
+        const teacherEmailClean = t.email.toLowerCase();
+        const teacherPrefix = teacherEmailClean.split('@')[0];
+        const teacherNameClean = t.name.toLowerCase();
+        return teacherEmailClean === cleanEmail || teacherPrefix === inputPrefix || teacherNameClean.includes(inputPrefix);
+      });
       if (guru) {
         const guruUser: User = {
           id: `user-guru-${guru.id}`,

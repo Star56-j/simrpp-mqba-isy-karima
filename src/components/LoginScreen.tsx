@@ -133,23 +133,23 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               {loginType === 'guru' ? (
                 <>
                   <div className="space-y-1.5">
-                    <label htmlFor="email" className="block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Alamat Email</label>
+                    <label htmlFor="email" className="block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Email atau Username</label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400" aria-hidden="true" />
                       <input
                         id="email"
                         name="email"
-                        type="email"
-                        autoComplete="email"
+                        type="text"
+                        autoComplete="username"
                         required
-                        placeholder="pengajar@isykarima.id"
+                        placeholder="Contoh: aryamukti atau aryamukti@mqba.sch.id"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-2.5 pl-10 pr-3 text-xs text-slate-800 dark:text-slate-100 outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-600 input-premium"
                       />
                     </div>
                   </div>
- 
+
                   <div className="space-y-1.5">
                     <label htmlFor="password" className="block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Kata Sandi</label>
                     <div className="relative">
@@ -166,6 +166,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                         className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-2.5 pl-10 pr-3 text-xs text-slate-800 dark:text-slate-100 outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-600 input-premium"
                       />
                     </div>
+                    <p className="text-[10px] leading-4 text-indigo-600 dark:text-indigo-400 font-medium pt-0.5">
+                      💡 Kata sandi default pengajar: <code className="font-bold bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded text-indigo-700 dark:text-indigo-300">guru123</code>
+                    </p>
                   </div>
                 </>
               ) : (

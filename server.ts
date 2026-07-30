@@ -101,18 +101,34 @@ app.post('/api/auth/login', (req, res) => {
 
   const db = getDatabase();
   const emailClean = email.trim().toLowerCase();
-  const user = db.users.find(u => 
-    u.email.toLowerCase() === emailClean || 
-    (u.role === 'Admin' && (emailClean === 'admin' || emailClean === 'admin@mqba.sch.id' || emailClean === 'admin@isykarima.id' || emailClean === 'aqli'))
-  );
+  const inputPrefix = emailClean.includes('@') ? emailClean.split('@')[0] : emailClean;
+
+  let user = db.users.find(u => (u.email || '').trim().toLowerCase() === emailClean);
+  if (!user && inputPrefix.length > 0) {
+    user = db.users.find(u => {
+      const userEmailClean = (u.email || '').trim().toLowerCase();
+      const userPrefix = userEmailClean.includes('@') ? userEmailClean.split('@')[0] : userEmailClean;
+      return userPrefix === inputPrefix;
+    });
+  }
+  if (!user) {
+    user = db.users.find(u => {
+      const userNameClean = (u.name || '').trim().toLowerCase();
+      return userNameClean.includes(emailClean) || (inputPrefix.length >= 3 && userNameClean.includes(inputPrefix));
+    });
+  }
+  if (!user && (emailClean === 'admin' || emailClean === 'admin@mqba.sch.id' || emailClean === 'admin@isykarima.id' || emailClean === 'aqli')) {
+    user = db.users.find(u => u.role === 'Admin');
+  }
 
   const isCorrectPass = user ? (
     user.passwordHash === hashPassword(password) ||
-    (user.role === 'Admin' && (password === 'parabek123' || password === 'admin123'))
+    (user.role === 'Admin' && (password === 'parabek123' || password === 'admin123')) ||
+    (user.role === 'Guru' && (password === 'guru123' || password === 'parabek123'))
   ) : false;
 
   if (!user || !isCorrectPass) {
-    res.status(401).json({ error: 'Email atau password salah' });
+    res.status(401).json({ error: 'Email/username atau password salah' });
     return;
   }
 

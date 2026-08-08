@@ -954,7 +954,8 @@ export const api = {
         body: JSON.stringify(data),
       });
     } catch {
-      const activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      let activeUser: any = {};
+      try { activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}'); } catch {}
       const existing = await this.getAttendances();
       const newAtt: Attendance = {
         id: `att-${Date.now()}`,
@@ -1088,7 +1089,8 @@ export const api = {
         body: JSON.stringify(data),
       });
     } catch {
-      const activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      let activeUser: any = {};
+      try { activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}'); } catch {}
       const existing = await this.getSantriAttendances();
       const newAtt: SantriAttendance = {
         ...data,
@@ -1529,7 +1531,8 @@ export const api = {
         body: JSON.stringify(data),
       });
     } catch {
-      const activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      let activeUser: any = {};
+      try { activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}'); } catch {}
       const existing = await this.getPengumuman();
       const newAnn: Pengumuman = {
         id: `ann-${Date.now()}`,

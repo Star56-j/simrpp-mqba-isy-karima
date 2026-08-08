@@ -12,7 +12,7 @@ import {
   Crown,
   Sparkles
 } from 'lucide-react';
-import { GuruStats, RPP, TeachingSchedule, WaliKelas } from '../types';
+import { GuruStats, RPP, TeachingSchedule, WaliKelas, Subject, SchoolClass } from '../types';
 import RealTimeClock from './RealTimeClock';
 
 interface GuruDashboardProps {
@@ -20,6 +20,8 @@ interface GuruDashboardProps {
   schedules: TeachingSchedule[];
   rpps: RPP[];
   waliKelas: WaliKelas[];
+  subjects: Subject[];
+  classes: SchoolClass[];
   onNavigate: (view: string, targetTab?: string) => void;
 }
 
@@ -70,6 +72,8 @@ export default function GuruDashboard({
   schedules, 
   rpps,
   waliKelas,
+  subjects,
+  classes,
   onNavigate,
 }: GuruDashboardProps) {
   // Get schedules for current teacher

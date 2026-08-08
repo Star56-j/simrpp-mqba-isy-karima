@@ -13,7 +13,8 @@ import {
   Attendance,
   WaliKelas,
   AdminStats,
-  GuruStats
+  GuruStats,
+  Santri
 } from './types';
 import { Bell, Plus, Megaphone } from 'lucide-react';
 import Pengumuman from './components/Pengumuman';
@@ -264,7 +265,7 @@ export default function App() {
       rpp: {
         total: rpps.length || 2,
         draft: rpps.filter(r => r.status === 'Draft').length,
-        pending: rpps.filter(r => r.status === 'Diajukan').length,
+        pending: rpps.filter(r => r.status === 'Menunggu Persetujuan').length,
         approved: rpps.filter(r => r.status === 'Disetujui').length || 2,
         revision: rpps.filter(r => r.status === 'Revisi').length,
       },
@@ -273,9 +274,13 @@ export default function App() {
 
     const defaultGuruStats: GuruStats = {
       mySchedulesCount: schedules.filter(s => s.teacherId === user?.teacherId).length || 4,
-      myRppsCount: rpps.filter(r => r.teacherId === user?.teacherId).length || 1,
-      approvedRppsCount: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Disetujui').length || 1,
-      pendingRppsCount: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Diajukan').length
+      rpp: {
+        total: rpps.filter(r => r.teacherId === user?.teacherId).length || 1,
+        draft: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Draft').length,
+        pending: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Menunggu Persetujuan').length,
+        approved: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Disetujui').length || 1,
+        revision: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Revisi').length
+      }
     };
 
     switch (currentView) {
@@ -293,11 +298,11 @@ export default function App() {
           <GuruDashboard 
             stats={guruStats || defaultGuruStats} 
             onNavigate={(view) => setView(view)} 
-            user={user} 
             rpps={rpps} 
             schedules={schedules} 
             subjects={subjects} 
             classes={classes} 
+            waliKelas={waliKelas}
           />
         );
 

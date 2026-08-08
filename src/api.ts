@@ -125,8 +125,27 @@ const FALLBACK_TEACHERS: Teacher[] = [
   { id: "teacher-24", name: "Ustadz Aidil Aqli, S.Ag.", email: "aidil@mqba.sch.id" },
   { id: "teacher-25", name: "Ustadzah Aulia Anim Amanillah", email: "anim@mqba.sch.id" },
   { id: "teacher-26", name: "Ustadzah Lina Ayu Fitriyyah, S. Ag.", email: "lina@mqba.sch.id" },
-  { id: "teacher-27", name: "Ustadz Farhan Akhandi", email: "farhan@mqba.sch.id" }
+  { id: "teacher-27", name: "Ustadz Farhan Akhandi", email: "farhan@mqba.sch.id" },
+  { id: "teacher-28", name: "Ustadz Abdullah", email: "abdullah@mqba.sch.id" },
+  { id: "teacher-29", name: "Ustadz Aqib", email: "aqib@mqba.sch.id" },
+  { id: "teacher-30", name: "Ustadzah Iffah", email: "iffah@mqba.sch.id" },
+  { id: "teacher-31", name: "Ustadzah Fani", email: "fani@mqba.sch.id" },
+  { id: "teacher-32", name: "Ustadzah Dila", email: "dila@mqba.sch.id" }
 ];
+
+// Auto-update localStorage to the latest schedule version
+try {
+  const CURRENT_VERSION = "2";
+  const storedVersion = localStorage.getItem('simrpp_db_version');
+  if (storedVersion !== CURRENT_VERSION) {
+    localStorage.removeItem('simrpp_schedules');
+    localStorage.removeItem('simrpp_teachers');
+    localStorage.removeItem('simrpp_rpps');
+    localStorage.setItem('simrpp_db_version', CURRENT_VERSION);
+  }
+} catch (e) {
+  console.warn("Storage migration failed", e);
+}
 
 export const api = {
   // Auth
@@ -249,27 +268,59 @@ export const api = {
 
   // Teachers (Admin)
   async getTeachers(): Promise<Teacher[]> {
-    return fetchJson<Teacher[]>('/api/teachers').catch(() => FALLBACK_TEACHERS);
+    return fetchJson<Teacher[]>('/api/teachers').catch(() => {
+      const stored = localStorage.getItem('simrpp_teachers');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      localStorage.setItem('simrpp_teachers', JSON.stringify(FALLBACK_TEACHERS));
+      return FALLBACK_TEACHERS;
+    });
   },
 
   async createTeacher(teacher: Omit<Teacher, 'id'> & { password?: string }): Promise<Teacher> {
-    return fetchJson<Teacher>('/api/teachers', {
-      method: 'POST',
-      body: JSON.stringify(teacher)
-    });
+    try {
+      return await fetchJson<Teacher>('/api/teachers', {
+        method: 'POST',
+        body: JSON.stringify(teacher)
+      });
+    } catch {
+      const existing = await this.getTeachers();
+      const newTch: Teacher = { id: `teacher-${Date.now()}`, name: teacher.name, email: teacher.email };
+      const updated = [...existing, newTch];
+      localStorage.setItem('simrpp_teachers', JSON.stringify(updated));
+      return newTch;
+    }
   },
 
   async updateTeacher(id: string, teacher: Partial<Teacher> & { password?: string }): Promise<Teacher> {
-    return fetchJson<Teacher>(`/api/teachers/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(teacher)
-    });
+    try {
+      return await fetchJson<Teacher>(`/api/teachers/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(teacher)
+      });
+    } catch {
+      const existing = await this.getTeachers();
+      const updated = existing.map(t => t.id === id ? { ...t, ...teacher } : t);
+      localStorage.setItem('simrpp_teachers', JSON.stringify(updated));
+      return updated.find(t => t.id === id) || existing[0];
+    }
   },
 
   async deleteTeacher(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/teachers/${id}`, {
-      method: 'DELETE'
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/teachers/${id}`, {
+        method: 'DELETE'
+      });
+    } catch {
+      const existing = await this.getTeachers();
+      const updated = existing.filter(t => t.id !== id);
+      localStorage.setItem('simrpp_teachers', JSON.stringify(updated));
+      return { message: 'Guru berhasil dihapus' };
+    }
   },
 
   // Subjects (Admin)
@@ -351,64 +402,141 @@ export const api = {
 
   // Classes (Admin)
   async getClasses(): Promise<SchoolClass[]> {
-    return fetchJson<SchoolClass[]>('/api/classes').catch(() => [
-      { id: "cls-1", name: "I'dad Putra", level: "I'dad" },
-      { id: "cls-2", name: "I'dad Putri", level: "I'dad" },
-      { id: "cls-3", name: "Kelas VII Putra", level: "Wustho" },
-      { id: "cls-4", name: "Kelas VII Putri", level: "Wustho" },
-      { id: "cls-5", name: "Kelas VIII Putra", level: "Wustho" },
-      { id: "cls-6", name: "Kelas VIII Putri", level: "Wustho" },
-      { id: "cls-7", name: "Kelas IX Putra", level: "Wustho" }
-    ]);
+    return fetchJson<SchoolClass[]>('/api/classes').catch(() => {
+      const stored = localStorage.getItem('simrpp_classes');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      const defaultClasses: SchoolClass[] = [
+        { id: "cls-1", name: "I'dad Putra", level: "I'dad" },
+        { id: "cls-2", name: "I'dad Putri", level: "I'dad" },
+        { id: "cls-3", name: "Kelas VII Putra", level: "Wustho" },
+        { id: "cls-4", name: "Kelas VII Putri", level: "Wustho" },
+        { id: "cls-5", name: "Kelas VIII Putra", level: "Wustho" },
+        { id: "cls-6", name: "Kelas VIII Putri", level: "Wustho" },
+        { id: "cls-7", name: "Kelas IX Putra", level: "Wustho" }
+      ];
+      localStorage.setItem('simrpp_classes', JSON.stringify(defaultClasses));
+      return defaultClasses;
+    });
   },
 
   async createClass(cls: Omit<SchoolClass, 'id'>): Promise<SchoolClass> {
-    return fetchJson<SchoolClass>('/api/classes', {
-      method: 'POST',
-      body: JSON.stringify(cls)
-    });
+    try {
+      return await fetchJson<SchoolClass>('/api/classes', {
+        method: 'POST',
+        body: JSON.stringify(cls)
+      });
+    } catch {
+      const existing = await this.getClasses();
+      const newCls: SchoolClass = { ...cls, id: `cls-${Date.now()}` };
+      const updated = [...existing, newCls];
+      localStorage.setItem('simrpp_classes', JSON.stringify(updated));
+      return newCls;
+    }
   },
 
   async updateClass(id: string, cls: Partial<SchoolClass>): Promise<SchoolClass> {
-    return fetchJson<SchoolClass>(`/api/classes/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(cls)
-    });
+    try {
+      return await fetchJson<SchoolClass>(`/api/classes/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(cls)
+      });
+    } catch {
+      const existing = await this.getClasses();
+      const updated = existing.map(c => c.id === id ? { ...c, ...cls } : c);
+      localStorage.setItem('simrpp_classes', JSON.stringify(updated));
+      return updated.find(c => c.id === id) || existing[0];
+    }
   },
 
   async deleteClass(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/classes/${id}`, {
-      method: 'DELETE'
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/classes/${id}`, {
+        method: 'DELETE'
+      });
+    } catch {
+      const existing = await this.getClasses();
+      const updated = existing.filter(c => c.id !== id);
+      localStorage.setItem('simrpp_classes', JSON.stringify(updated));
+      return { message: 'Kelas berhasil dihapus' };
+    }
   },
 
   // Academic Years & Semesters
   async getAcademicYears(): Promise<AcademicYear[]> {
-    return fetchJson<AcademicYear[]>('/api/academic-years').catch(() => [{ id: "ay-1", name: "2026 / 2027" }]);
+    return fetchJson<AcademicYear[]>('/api/academic-years').catch(() => {
+      const stored = localStorage.getItem('simrpp_academic_years');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      const defaultAY: AcademicYear[] = [{ id: "ay-1", name: "2026 / 2027" }];
+      localStorage.setItem('simrpp_academic_years', JSON.stringify(defaultAY));
+      return defaultAY;
+    });
   },
 
   async createAcademicYear(name: string): Promise<AcademicYear> {
-    return fetchJson<AcademicYear>('/api/academic-years', {
-      method: 'POST',
-      body: JSON.stringify({ name })
-    });
+    try {
+      return await fetchJson<AcademicYear>('/api/academic-years', {
+        method: 'POST',
+        body: JSON.stringify({ name })
+      });
+    } catch {
+      const existing = await this.getAcademicYears();
+      const newAY: AcademicYear = { id: `ay-${Date.now()}`, name };
+      const updated = [...existing, newAY];
+      localStorage.setItem('simrpp_academic_years', JSON.stringify(updated));
+      return newAY;
+    }
   },
 
   async updateAcademicYear(id: string, name: string): Promise<AcademicYear> {
-    return fetchJson<AcademicYear>(`/api/academic-years/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ name })
-    });
+    try {
+      return await fetchJson<AcademicYear>(`/api/academic-years/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ name })
+      });
+    } catch {
+      const existing = await this.getAcademicYears();
+      const updated = existing.map(ay => ay.id === id ? { ...ay, name } : ay);
+      localStorage.setItem('simrpp_academic_years', JSON.stringify(updated));
+      return updated.find(ay => ay.id === id) || existing[0];
+    }
   },
 
   async deleteAcademicYear(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/academic-years/${id}`, {
-      method: 'DELETE'
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/academic-years/${id}`, {
+        method: 'DELETE'
+      });
+    } catch {
+      const existing = await this.getAcademicYears();
+      const updated = existing.filter(ay => ay.id !== id);
+      localStorage.setItem('simrpp_academic_years', JSON.stringify(updated));
+      return { message: 'Tahun akademik berhasil dihapus' };
+    }
   },
 
   async getSemesters(): Promise<Semester[]> {
-    return fetchJson<Semester[]>('/api/semesters').catch(() => [{ id: "sem-1", name: "Ganjil" }, { id: "sem-2", name: "Genap" }]);
+    return fetchJson<Semester[]>('/api/semesters').catch(() => {
+      const stored = localStorage.getItem('simrpp_semesters');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      const defaultSemesters: Semester[] = [{ id: "sem-1", name: "Ganjil" }, { id: "sem-2", name: "Genap" }];
+      localStorage.setItem('simrpp_semesters', JSON.stringify(defaultSemesters));
+      return defaultSemesters;
+    });
   },
 
   // Teaching Schedules (Jadwal KBM)
@@ -422,97 +550,108 @@ export const api = {
         } catch {}
       }
       const defaultSchedules: TeachingSchedule[] = [
+        // === SABTU ===
+        // 10:00 - 11:30
         { id: "sch-1", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-7", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-2", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-2", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-17", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
         { id: "sch-3", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-8", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-4", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-11", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-5", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-6", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-7", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-8", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-2", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-4", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-18", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-5", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-6", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-7", day: "Sabtu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-25", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        // 12:30 - 13:30
+        { id: "sch-8", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-29", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
         { id: "sch-9", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-12", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-10", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-11", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-10", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-11", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-30", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
         { id: "sch-12", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-8", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-13", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-14", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-15", day: "Ahad", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-3", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-16", day: "Ahad", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-17", day: "Ahad", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-18", day: "Ahad", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-15", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-19", day: "Ahad", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-20", day: "Ahad", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-3", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-21", day: "Ahad", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-22", day: "Ahad", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-24", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-23", day: "Ahad", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-24", day: "Ahad", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-22", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-25", day: "Ahad", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-26", day: "Ahad", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-27", day: "Ahad", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-28", day: "Ahad", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-29", day: "Senin", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-30", day: "Senin", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-31", day: "Senin", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-1", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-32", day: "Senin", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-13", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-33", day: "Senin", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-11", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-34", day: "Senin", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-35", day: "Senin", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-36", day: "Senin", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-37", day: "Senin", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-38", day: "Senin", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-39", day: "Senin", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-40", day: "Senin", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-41", day: "Senin", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-42", day: "Senin", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-43", day: "Selasa", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-44", day: "Selasa", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-45", day: "Selasa", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-24", subjectId: "sub-18", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-46", day: "Selasa", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-14", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-47", day: "Selasa", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-48", day: "Selasa", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-49", day: "Selasa", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-50", day: "Selasa", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-51", day: "Selasa", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-52", day: "Selasa", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-5", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-53", day: "Selasa", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-16", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-54", day: "Selasa", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-24", subjectId: "sub-14", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-55", day: "Selasa", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-56", day: "Selasa", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-57", day: "Rabu", time: "07:30 - 08:45", classId: "cls-3", teacherId: "teacher-24", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-58", day: "Rabu", time: "07:30 - 08:45", classId: "cls-4", teacherId: "teacher-7", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-59", day: "Rabu", time: "07:30 - 08:45", classId: "cls-5", teacherId: "teacher-24", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-60", day: "Rabu", time: "07:30 - 08:45", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-61", day: "Rabu", time: "07:30 - 08:45", classId: "cls-7", teacherId: "teacher-24", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-62", day: "Rabu", time: "07:30 - 08:45", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-63", day: "Rabu", time: "07:30 - 08:45", classId: "cls-2", teacherId: "teacher-7", subjectId: "sub-19", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-64", day: "Rabu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-65", day: "Rabu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-66", day: "Rabu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-67", day: "Rabu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-68", day: "Rabu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-69", day: "Rabu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-70", day: "Rabu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-71", day: "Rabu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-72", day: "Rabu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-73", day: "Rabu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-3", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-74", day: "Rabu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-75", day: "Rabu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-22", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-76", day: "Rabu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-77", day: "Rabu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-78", day: "Kamis", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-79", day: "Kamis", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-9", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-80", day: "Kamis", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-4", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-81", day: "Kamis", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-82", day: "Kamis", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-2", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-83", day: "Kamis", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-84", day: "Kamis", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-85", day: "Kamis", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-86", day: "Kamis", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-6", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-87", day: "Kamis", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-11", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-88", day: "Kamis", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-7", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-89", day: "Kamis", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-18", subjectId: "sub-8", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-90", day: "Kamis", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-6", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" },
-        { id: "sch-91", day: "Kamis", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-8", subjectId: "sub-20", academicYearId: "ay-1", semesterId: "sem-1" }
+        { id: "sch-13", day: "Sabtu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+
+        // === AHAD ===
+        // 10:00 - 11:30
+        { id: "sch-14", day: "Ahad", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-19", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-15", day: "Ahad", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-30", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-16", day: "Ahad", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-17", day: "Ahad", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-13", subjectId: "sub-15", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-18", day: "Ahad", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-19", day: "Ahad", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-19", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-20", day: "Ahad", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-25", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        // 12:30 - 13:30
+        { id: "sch-21", day: "Ahad", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-24", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-22", day: "Ahad", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-23", day: "Ahad", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-24", day: "Ahad", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-1", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-25", day: "Ahad", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-1", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-26", day: "Ahad", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+
+        // === SENIN ===
+        // 10:00 - 11:30
+        { id: "sch-27", day: "Senin", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-6", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-28", day: "Senin", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-30", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-29", day: "Senin", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-3", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-30", day: "Senin", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-31", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-31", day: "Senin", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-27", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-32", day: "Senin", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-33", day: "Senin", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-25", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        // 12:30 - 13:30
+        { id: "sch-34", day: "Senin", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-35", day: "Senin", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-36", day: "Senin", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-22", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-37", day: "Senin", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-30", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-38", day: "Senin", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-5", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-39", day: "Senin", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-1", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-40", day: "Senin", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+
+        // === SELASA ===
+        // 10:00 - 11:30
+        { id: "sch-41", day: "Selasa", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-42", day: "Selasa", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-30", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-43", day: "Selasa", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-14", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-44", day: "Selasa", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-45", day: "Selasa", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-46", day: "Selasa", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-25", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        // 12:30 - 13:30
+        { id: "sch-47", day: "Selasa", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-48", day: "Selasa", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-32", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-49", day: "Selasa", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-5", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-50", day: "Selasa", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-16", subjectId: "sub-17", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-51", day: "Selasa", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-24", subjectId: "sub-14", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-52", day: "Selasa", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-32", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+
+        // === RABU ===
+        // 10:00 - 11:30
+        { id: "sch-53", day: "Rabu", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-54", day: "Rabu", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-55", day: "Rabu", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-23", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-56", day: "Rabu", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-57", day: "Rabu", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-1", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-58", day: "Rabu", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-59", day: "Rabu", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-10", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        // 12:30 - 13:30
+        { id: "sch-60", day: "Rabu", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-61", day: "Rabu", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-32", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-62", day: "Rabu", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-3", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-63", day: "Rabu", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-30", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-64", day: "Rabu", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-22", subjectId: "sub-9", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-65", day: "Rabu", time: "12:30 - 13:30", classId: "cls-1", teacherId: "teacher-28", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-66", day: "Rabu", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-32", subjectId: "sub-3", academicYearId: "ay-1", semesterId: "sem-1" },
+
+        // === KAMIS ===
+        // 10:00 - 11:30
+        { id: "sch-67", day: "Kamis", time: "10:00 - 11:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-68", day: "Kamis", time: "10:00 - 11:30", classId: "cls-4", teacherId: "teacher-9", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-69", day: "Kamis", time: "10:00 - 11:30", classId: "cls-5", teacherId: "teacher-20", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-70", day: "Kamis", time: "10:00 - 11:30", classId: "cls-6", teacherId: "teacher-17", subjectId: "sub-5", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-71", day: "Kamis", time: "10:00 - 11:30", classId: "cls-7", teacherId: "teacher-2", subjectId: "sub-16", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-72", day: "Kamis", time: "10:00 - 11:30", classId: "cls-1", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-73", day: "Kamis", time: "10:00 - 11:30", classId: "cls-2", teacherId: "teacher-25", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        // 12:30 - 13:30
+        { id: "sch-74", day: "Kamis", time: "12:30 - 13:30", classId: "cls-3", teacherId: "teacher-12", subjectId: "sub-2", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-75", day: "Kamis", time: "12:30 - 13:30", classId: "cls-4", teacherId: "teacher-26", subjectId: "sub-6", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-76", day: "Kamis", time: "12:30 - 13:30", classId: "cls-5", teacherId: "teacher-11", subjectId: "sub-7", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-77", day: "Kamis", time: "12:30 - 13:30", classId: "cls-6", teacherId: "teacher-30", subjectId: "sub-13", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-78", day: "Kamis", time: "12:30 - 13:30", classId: "cls-7", teacherId: "teacher-18", subjectId: "sub-8", academicYearId: "ay-1", semesterId: "sem-1" },
+        { id: "sch-79", day: "Kamis", time: "12:30 - 13:30", classId: "cls-2", teacherId: "teacher-18", subjectId: "sub-8", academicYearId: "ay-1", semesterId: "sem-1" }
       ];
       localStorage.setItem('simrpp_schedules', JSON.stringify(defaultSchedules));
       return defaultSchedules;
@@ -520,23 +659,45 @@ export const api = {
   },
 
   async createSchedule(schedule: Omit<TeachingSchedule, 'id'>): Promise<TeachingSchedule> {
-    return fetchJson<TeachingSchedule>('/api/schedules', {
-      method: 'POST',
-      body: JSON.stringify(schedule)
-    });
+    try {
+      return await fetchJson<TeachingSchedule>('/api/schedules', {
+        method: 'POST',
+        body: JSON.stringify(schedule)
+      });
+    } catch {
+      const existing = await this.getSchedules();
+      const newSch: TeachingSchedule = { ...schedule, id: `sch-${Date.now()}` };
+      const updated = [...existing, newSch];
+      localStorage.setItem('simrpp_schedules', JSON.stringify(updated));
+      return newSch;
+    }
   },
 
   async updateSchedule(id: string, schedule: Partial<TeachingSchedule>): Promise<TeachingSchedule> {
-    return fetchJson<TeachingSchedule>(`/api/schedules/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(schedule)
-    });
+    try {
+      return await fetchJson<TeachingSchedule>(`/api/schedules/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(schedule)
+      });
+    } catch {
+      const existing = await this.getSchedules();
+      const updated = existing.map(s => s.id === id ? { ...s, ...schedule } : s);
+      localStorage.setItem('simrpp_schedules', JSON.stringify(updated));
+      return updated.find(s => s.id === id) || existing[0];
+    }
   },
 
   async deleteSchedule(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/schedules/${id}`, {
-      method: 'DELETE'
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/schedules/${id}`, {
+        method: 'DELETE'
+      });
+    } catch {
+      const existing = await this.getSchedules();
+      const updated = existing.filter(s => s.id !== id);
+      localStorage.setItem('simrpp_schedules', JSON.stringify(updated));
+      return { message: 'Jadwal berhasil dihapus' };
+    }
   },
 
   async copySemester(payload: {
@@ -545,54 +706,198 @@ export const api = {
     toAcademicYearId: string;
     toSemesterId: string;
   }): Promise<{ message: string; count: number }> {
-    return fetchJson<{ message: string; count: number }>('/api/schedules/copy-semester', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
+    try {
+      return await fetchJson<{ message: string; count: number }>('/api/schedules/copy-semester', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      const existing = await this.getSchedules();
+      const targets = existing.filter(s => s.academicYearId === payload.fromAcademicYearId && s.semesterId === payload.fromSemesterId);
+      const copied = targets.map(s => ({
+        ...s,
+        id: `sch-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        academicYearId: payload.toAcademicYearId,
+        semesterId: payload.toSemesterId
+      }));
+      const updated = [...existing, ...copied];
+      localStorage.setItem('simrpp_schedules', JSON.stringify(updated));
+      return { message: `Berhasil menyalin ${copied.length} jadwal`, count: copied.length };
+    }
   },
 
   // RPPs
   async getRPPs(): Promise<RPP[]> {
-    return fetchJson<RPP[]>('/api/rpps');
+    return fetchJson<RPP[]>('/api/rpps').catch(() => {
+      const stored = localStorage.getItem('simrpp_rpps');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
+      const defaultRPPs: RPP[] = [
+        {
+          id: "rpp-demo-1",
+          teacherId: "teacher-1",
+          subjectId: "sub-1",
+          classId: "cls-3",
+          academicYearId: "ay-1",
+          profilPelajar: "Beriman & Bertakwa kepada Tuhan YME, Mandiri, Bergotong Royong",
+          sarana: "Mushaf Al-Qur'an Pojok, Lembar Monitor Hafalan, Papan Tulis, Spidol",
+          capaiPembelajaran: "Pada akhir fase ini, peserta didik mampu membaca Al-Qur'an dengan tajwid yang benar, menghafal juz-juz pilihan secara tartil, dan memahami makna kandungan ayat yang dihafal.",
+          tujuanPembelajaran: "1. Santri dapat menyetorkan hafalan baru minimal 1 halaman per pertemuan dengan makhraj yang benar.\n2. Santri dapat memuroja'ah hafalan lama dengan lancar dan tanpa kesalahan.\n3. Santri memahami adab berinteraksi dengan Al-Qur'an.",
+          alurTP: "Tes Diagnostik Awal → Talaqqi Hafalan Baru → Tikrar Mandiri → Setoran ke Pengajar → Muroja'ah → Evaluasi Akhir Semester",
+          materiGanjil: "Hafalan Juz 30 (An-Naba' s.d. Al-Fajr) — muroja'ah harian, tajwid, adab tilawah",
+          materiGenap: "Hafalan Juz 29 (Al-Mulk s.d. Al-Mursalat) — muroja'ah gabungan Juz 29-30",
+          totalMeetingsGanjil: 18,
+          totalMeetingsGenap: 18,
+          pendahuluan: "1. Salam dan doa bersama (5 mnt).\n2. Absensi dan cek kondisi santri.\n3. Motivasi adab menghafal Al-Qur'an.\n4. Muroja'ah bersama hafalan pertemuan sebelumnya (10 mnt).",
+          kegiatanInti: "1. Pengajar mencontohkan bacaan ayat baru (talaqqi) — 15 mnt.\n2. Santri mengikuti bacaan pengajar 3x berulang.\n3. Santri tikrar mandiri/berpasangan — 30 mnt.\n4. Setoran hafalan individual ke pengajar — 30 mnt.\n5. Koreksi makhraj dan tajwid secara langsung.",
+          penutup: "1. Pengajar merangkum pencapaian hari ini.\n2. Santri mencatat target hafalan berikutnya.\n3. Doa penutup majelis — 5 mnt.",
+          metode: "Talaqqi, Tikrar (Pengulangan), Sima'i, Setoran Individual",
+          media: "Mushaf Al-Qur'an Pojok, Lembar Monitor Hafalan, Papan Tulis",
+          asesmenDiagnostik: "Tes kelancaran hafalan awal semester untuk menentukan posisi hafalan tiap santri.",
+          asesmenFormatif: "Observasi kelancaran setoran tiap pertemuan; catatan makhraj dan tajwid per santri.",
+          asesmenSumatif: "Ujian setoran hafalan di akhir semester disaksikan pengajar dan koordinator halaqah.",
+          diferensiasi: "Santri yang belum lancar mendapat sesi muroja'ah tambahan. Santri yang sudah hafal maju ke juz berikutnya.",
+          pengayaan: "Santri berprestasi mendapat kesempatan menjadi musami' (penyimak) untuk santri lain.",
+          catatan: "Prioritas semester ganjil: kelancaran dan konsistensi. Semester genap: tartil dan penguatan makna.",
+          syllabusItems: [
+            { meetingNo: 1, semester: 'Ganjil', topic: "Tes Diagnostik Awal & Orientasi Program Halaqah", date: "2026-07-14" },
+            { meetingNo: 2, semester: 'Ganjil', topic: "Hafalan An-Naba' (78:1-20) + Pengenalan Tajwid", date: "2026-07-21" },
+            { meetingNo: 3, semester: 'Ganjil', topic: "Hafalan An-Naba' (78:21-40) + Muroja'ah", date: "2026-07-28" },
+            { meetingNo: 1, semester: 'Genap', topic: "Muroja'ah Juz 30 + Orientasi Juz 29", date: "2027-01-13" },
+            { meetingNo: 2, semester: 'Genap', topic: "Hafalan Al-Mulk (67:1-15)", date: "2027-01-20" },
+          ],
+          status: "Disetujui",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('simrpp_rpps', JSON.stringify(defaultRPPs));
+      return defaultRPPs;
+    });
   },
 
   async createRPP(rpp: Partial<RPP>): Promise<RPP> {
-    return fetchJson<RPP>('/api/rpps', {
-      method: 'POST',
-      body: JSON.stringify(rpp)
-    });
+    try {
+      return await fetchJson<RPP>('/api/rpps', {
+        method: 'POST',
+        body: JSON.stringify(rpp)
+      });
+    } catch {
+      const existing = await this.getRPPs();
+      const newRpp: RPP = {
+        id: `rpp-${Date.now()}`,
+        teacherId: rpp.teacherId || '',
+        subjectId: rpp.subjectId || '',
+        classId: rpp.classId || '',
+        academicYearId: rpp.academicYearId || '',
+        profilPelajar: rpp.profilPelajar || '',
+        sarana: rpp.sarana || '',
+        capaiPembelajaran: rpp.capaiPembelajaran || '',
+        tujuanPembelajaran: rpp.tujuanPembelajaran || '',
+        alurTP: rpp.alurTP || '',
+        materiGanjil: rpp.materiGanjil || '',
+        materiGenap: rpp.materiGenap || '',
+        totalMeetingsGanjil: rpp.totalMeetingsGanjil || 16,
+        totalMeetingsGenap: rpp.totalMeetingsGenap || 16,
+        pendahuluan: rpp.pendahuluan || '',
+        kegiatanInti: rpp.kegiatanInti || '',
+        penutup: rpp.penutup || '',
+        metode: rpp.metode || '',
+        media: rpp.media || '',
+        asesmenDiagnostik: rpp.asesmenDiagnostik || '',
+        asesmenFormatif: rpp.asesmenFormatif || '',
+        asesmenSumatif: rpp.asesmenSumatif || '',
+        diferensiasi: rpp.diferensiasi || '',
+        pengayaan: rpp.pengayaan || '',
+        catatan: rpp.catatan || '',
+        syllabusItems: rpp.syllabusItems || [],
+        attachmentUrl: rpp.attachmentUrl,
+        attachmentName: rpp.attachmentName,
+        status: rpp.status || 'Draft',
+        revisionNotes: rpp.revisionNotes,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newRpp];
+      localStorage.setItem('simrpp_rpps', JSON.stringify(updated));
+      return newRpp;
+    }
   },
 
   async createRPPBulk(data: { rppList: any[] }): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>('/api/rpp/bulk', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<{ message: string }>('/api/rpp/bulk', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getRPPs();
+      const newItems = data.rppList.map((r, idx) => ({
+        ...r,
+        id: `rpp-${Date.now()}-${idx}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })) as RPP[];
+      const updated = [...existing, ...newItems];
+      localStorage.setItem('simrpp_rpps', JSON.stringify(updated));
+      return { message: `Berhasil mengimpor ${newItems.length} RPP` };
+    }
   },
 
   async updateRPP(id: string, rpp: Partial<RPP>): Promise<RPP> {
-    return fetchJson<RPP>(`/api/rpps/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(rpp)
-    });
+    try {
+      return await fetchJson<RPP>(`/api/rpps/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(rpp)
+      });
+    } catch {
+      const existing = await this.getRPPs();
+      const updated = existing.map(r => r.id === id ? { ...r, ...rpp, updatedAt: new Date().toISOString() } : r);
+      localStorage.setItem('simrpp_rpps', JSON.stringify(updated));
+      return updated.find(r => r.id === id) || existing[0];
+    }
   },
 
   async reviewRPP(id: string, status: 'Disetujui' | 'Revisi', revisionNotes: string): Promise<RPP> {
-    return fetchJson<RPP>(`/api/rpps/${id}/review`, {
-      method: 'POST',
-      body: JSON.stringify({ status, revisionNotes })
-    });
+    try {
+      return await fetchJson<RPP>(`/api/rpps/${id}/review`, {
+        method: 'POST',
+        body: JSON.stringify({ status, revisionNotes })
+      });
+    } catch {
+      return await this.updateRPP(id, { status, revisionNotes });
+    }
   },
 
   async deleteRPP(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/rpps/${id}`, {
-      method: 'DELETE'
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/rpps/${id}`, {
+        method: 'DELETE'
+      });
+    } catch {
+      const existing = await this.getRPPs();
+      const updated = existing.filter(r => r.id !== id);
+      localStorage.setItem('simrpp_rpps', JSON.stringify(updated));
+      return { message: 'RPP berhasil dihapus' };
+    }
   },
 
   // Activity Logs
   async getActivityLogs(): Promise<ActivityLog[]> {
-    return fetchJson<ActivityLog[]>('/api/activity-logs');
+    return fetchJson<ActivityLog[]>('/api/activity-logs').catch(() => {
+      const stored = localStorage.getItem('simrpp_activity_logs');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) return parsed;
+        } catch {}
+      }
+      return [];
+    });
   },
 
   // Attendance
@@ -604,33 +909,94 @@ export const api = {
     academicYearId?: string;
   }): Promise<Attendance[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
-    return fetchJson<Attendance[]>(`/api/attendances${q ? '?' + q : ''}`);
+    return fetchJson<Attendance[]>(`/api/attendances${q ? '?' + q : ''}`).catch(() => {
+      const stored = localStorage.getItem('simrpp_attendances');
+      let list: Attendance[] = [];
+      if (stored) {
+        try {
+          list = JSON.parse(stored) as Attendance[];
+        } catch {}
+      }
+      if (params) {
+        if (params.teacherId) list = list.filter(a => a.teacherId === params.teacherId);
+        if (params.semesterId) list = list.filter(a => a.semesterId === params.semesterId);
+        if (params.academicYearId) list = list.filter(a => a.academicYearId === params.academicYearId);
+      }
+      return list;
+    });
   },
 
   async createAttendance(data: Omit<Attendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<Attendance> {
-    return fetchJson<Attendance>('/api/attendances', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Attendance>('/api/attendances', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getAttendances();
+      const newAtt: Attendance = {
+        ...data,
+        id: `att-${Date.now()}`,
+        recordedBy: 'user-admin-1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newAtt];
+      localStorage.setItem('simrpp_attendances', JSON.stringify(updated));
+      return newAtt;
+    }
   },
 
-  // Guru mengisi absensi diri sendiri (hanya Hadir/Izin/Sakit, tidak bisa Alpha)
   async selfAttendance(data: { date: string; status: 'Hadir' | 'Izin' | 'Sakit'; notes?: string; academicYearId: string; semesterId: string }): Promise<Attendance> {
-    return fetchJson<Attendance>('/api/attendances/self', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Attendance>('/api/attendances/self', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      const existing = await this.getAttendances();
+      const newAtt: Attendance = {
+        id: `att-${Date.now()}`,
+        teacherId: activeUser.teacherId || '',
+        date: data.date,
+        status: data.status,
+        notes: data.notes || '',
+        academicYearId: data.academicYearId,
+        semesterId: data.semesterId,
+        recordedBy: activeUser.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newAtt];
+      localStorage.setItem('simrpp_attendances', JSON.stringify(updated));
+      return newAtt;
+    }
   },
 
   async updateAttendance(id: string, data: Partial<Attendance>): Promise<Attendance> {
-    return fetchJson<Attendance>(`/api/attendances/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Attendance>(`/api/attendances/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getAttendances();
+      const updated = existing.map(a => a.id === id ? { ...a, ...data, updatedAt: new Date().toISOString() } : a);
+      localStorage.setItem('simrpp_attendances', JSON.stringify(updated));
+      return updated.find(a => a.id === id) || existing[0];
+    }
   },
 
   async deleteAttendance(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/attendances/${id}`, { method: 'DELETE' });
+    try {
+      return await fetchJson<{ message: string }>(`/api/attendances/${id}`, { method: 'DELETE' });
+    } catch {
+      const existing = await this.getAttendances();
+      const updated = existing.filter(a => a.id !== id);
+      localStorage.setItem('simrpp_attendances', JSON.stringify(updated));
+      return { message: 'Absensi berhasil dihapus' };
+    }
   },
 
   async getAttendanceSummary(params?: {
@@ -640,7 +1006,32 @@ export const api = {
     academicYearId?: string;
   }): Promise<AttendanceSummary[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
-    return fetchJson<AttendanceSummary[]>(`/api/attendances/summary${q ? '?' + q : ''}`);
+    return fetchJson<AttendanceSummary[]>(`/api/attendances/summary${q ? '?' + q : ''}`).catch(async () => {
+      const teachersList = await this.getTeachers();
+      const allAtts = await this.getAttendances();
+      
+      const summaries: AttendanceSummary[] = teachersList.map(t => {
+        const tAtts = allAtts.filter(a => a.teacherId === t.id);
+        const hadir = tAtts.filter(a => a.status === 'Hadir').length;
+        const izin = tAtts.filter(a => a.status === 'Izin').length;
+        const sakit = tAtts.filter(a => a.status === 'Sakit').length;
+        const alpha = tAtts.filter(a => a.status === 'Alpha').length;
+        const total = tAtts.length;
+        const persentaseHadir = total > 0 ? Math.round((hadir / total) * 100) : 100;
+        
+        return {
+          teacherId: t.id,
+          teacherName: t.name,
+          hadir,
+          izin,
+          sakit,
+          alpha,
+          total,
+          persentaseHadir
+        };
+      });
+      return summaries;
+    });
   },
 
   // Santri Attendance
@@ -652,39 +1043,111 @@ export const api = {
     academicYearId?: string;
   }): Promise<SantriAttendance[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
-    return fetchJson<SantriAttendance[]>(`/api/santri-attendances${q ? '?' + q : ''}`);
+    return fetchJson<SantriAttendance[]>(`/api/santri-attendances${q ? '?' + q : ''}`).catch(() => {
+      const stored = localStorage.getItem('simrpp_santri_attendances');
+      let list: SantriAttendance[] = [];
+      if (stored) {
+        try {
+          list = JSON.parse(stored) as SantriAttendance[];
+        } catch {}
+      }
+      if (params) {
+        if (params.classId) list = list.filter(a => a.classId === params.classId);
+        if (params.semesterId) list = list.filter(a => a.semesterId === params.semesterId);
+        if (params.academicYearId) list = list.filter(a => a.academicYearId === params.academicYearId);
+      }
+      return list;
+    });
   },
 
   async createSantriAttendance(data: Omit<SantriAttendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<SantriAttendance> {
-    return fetchJson<SantriAttendance>('/api/santri-attendances', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<SantriAttendance>('/api/santri-attendances', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getSantriAttendances();
+      const newAtt: SantriAttendance = {
+        ...data,
+        id: `sa-${Date.now()}`,
+        recordedBy: 'user-admin-1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newAtt];
+      localStorage.setItem('simrpp_santri_attendances', JSON.stringify(updated));
+      return newAtt;
+    }
   },
 
   async createSantriAttendanceGuru(data: Omit<SantriAttendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<SantriAttendance> {
-    return fetchJson<SantriAttendance>('/api/santri-attendances/guru', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<SantriAttendance>('/api/santri-attendances/guru', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      const existing = await this.getSantriAttendances();
+      const newAtt: SantriAttendance = {
+        ...data,
+        id: `sa-${Date.now()}`,
+        recordedBy: activeUser.id || 'user-guru',
+        teacherId: activeUser.teacherId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newAtt];
+      localStorage.setItem('simrpp_santri_attendances', JSON.stringify(updated));
+      return newAtt;
+    }
   },
 
   async updateSantriAttendance(id: string, data: Partial<SantriAttendance>): Promise<SantriAttendance> {
-    return fetchJson<SantriAttendance>(`/api/santri-attendances/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<SantriAttendance>(`/api/santri-attendances/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getSantriAttendances();
+      const updated = existing.map(a => a.id === id ? { ...a, ...data, updatedAt: new Date().toISOString() } : a);
+      localStorage.setItem('simrpp_santri_attendances', JSON.stringify(updated));
+      return updated.find(a => a.id === id) || existing[0];
+    }
   },
 
   async deleteSantriAttendance(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/santri-attendances/${id}`, { method: 'DELETE' });
+    try {
+      return await fetchJson<{ message: string }>(`/api/santri-attendances/${id}`, { method: 'DELETE' });
+    } catch {
+      const existing = await this.getSantriAttendances();
+      const updated = existing.filter(a => a.id !== id);
+      localStorage.setItem('simrpp_santri_attendances', JSON.stringify(updated));
+      return { message: 'Absensi santri berhasil dihapus' };
+    }
   },
 
   async createSantriAttendanceBulk(data: { attendances: any[] }): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>('/api/santri-attendance/bulk', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<{ message: string }>('/api/santri-attendance/bulk', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getSantriAttendances();
+      const newItems = data.attendances.map((a, idx) => ({
+        ...a,
+        id: `sa-${Date.now()}-${idx}`,
+        recordedBy: 'user-admin-1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })) as SantriAttendance[];
+      const updated = [...existing, ...newItems];
+      localStorage.setItem('simrpp_santri_attendances', JSON.stringify(updated));
+      return { message: `Berhasil menyimpan ${newItems.length} absensi santri` };
+    }
   },
 
   async getSantriAttendanceSummary(params?: {
@@ -694,7 +1157,32 @@ export const api = {
     academicYearId?: string;
   }): Promise<SantriAttendanceSummary[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
-    return fetchJson<SantriAttendanceSummary[]>(`/api/santri-attendances/summary${q ? '?' + q : ''}`);
+    return fetchJson<SantriAttendanceSummary[]>(`/api/santri-attendances/summary${q ? '?' + q : ''}`).catch(async () => {
+      const classesList = await this.getClasses();
+      const allAtts = await this.getSantriAttendances();
+      
+      const summaries: SantriAttendanceSummary[] = classesList.map(c => {
+        const cAtts = allAtts.filter(a => a.classId === c.id);
+        const hadir = cAtts.reduce((acc, curr) => acc + (curr.jumlahHadir || 0), 0);
+        const izin = cAtts.reduce((acc, curr) => acc + (curr.jumlahIzin || 0), 0);
+        const sakit = cAtts.reduce((acc, curr) => acc + (curr.jumlahSakit || 0), 0);
+        const alpha = cAtts.reduce((acc, curr) => acc + (curr.jumlahAlpha || 0), 0);
+        const total = cAtts.reduce((acc, curr) => acc + (curr.jumlahTotal || 0), 0);
+        const rataHadir = cAtts.length > 0 ? Number((hadir / cAtts.length).toFixed(1)) : 0;
+        
+        return {
+          classId: c.id,
+          className: c.name,
+          hadir,
+          izin,
+          sakit,
+          alpha,
+          total,
+          rataHadir
+        };
+      });
+      return summaries;
+    });
   },
 
   // Wali Kelas
@@ -705,109 +1193,292 @@ export const api = {
     semesterId?: string;
   }): Promise<WaliKelas[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
-    return fetchJson<WaliKelas[]>(`/api/wali-kelas${q ? '?' + q : ''}`);
+    return fetchJson<WaliKelas[]>(`/api/wali-kelas${q ? '?' + q : ''}`).catch(() => {
+      const stored = localStorage.getItem('simrpp_wali_kelas');
+      let list: WaliKelas[] = [];
+      if (stored) {
+        try {
+          list = JSON.parse(stored) as WaliKelas[];
+        } catch {}
+      }
+      if (params) {
+        if (params.teacherId) list = list.filter(w => w.teacherId === params.teacherId);
+        if (params.classId) list = list.filter(w => w.classId === params.classId);
+        if (params.semesterId) list = list.filter(w => w.semesterId === params.semesterId);
+        if (params.academicYearId) list = list.filter(w => w.academicYearId === params.academicYearId);
+      }
+      return list;
+    });
   },
 
   async createWaliKelas(data: Omit<WaliKelas, 'id' | 'assignedBy' | 'createdAt' | 'updatedAt'>): Promise<WaliKelas> {
-    return fetchJson<WaliKelas>('/api/wali-kelas', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<WaliKelas>('/api/wali-kelas', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getWaliKelas();
+      const newWali: WaliKelas = {
+        ...data,
+        id: `wk-${Date.now()}`,
+        assignedBy: 'user-admin-1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newWali];
+      localStorage.setItem('simrpp_wali_kelas', JSON.stringify(updated));
+      return newWali;
+    }
   },
 
   async updateWaliKelas(id: string, data: Partial<WaliKelas>): Promise<WaliKelas> {
-    return fetchJson<WaliKelas>(`/api/wali-kelas/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<WaliKelas>(`/api/wali-kelas/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getWaliKelas();
+      const updated = existing.map(w => w.id === id ? { ...w, ...data, updatedAt: new Date().toISOString() } : w);
+      localStorage.setItem('simrpp_wali_kelas', JSON.stringify(updated));
+      return updated.find(w => w.id === id) || existing[0];
+    }
   },
 
   async deleteWaliKelas(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/wali-kelas/${id}`, { method: 'DELETE' });
+    try {
+      return await fetchJson<{ message: string }>(`/api/wali-kelas/${id}`, { method: 'DELETE' });
+    } catch {
+      const existing = await this.getWaliKelas();
+      const updated = existing.filter(w => w.id !== id);
+      localStorage.setItem('simrpp_wali_kelas', JSON.stringify(updated));
+      return { message: 'Wali kelas berhasil dihapus' };
+    }
   },
 
   // Santri
   async getSantri(classId?: string): Promise<Santri[]> {
     return fetchJson<Santri[]>(`/api/santri${classId ? `?classId=${classId}` : ''}`).catch(() => {
-      if (classId) return FALLBACK_SANTRI_LIST.filter(s => s.classId === classId);
-      return FALLBACK_SANTRI_LIST;
+      const stored = localStorage.getItem('simrpp_santri');
+      let list: Santri[] = [];
+      if (stored) {
+        try {
+          list = JSON.parse(stored) as Santri[];
+        } catch {}
+      } else {
+        list = FALLBACK_SANTRI_LIST;
+        localStorage.setItem('simrpp_santri', JSON.stringify(list));
+      }
+      if (classId) return list.filter(s => s.classId === classId);
+      return list;
     });
   },
 
   async createSantri(data: Omit<Santri, 'id' | 'createdAt' | 'updatedAt'>): Promise<Santri> {
-    return fetchJson<Santri>('/api/santri', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Santri>('/api/santri', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getSantri();
+      const newSantri: Santri = {
+        ...data,
+        id: `santri-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newSantri];
+      localStorage.setItem('simrpp_santri', JSON.stringify(updated));
+      return newSantri;
+    }
   },
 
   async updateSantri(id: string, data: Partial<Santri>): Promise<Santri> {
-    return fetchJson<Santri>(`/api/santri/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Santri>(`/api/santri/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getSantri();
+      const updated = existing.map(s => s.id === id ? { ...s, ...data, updatedAt: new Date().toISOString() } : s);
+      localStorage.setItem('simrpp_santri', JSON.stringify(updated));
+      return updated.find(s => s.id === id) || existing[0];
+    }
   },
 
   async deleteSantri(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/santri/${id}`, { method: 'DELETE' });
+    try {
+      return await fetchJson<{ message: string }>(`/api/santri/${id}`, { method: 'DELETE' });
+    } catch {
+      const existing = await this.getSantri();
+      const updated = existing.filter(s => s.id !== id);
+      localStorage.setItem('simrpp_santri', JSON.stringify(updated));
+      return { message: 'Santri berhasil dihapus' };
+    }
   },
 
   // Nilai
   async getNilai(params?: { santriId?: string; classId?: string; subjectId?: string; academicYearId?: string; semesterId?: string; teacherId?: string }): Promise<Nilai[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
-    return fetchJson<Nilai[]>(`/api/nilai${q ? '?' + q : ''}`);
+    return fetchJson<Nilai[]>(`/api/nilai${q ? '?' + q : ''}`).catch(() => {
+      const stored = localStorage.getItem('simrpp_nilai');
+      let list: Nilai[] = [];
+      if (stored) {
+        try {
+          list = JSON.parse(stored) as Nilai[];
+        } catch {}
+      }
+      if (params) {
+        if (params.santriId) list = list.filter(n => n.santriId === params.santriId);
+        if (params.subjectId) list = list.filter(n => n.subjectId === params.subjectId);
+        if (params.semesterId) list = list.filter(n => n.semesterId === params.semesterId);
+        if (params.academicYearId) list = list.filter(n => n.academicYearId === params.academicYearId);
+        if (params.teacherId) list = list.filter(n => n.teacherId === params.teacherId);
+      }
+      return list;
+    });
   },
 
   async createNilai(data: Omit<Nilai, 'id' | 'createdAt' | 'updatedAt'>): Promise<Nilai> {
-    return fetchJson<Nilai>('/api/nilai', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Nilai>('/api/nilai', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getNilai();
+      const newNilai: Nilai = {
+        ...data,
+        id: `nilai-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newNilai];
+      localStorage.setItem('simrpp_nilai', JSON.stringify(updated));
+      return newNilai;
+    }
   },
 
   async updateNilai(id: string, data: Partial<Nilai>): Promise<Nilai> {
-    return fetchJson<Nilai>(`/api/nilai/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Nilai>(`/api/nilai/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getNilai();
+      const updated = existing.map(n => n.id === id ? { ...n, ...data, updatedAt: new Date().toISOString() } : n);
+      localStorage.setItem('simrpp_nilai', JSON.stringify(updated));
+      return updated.find(n => n.id === id) || existing[0];
+    }
   },
 
   async deleteNilai(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/nilai/${id}`, { method: 'DELETE' });
+    try {
+      return await fetchJson<{ message: string }>(`/api/nilai/${id}`, { method: 'DELETE' });
+    } catch {
+      const existing = await this.getNilai();
+      const updated = existing.filter(n => n.id !== id);
+      localStorage.setItem('simrpp_nilai', JSON.stringify(updated));
+      return { message: 'Nilai berhasil dihapus' };
+    }
   },
 
   async createNilaiBulk(data: { nilaiList: any[] }): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>('/api/nilai/bulk', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<{ message: string }>('/api/nilai/bulk', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getNilai();
+      const newItems = data.nilaiList.map((n, idx) => ({
+        ...n,
+        id: `nilai-${Date.now()}-${idx}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })) as Nilai[];
+      const updated = [...existing, ...newItems];
+      localStorage.setItem('simrpp_nilai', JSON.stringify(updated));
+      return { message: `Berhasil menyimpan ${newItems.length} nilai` };
+    }
   },
 
   // Rapor Detail
   async getRaporDetail(params?: { santriId?: string; academicYearId?: string; semesterId?: string }): Promise<RaporDetail[]> {
     const q = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== undefined && v !== ''))).toString() : '';
-    return fetchJson<RaporDetail[]>(`/api/rapor-detail${q ? '?' + q : ''}`);
+    return fetchJson<RaporDetail[]>(`/api/rapor-detail${q ? '?' + q : ''}`).catch(() => {
+      const stored = localStorage.getItem('simrpp_rapor_detail');
+      let list: RaporDetail[] = [];
+      if (stored) {
+        try {
+          list = JSON.parse(stored) as RaporDetail[];
+        } catch {}
+      }
+      if (params) {
+        if (params.santriId) list = list.filter(r => r.santriId === params.santriId);
+        if (params.semesterId) list = list.filter(r => r.semesterId === params.semesterId);
+        if (params.academicYearId) list = list.filter(r => r.academicYearId === params.academicYearId);
+      }
+      return list;
+    });
   },
 
   async createRaporDetail(data: Omit<RaporDetail, 'id' | 'createdAt' | 'updatedAt'>): Promise<RaporDetail> {
-    return fetchJson<RaporDetail>('/api/rapor-detail', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<RaporDetail>('/api/rapor-detail', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getRaporDetail();
+      const newRapor: RaporDetail = {
+        ...data,
+        id: `rapor-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const updated = [...existing, newRapor];
+      localStorage.setItem('simrpp_rapor_detail', JSON.stringify(updated));
+      return newRapor;
+    }
   },
 
   async updateRaporDetail(id: string, data: Partial<RaporDetail>): Promise<RaporDetail> {
-    return fetchJson<RaporDetail>(`/api/rapor-detail/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<RaporDetail>(`/api/rapor-detail/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getRaporDetail();
+      const updated = existing.map(r => r.id === id ? { ...r, ...data, updatedAt: new Date().toISOString() } : r);
+      localStorage.setItem('simrpp_rapor_detail', JSON.stringify(updated));
+      return updated.find(r => r.id === id) || existing[0];
+    }
   },
 
   async createRaporDetailBulk(data: { raporList: any[] }): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>('/api/rapor-detail/bulk', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<{ message: string }>('/api/rapor-detail/bulk', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const existing = await this.getRaporDetail();
+      const newItems = data.raporList.map((r, idx) => ({
+        ...r,
+        id: `rapor-${Date.now()}-${idx}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })) as RaporDetail[];
+      const updated = [...existing, ...newItems];
+      localStorage.setItem('simrpp_rapor_detail', JSON.stringify(updated));
+      return { message: `Berhasil menyimpan ${newItems.length} detail rapor` };
+    }
   },
 
   // Upload File Attachment (converts File to base64, uploads via JSON api)
@@ -839,18 +1510,53 @@ export const api = {
 
   // Pengumuman
   async getPengumuman(): Promise<Pengumuman[]> {
-    return fetchJson<Pengumuman[]>('/api/pengumuman');
+    return fetchJson<Pengumuman[]>('/api/pengumuman').catch(() => {
+      const stored = localStorage.getItem('simrpp_pengumuman');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) return parsed;
+        } catch {}
+      }
+      return [];
+    });
   },
+
   async createPengumuman(data: { title: string; content: string }): Promise<Pengumuman> {
-    return fetchJson<Pengumuman>('/api/pengumuman', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    try {
+      return await fetchJson<Pengumuman>('/api/pengumuman', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const activeUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      const existing = await this.getPengumuman();
+      const newAnn: Pengumuman = {
+        id: `ann-${Date.now()}`,
+        title: data.title,
+        content: data.content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        authorId: activeUser.id || 'admin',
+        authorName: activeUser.name || 'Admin'
+      };
+      const updated = [newAnn, ...existing];
+      localStorage.setItem('simrpp_pengumuman', JSON.stringify(updated));
+      return newAnn;
+    }
   },
+
   async deletePengumuman(id: string): Promise<{ message: string }> {
-    return fetchJson<{ message: string }>(`/api/pengumuman/${id}`, {
-      method: 'DELETE',
-    });
+    try {
+      return await fetchJson<{ message: string }>(`/api/pengumuman/${id}`, {
+        method: 'DELETE',
+      });
+    } catch {
+      const existing = await this.getPengumuman();
+      const updated = existing.filter(ann => ann.id !== id);
+      localStorage.setItem('simrpp_pengumuman', JSON.stringify(updated));
+      return { message: 'Pengumuman berhasil dihapus' };
+    }
   },
 
   // Evaluasi Pembelajaran Bulanan

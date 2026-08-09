@@ -2354,7 +2354,7 @@ async function startServer() {
 
   if (!process.env.VERCEL) {
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`SIMRPP MQBA Isy Karima server is running on http://localhost:${PORT}`);
+      console.log(`Akademik MQBA Isy Karima server is running on http://localhost:${PORT}`);
     });
   }
 }

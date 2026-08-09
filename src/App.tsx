@@ -577,16 +577,7 @@ export default function App() {
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
 
             {/* Action Button */}
-            {user.role === 'Guru' ? (
-              <button 
-                onClick={() => setView('my-rpps')}
-                className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Buat RPP Baru</span>
-                <span className="sm:hidden">Buat RPP</span>
-              </button>
-            ) : (
+            {currentView === 'admin-dashboard' && (
               <button 
                 onClick={() => setView('master-teachers')}
                 className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
@@ -594,6 +585,16 @@ export default function App() {
                 <Plus className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Tambah Guru</span>
                 <span className="sm:hidden">Guru</span>
+              </button>
+            )}
+            {currentView === 'guru-dashboard' && (
+              <button 
+                onClick={() => setView('my-rpps')}
+                className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Buat RPP Baru</span>
+                <span className="sm:hidden">Buat RPP</span>
               </button>
             )}
           </div>

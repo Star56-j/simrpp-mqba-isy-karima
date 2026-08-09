@@ -85,7 +85,7 @@ export default function RekapRaporWaliKelas({
     setLoading(true);
     try {
       const [santriData, nilaiData, raporData] = await Promise.all([
-        api.getSantri({ classId: selectedClass }),
+        api.getSantri(selectedClass),
         api.getNilai ? await api.getNilai() : [],
         api.getRaporDetail({ academicYearId: selectedAY, semesterId: selectedSem }).catch(() => [])
       ]);

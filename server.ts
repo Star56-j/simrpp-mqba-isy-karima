@@ -1843,7 +1843,7 @@ app.get('/api/rapor-detail', requireAuth(), (req, res) => {
 
 app.post('/api/rapor-detail', requireAuth(), (req, res) => {
   const user = (req as any).user as User;
-  const { santriId, academicYearId, semesterId, kepribadian, ketahfizhan, ekstrakurikuler, ketidakhadiran, catatanWaliKelas, keputusanKenaikan, tanggapanOrangTua } = req.body;
+  const { santriId, academicYearId, semesterId, kepribadian, ketahfizhan, ekstrakurikuler, ketidakhadiran, catatanWaliKelas, keputusanKenaikan, tanggapanOrangTua, nisn } = req.body;
 
   if (!santriId || !academicYearId || !semesterId) {
     res.status(400).json({ error: 'Data santri, tahun ajaran, dan semester wajib diisi' });
@@ -1873,6 +1873,7 @@ app.post('/api/rapor-detail', requireAuth(), (req, res) => {
     catatanWaliKelas: catatanWaliKelas || '',
     keputusanKenaikan: keputusanKenaikan || '',
     tanggapanOrangTua: tanggapanOrangTua || '',
+    nisn: nisn || '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -1895,7 +1896,7 @@ app.put('/api/rapor-detail/:id', requireAuth(), (req, res) => {
     return;
   }
 
-  const { kepribadian, ketahfizhan, ekstrakurikuler, ketidakhadiran, catatanWaliKelas, keputusanKenaikan, tanggapanOrangTua } = req.body;
+  const { kepribadian, ketahfizhan, ekstrakurikuler, ketidakhadiran, catatanWaliKelas, keputusanKenaikan, tanggapanOrangTua, nisn } = req.body;
 
   if (kepribadian) rapor.kepribadian = kepribadian;
   if (ketahfizhan) rapor.ketahfizhan = ketahfizhan;
@@ -1904,6 +1905,7 @@ app.put('/api/rapor-detail/:id', requireAuth(), (req, res) => {
   if (catatanWaliKelas !== undefined) rapor.catatanWaliKelas = catatanWaliKelas;
   if (keputusanKenaikan !== undefined) rapor.keputusanKenaikan = keputusanKenaikan;
   if (tanggapanOrangTua !== undefined) rapor.tanggapanOrangTua = tanggapanOrangTua;
+  if (nisn !== undefined) rapor.nisn = nisn;
   
   rapor.updatedAt = new Date().toISOString();
 

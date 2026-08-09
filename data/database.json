@@ -1,2248 +1,2375 @@
 {
-    "users":  [
-                  {
-                      "id":  "user-admin-1",
-                      "name":  "Aqli",
-                      "email":  "aidilibnusalam3@gmail.com",
-                      "passwordHash":  "eecc688fe23899560c8ab7e77c2daf9c1ef71b0b80b4575c6fc58937957c512b",
-                      "role":  "Admin"
-                  },
-                  {
-                      "id":  "user-guru-teacher-1",
-                      "name":  "Ustadz Muhammad Arya Mukti, Al Hafizh",
-                      "email":  "aryamukti@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-1"
-                  },
-                  {
-                      "id":  "user-guru-teacher-2",
-                      "name":  "Ustadz Akmal Firmana, ST.",
-                      "email":  "akmal@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-2"
-                  },
-                  {
-                      "id":  "user-guru-teacher-3",
-                      "name":  "Ustadz Abdul Kholif",
-                      "email":  "abdulkholif@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-3"
-                  },
-                  {
-                      "id":  "user-guru-teacher-4",
-                      "name":  "Ustadz Sahmura Maula Maghribi, S.Mat.",
-                      "email":  "sahmura@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-4"
-                  },
-                  {
-                      "id":  "user-guru-teacher-5",
-                      "name":  "Ustadz Muhammad Hafizh Hibatullah, S.Si.",
-                      "email":  "hafizh@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-5"
-                  },
-                  {
-                      "id":  "user-guru-teacher-6",
-                      "name":  "Ustadz Faqih Hidayat, Lc.",
-                      "email":  "faqih@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-6"
-                  },
-                  {
-                      "id":  "user-guru-teacher-7",
-                      "name":  "Ustadz Muhammad Abdul Malik Ibrahim, S.Kom.",
-                      "email":  "abdulmalik@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-7"
-                  },
-                  {
-                      "id":  "user-guru-teacher-8",
-                      "name":  "Ustadz Dzulfikar Tri Bagaskara, S.Ag., M.Pd.",
-                      "email":  "dzulfikar@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-8"
-                  },
-                  {
-                      "id":  "user-guru-teacher-9",
-                      "name":  "Ustadzah Hasri Haryani Direja, S.Ds.",
-                      "email":  "hasri@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-9"
-                  },
-                  {
-                      "id":  "user-guru-teacher-10",
-                      "name":  "Ustadzah Saiba Musyayia",
-                      "email":  "saibamusyayia@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-10"
-                  },
-                  {
-                      "id":  "user-guru-teacher-11",
-                      "name":  "Ustadz Rezkidar",
-                      "email":  "rezkidar@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-11"
-                  },
-                  {
-                      "id":  "user-guru-teacher-12",
-                      "name":  "Ustadz Azri Robani Indra Robbi, S.Ag.",
-                      "email":  "azri@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-12"
-                  },
-                  {
-                      "id":  "user-guru-teacher-13",
-                      "name":  "Ustadzah Indri Nurbidari, S.Si",
-                      "email":  "indri@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-13"
-                  },
-                  {
-                      "id":  "user-guru-teacher-14",
-                      "name":  "Ustadzah Bela Dwi Lestari, S.Pd.",
-                      "email":  "bela@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-14"
-                  },
-                  {
-                      "id":  "user-guru-teacher-15",
-                      "name":  "Ustadzah Nurika Nuralifah, S.Ag.",
-                      "email":  "nurika@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-15"
-                  },
-                  {
-                      "id":  "user-guru-teacher-16",
-                      "name":  "Ustadzah Azizah Nur Aini, S.Pd.",
-                      "email":  "azizah@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-16"
-                  },
-                  {
-                      "id":  "user-guru-teacher-17",
-                      "name":  "Ustadz Umar Alamuddin, Lc., Al-Hafizh",
-                      "email":  "umar@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-17"
-                  },
-                  {
-                      "id":  "user-guru-teacher-18",
-                      "name":  "Ustadz Nashiruddin Karim, Lc., Al-Hafizh",
-                      "email":  "karim@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-18"
-                  },
-                  {
-                      "id":  "user-guru-teacher-19",
-                      "name":  "Ustadz Yunan Hidayat, Al Hafizh",
-                      "email":  "yunan@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-19"
-                  },
-                  {
-                      "id":  "user-guru-teacher-20",
-                      "name":  "Ustadz Muhammad Latief Amiruddin, S.T.",
-                      "email":  "latief@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-20"
-                  },
-                  {
-                      "id":  "user-guru-teacher-21",
-                      "name":  "Ustadzah Hasna Halimatun Basyaria, S.Ag., Al Hafizhah",
-                      "email":  "hasna@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-21"
-                  },
-                  {
-                      "id":  "user-guru-teacher-22",
-                      "name":  "Ustadz Tubagus Ahadiyat Rachmadi Luhur, S. Ag.",
-                      "email":  "tubagus@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-22"
-                  },
-                  {
-                      "id":  "user-guru-teacher-23",
-                      "name":  "Ustadz Fredy Susilo Supriyanto, S.Ag., Al Hafizh",
-                      "email":  "fredy@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-23"
-                  },
-                  {
-                      "id":  "user-guru-teacher-24",
-                      "name":  "Ustadz Aidil Aqli, S.Ag.",
-                      "email":  "aidil@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-24"
-                  },
-                  {
-                      "id":  "user-guru-teacher-25",
-                      "name":  "Ustadzah Aulia Anim Amanillah",
-                      "email":  "anim@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-25"
-                  },
-                  {
-                      "id":  "user-guru-teacher-26",
-                      "name":  "Ustadzah Lina Ayu Fitriyyah, S. Ag.",
-                      "email":  "lina@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-26"
-                  },
-                  {
-                      "id":  "user-guru-teacher-27",
-                      "name":  "Ustadz Farhan Akhandi",
-                      "email":  "farhan@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-27"
-                  },
-                  {
-                      "id":  "user-guru-teacher-28",
-                      "name":  "Ustadz Abdullah",
-                      "email":  "abdullah@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-28"
-                  },
-                  {
-                      "id":  "user-guru-teacher-29",
-                      "name":  "Ustadz Aqib",
-                      "email":  "aqib@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-29"
-                  },
-                  {
-                      "id":  "user-guru-teacher-30",
-                      "name":  "Ustadzah Iffah",
-                      "email":  "iffah@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-30"
-                  },
-                  {
-                      "id":  "user-guru-teacher-31",
-                      "name":  "Ustadzah Fani",
-                      "email":  "fani@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-31"
-                  },
-                  {
-                      "id":  "user-guru-teacher-32",
-                      "name":  "Ustadzah Dila",
-                      "email":  "dila@mqba.sch.id",
-                      "passwordHash":  "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
-                      "role":  "Guru",
-                      "teacherId":  "teacher-32"
-                  }
-              ],
-    "teachers":  [
-                     {
-                         "id":  "teacher-1",
-                         "name":  "Ustadz Muhammad Arya Mukti, Al Hafizh",
-                         "email":  "aryamukti@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-2",
-                         "name":  "Ustadz Akmal Firmana, ST.",
-                         "email":  "akmal@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-3",
-                         "name":  "Ustadz Abdul Kholif",
-                         "email":  "abdulkholif@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-4",
-                         "name":  "Ustadz Sahmura Maula Maghribi, S.Mat.",
-                         "email":  "sahmura@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-5",
-                         "name":  "Ustadz Muhammad Hafizh Hibatullah, S.Si.",
-                         "email":  "hafizh@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-6",
-                         "name":  "Ustadz Faqih Hidayat, Lc.",
-                         "email":  "faqih@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-7",
-                         "name":  "Ustadz Muhammad Abdul Malik Ibrahim, S.Kom.",
-                         "email":  "abdulmalik@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-8",
-                         "name":  "Ustadz Dzulfikar Tri Bagaskara, S.Ag., M.Pd.",
-                         "email":  "dzulfikar@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-9",
-                         "name":  "Ustadzah Hasri Haryani Direja, S.Ds.",
-                         "email":  "hasri@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-10",
-                         "name":  "Ustadzah Saiba Musyayia",
-                         "email":  "saibamusyayia@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-11",
-                         "name":  "Ustadz Rezkidar",
-                         "email":  "rezkidar@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-12",
-                         "name":  "Ustadz Azri Robani Indra Robbi, S.Ag.",
-                         "email":  "azri@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-13",
-                         "name":  "Ustadzah Indri Nurbidari, S.Si",
-                         "email":  "indri@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-14",
-                         "name":  "Ustadzah Bela Dwi Lestari, S.Pd.",
-                         "email":  "bela@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-15",
-                         "name":  "Ustadzah Nurika Nuralifah, S.Ag.",
-                         "email":  "nurika@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-16",
-                         "name":  "Ustadzah Azizah Nur Aini, S.Pd.",
-                         "email":  "azizah@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-17",
-                         "name":  "Ustadz Umar Alamuddin, Lc., Al-Hafizh",
-                         "email":  "umar@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-18",
-                         "name":  "Ustadz Nashiruddin Karim, Lc., Al-Hafizh",
-                         "email":  "karim@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-19",
-                         "name":  "Ustadz Yunan Hidayat, Al Hafizh",
-                         "email":  "yunan@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-20",
-                         "name":  "Ustadz Muhammad Latief Amiruddin, S.T.",
-                         "email":  "latief@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-21",
-                         "name":  "Ustadzah Hasna Halimatun Basyaria, S.Ag., Al Hafizhah",
-                         "email":  "hasna@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-22",
-                         "name":  "Ustadz Tubagus Ahadiyat Rachmadi Luhur, S. Ag.",
-                         "email":  "tubagus@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-23",
-                         "name":  "Ustadz Fredy Susilo Supriyanto, S.Ag., Al Hafizh",
-                         "email":  "fredy@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-24",
-                         "name":  "Ustadz Aidil Aqli, S.Ag.",
-                         "email":  "aidil@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-25",
-                         "name":  "Ustadzah Aulia Anim Amanillah",
-                         "email":  "anim@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-26",
-                         "name":  "Ustadzah Lina Ayu Fitriyyah, S. Ag.",
-                         "email":  "lina@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-27",
-                         "name":  "Ustadz Farhan Akhandi",
-                         "email":  "farhan@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-28",
-                         "name":  "Ustadz Abdullah",
-                         "email":  "abdullah@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-29",
-                         "name":  "Ustadz Aqib",
-                         "email":  "aqib@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-30",
-                         "name":  "Ustadzah Iffah",
-                         "email":  "iffah@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-31",
-                         "name":  "Ustadzah Fani",
-                         "email":  "fani@mqba.sch.id"
-                     },
-                     {
-                         "id":  "teacher-32",
-                         "name":  "Ustadzah Dila",
-                         "email":  "dila@mqba.sch.id"
-                     }
-                 ],
-    "subjects":  [
-                     {
-                         "id":  "sub-2",
-                         "name":  "Tahsin",
-                         "category":  "Al-Qur\u0027an"
-                     },
-                     {
-                         "id":  "sub-3",
-                         "name":  "Tajwid",
-                         "category":  "Al-Qur\u0027an"
-                     },
-                     {
-                         "id":  "sub-20",
-                         "name":  "Muraja\u0027ah Hafalan",
-                         "category":  "Al-Qur\u0027an"
-                     },
-                     {
-                         "id":  "sub-5",
-                         "name":  "Aqidah",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-6",
-                         "name":  "Akhlaq",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-7",
-                         "name":  "Fiqih",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-8",
-                         "name":  "Adab wa Tarbiyah",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-9",
-                         "name":  "Siroh",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-10",
-                         "name":  "Manhaji",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-11",
-                         "name":  "Jazary",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-12",
-                         "name":  "Khot",
-                         "category":  "Diniyah"
-                     },
-                     {
-                         "id":  "sub-13",
-                         "name":  "Arabiyah Baina Yadaik (ABY)",
-                         "category":  "Bahasa"
-                     },
-                     {
-                         "id":  "sub-14",
-                         "name":  "Bahasa Indonesia",
-                         "category":  "Bahasa"
-                     },
-                     {
-                         "id":  "sub-15",
-                         "name":  "Bahasa Inggris",
-                         "category":  "Bahasa"
-                     },
-                     {
-                         "id":  "sub-16",
-                         "name":  "Matematika",
-                         "category":  "Umum"
-                     },
-                     {
-                         "id":  "sub-17",
-                         "name":  "IPA",
-                         "category":  "Umum"
-                     },
-                     {
-                         "id":  "sub-18",
-                         "name":  "Furusiyah",
-                         "category":  "Umum"
-                     },
-                     {
-                         "id":  "sub-19",
-                         "name":  "Tai Chi / Olah Raga",
-                         "category":  "Umum"
-                     }
-                 ],
-    "classes":  [
-                    {
-                        "id":  "cls-1",
-                        "name":  "I\u0027dad Putra",
-                        "level":  "I\u0027dad"
-                    },
-                    {
-                        "id":  "cls-2",
-                        "name":  "I\u0027dad Putri",
-                        "level":  "I\u0027dad"
-                    },
-                    {
-                        "id":  "cls-3",
-                        "name":  "Kelas VII Putra",
-                        "level":  "Wustho"
-                    },
-                    {
-                        "id":  "cls-4",
-                        "name":  "Kelas VII Putri",
-                        "level":  "Wustho"
-                    },
-                    {
-                        "id":  "cls-5",
-                        "name":  "Kelas VIII Putra",
-                        "level":  "Wustho"
-                    },
-                    {
-                        "id":  "cls-6",
-                        "name":  "Kelas VIII Putri",
-                        "level":  "Wustho"
-                    },
-                    {
-                        "id":  "cls-7",
-                        "name":  "Kelas IX Putra",
-                        "level":  "Wustho"
-                    }
-                ],
-    "academicYears":  [
-                          {
-                              "id":  "ay-1",
-                              "name":  "2026 / 2027"
-                          }
-                      ],
-    "semesters":  [
-                      {
-                          "id":  "sem-1",
-                          "name":  "Ganjil"
-                      },
-                      {
-                          "id":  "sem-2",
-                          "name":  "Genap"
-                      }
-                  ],
-    "teachingSchedules":  [
-                              {
-                                  "id":  "sch-1",
-                                  "day":  "Sabtu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-1",
-                                  "subjectId":  "sub-12",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-2",
-                                  "day":  "Sabtu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-2",
-                                  "subjectId":  "sub-5",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-3",
-                                  "day":  "Sabtu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-3",
-                                  "subjectId":  "sub-15",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-4",
-                                  "day":  "Sabtu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-4",
-                                  "subjectId":  "sub-7",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-5",
-                                  "day":  "Sabtu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-5",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-6",
-                                  "day":  "Sabtu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-7",
-                                  "day":  "Sabtu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-8",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-8",
-                                  "day":  "Sabtu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-2",
-                                  "subjectId":  "sub-16",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-9",
-                                  "day":  "Sabtu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-1",
-                                  "subjectId":  "sub-12",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-10",
-                                  "day":  "Sabtu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-5",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-11",
-                                  "day":  "Sabtu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-12",
-                                  "day":  "Sabtu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-3",
-                                  "subjectId":  "sub-15",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-13",
-                                  "day":  "Sabtu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-14",
-                                  "day":  "Sabtu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-20",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-15",
-                                  "day":  "Ahad",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-3",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-16",
-                                  "day":  "Ahad",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-17",
-                                  "day":  "Ahad",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-14",
-                                  "subjectId":  "sub-5",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-18",
-                                  "day":  "Ahad",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-15",
-                                  "subjectId":  "sub-9",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-19",
-                                  "day":  "Ahad",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-5",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-20",
-                                  "day":  "Ahad",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-3",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-21",
-                                  "day":  "Ahad",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-22",
-                                  "day":  "Ahad",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-6",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-23",
-                                  "day":  "Ahad",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-24",
-                                  "day":  "Ahad",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-15",
-                                  "subjectId":  "sub-9",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-25",
-                                  "day":  "Ahad",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-26",
-                                  "day":  "Ahad",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-27",
-                                  "day":  "Ahad",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-28",
-                                  "day":  "Ahad",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-29",
-                                  "day":  "Senin",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-14",
-                                  "subjectId":  "sub-5",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-30",
-                                  "day":  "Senin",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-31",
-                                  "day":  "Senin",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-13",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-32",
-                                  "day":  "Senin",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-13",
-                                  "subjectId":  "sub-15",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-33",
-                                  "day":  "Senin",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-7",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-34",
-                                  "day":  "Senin",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-35",
-                                  "day":  "Senin",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-36",
-                                  "day":  "Senin",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-37",
-                                  "day":  "Senin",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-38",
-                                  "day":  "Senin",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-39",
-                                  "day":  "Senin",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-40",
-                                  "day":  "Senin",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-16",
-                                  "subjectId":  "sub-17",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-41",
-                                  "day":  "Senin",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-42",
-                                  "day":  "Senin",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-43",
-                                  "day":  "Selasa",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-44",
-                                  "day":  "Selasa",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-45",
-                                  "day":  "Selasa",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-18",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-46",
-                                  "day":  "Selasa",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-14",
-                                  "subjectId":  "sub-16",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-47",
-                                  "day":  "Selasa",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-5",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-48",
-                                  "day":  "Selasa",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-49",
-                                  "day":  "Selasa",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-50",
-                                  "day":  "Selasa",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-51",
-                                  "day":  "Selasa",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-3",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-52",
-                                  "day":  "Selasa",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-16",
-                                  "subjectId":  "sub-17",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-53",
-                                  "day":  "Selasa",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-9",
-                                  "subjectId":  "sub-17",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-54",
-                                  "day":  "Selasa",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-14",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-55",
-                                  "day":  "Selasa",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-20",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-56",
-                                  "day":  "Selasa",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-3",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-57",
-                                  "day":  "Rabu",
-                                  "time":  "07:30 - 08:45",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-19",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-58",
-                                  "day":  "Rabu",
-                                  "time":  "07:30 - 08:45",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-19",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-59",
-                                  "day":  "Rabu",
-                                  "time":  "07:30 - 08:45",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-19",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-60",
-                                  "day":  "Rabu",
-                                  "time":  "07:30 - 08:45",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-19",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-61",
-                                  "day":  "Rabu",
-                                  "time":  "07:30 - 08:45",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-19",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-62",
-                                  "day":  "Rabu",
-                                  "time":  "07:30 - 08:45",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-19",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-63",
-                                  "day":  "Rabu",
-                                  "time":  "07:30 - 08:45",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-19",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-64",
-                                  "day":  "Rabu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-65",
-                                  "day":  "Rabu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-66",
-                                  "day":  "Rabu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-5",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-67",
-                                  "day":  "Rabu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-68",
-                                  "day":  "Rabu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-69",
-                                  "day":  "Rabu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-70",
-                                  "day":  "Rabu",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-71",
-                                  "day":  "Rabu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-72",
-                                  "day":  "Rabu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-3",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-73",
-                                  "day":  "Rabu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-13",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-74",
-                                  "day":  "Rabu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-75",
-                                  "day":  "Rabu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-15",
-                                  "subjectId":  "sub-9",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-76",
-                                  "day":  "Rabu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-77",
-                                  "day":  "Rabu",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-10",
-                                  "subjectId":  "sub-3",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-78",
-                                  "day":  "Kamis",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-79",
-                                  "day":  "Kamis",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-9",
-                                  "subjectId":  "sub-16",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-80",
-                                  "day":  "Kamis",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-4",
-                                  "subjectId":  "sub-16",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-81",
-                                  "day":  "Kamis",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-2",
-                                  "subjectId":  "sub-5",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-82",
-                                  "day":  "Kamis",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-2",
-                                  "subjectId":  "sub-16",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-83",
-                                  "day":  "Kamis",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-84",
-                                  "day":  "Kamis",
-                                  "time":  "10:00 - 11:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-8",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-85",
-                                  "day":  "Kamis",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-3",
-                                  "teacherId":  "teacher-12",
-                                  "subjectId":  "sub-2",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-86",
-                                  "day":  "Kamis",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-4",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-6",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-87",
-                                  "day":  "Kamis",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-5",
-                                  "teacherId":  "teacher-11",
-                                  "subjectId":  "sub-7",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-88",
-                                  "day":  "Kamis",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-6",
-                                  "teacherId":  "teacher-7",
-                                  "subjectId":  "sub-13",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-89",
-                                  "day":  "Kamis",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-7",
-                                  "teacherId":  "teacher-4",
-                                  "subjectId":  "sub-8",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-90",
-                                  "day":  "Kamis",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-1",
-                                  "teacherId":  "teacher-6",
-                                  "subjectId":  "sub-20",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              },
-                              {
-                                  "id":  "sch-91",
-                                  "day":  "Kamis",
-                                  "time":  "12:30 - 13:30",
-                                  "classId":  "cls-2",
-                                  "teacherId":  "teacher-8",
-                                  "subjectId":  "sub-20",
-                                  "academicYearId":  "ay-1",
-                                  "semesterId":  "sem-1"
-                              }
-                          ],
-    "rpps":  [
-                 {
-                     "id":  "rpp-demo-1",
-                     "teacherId":  "teacher-1",
-                     "subjectId":  "sub-2",
-                     "classId":  "cls-3",
-                     "academicYearId":  "ay-1",
-                     "profilPelajar":  "Beriman \u0026 Bertakwa kepada Tuhan YME, Mandiri, Bergotong Royong",
-                     "sarana":  "Mushaf Al-Qur\u0027an Pojok, Lembar Monitor Hafalan, Papan Tulis, Spidol",
-                     "capaiPembelajaran":  "Pada akhir fase ini, peserta didik mampu membaca Al-Qur\u0027an dengan tajwid yang benar, menghafal juz-juz pilihan secara tartil, dan memahami makna kandungan ayat yang dihafal.",
-                     "tujuanPembelajaran":  "1. Santri dapat menyetorkan hafalan baru minimal 1 halaman per pertemuan dengan makhraj yang benar.\n2. Santri dapat memuroja\u0027ah hafalan lama dengan lancar dan tanpa kesalahan.\n3. Santri memahami adab berinteraksi dengan Al-Qur\u0027an.",
-                     "alurTP":  "Tes Diagnostik Awal → Talaqqi Hafalan Baru → Tikrar Mandiri → Setoran ke Pengajar → Muroja\u0027ah → Evaluasi Akhir Semester",
-                     "materiGanjil":  "Hafalan Juz 30 (An-Naba\u0027 s.d. Al-Fajr) — muroja\u0027ah harian, tajwid, adab tilawah",
-                     "materiGenap":  "Hafalan Juz 29 (Al-Mulk s.d. Al-Mursalat) — muroja\u0027ah gabungan Juz 29-30",
-                     "totalMeetingsGanjil":  18,
-                     "totalMeetingsGenap":  18,
-                     "pendahuluan":  "1. Salam dan doa bersama (5 mnt).\n2. Absensi dan cek kondisi santri.\n3. Motivasi adab menghafal Al-Qur\u0027an.\n4. Muroja\u0027ah bersama hafalan pertemuan sebelumnya (10 mnt).",
-                     "kegiatanInti":  "1. Pengajar mencontohkan bacaan ayat baru (talaqqi) — 15 mnt.\n2. Santri mengikuti bacaan pengajar 3x berulang.\n3. Santri tikrar mandiri/berpasangan — 30 mnt.\n4. Setoran hafalan individual ke pengajar — 30 mnt.\n5. Koreksi makhraj dan tajwid secara langsung.",
-                     "penutup":  "1. Pengajar merangkum pencapaian hari ini.\n2. Santri mencatat target hafalan berikutnya.\n3. Doa penutup majelis — 5 mnt.",
-                     "metode":  "Talaqqi, Tikrar (Pengulangan), Sima\u0027i, Setoran Individual",
-                     "media":  "Mushaf Al-Qur\u0027an Pojok, Lembar Monitor Hafalan, Papan Tulis",
-                     "asesmenDiagnostik":  "Tes kelancaran hafalan awal semester untuk menentukan posisi hafalan tiap santri.",
-                     "asesmenFormatif":  "Observasi kelancaran setoran tiap pertemuan; catatan makhraj dan tajwid per santri.",
-                     "asesmenSumatif":  "Ujian setoran hafalan di akhir semester disaksikan pengajar dan koordinator halaqah.",
-                     "diferensiasi":  "Santri yang belum lancar mendapat sesi muroja\u0027ah tambahan. Santri yang sudah hafal maju ke juz berikutnya.",
-                     "pengayaan":  "Santri berprestasi mendapat kesempatan menjadi musami\u0027 (penyimak) untuk santri lain.",
-                     "catatan":  "Prioritas semester ganjil: kelancaran dan konsistensi. Semester genap: tartil dan penguatan makna.",
-                     "syllabusItems":  [
-                                           {
-                                               "meetingNo":  1,
-                                               "semester":  "Ganjil",
-                                               "topic":  "Tes Diagnostik Awal \u0026 Orientasi Program Halaqah",
-                                               "date":  "2026-07-14"
-                                           },
-                                           {
-                                               "meetingNo":  2,
-                                               "semester":  "Ganjil",
-                                               "topic":  "Hafalan An-Naba\u0027 (78:1-20) + Pengenalan Tajwid",
-                                               "date":  "2026-07-21"
-                                           },
-                                           {
-                                               "meetingNo":  3,
-                                               "semester":  "Ganjil",
-                                               "topic":  "Hafalan An-Naba\u0027 (78:21-40) + Muroja\u0027ah",
-                                               "date":  "2026-07-28"
-                                           },
-                                           {
-                                               "meetingNo":  1,
-                                               "semester":  "Genap",
-                                               "topic":  "Muroja\u0027ah Juz 30 + Orientasi Juz 29",
-                                               "date":  "2027-01-13"
-                                           },
-                                           {
-                                               "meetingNo":  2,
-                                               "semester":  "Genap",
-                                               "topic":  "Hafalan Al-Mulk (67:1-15)",
-                                               "date":  "2027-01-20"
-                                           }
-                                       ],
-                     "status":  "Disetujui",
-                     "createdAt":  "2026-07-19T03:33:25.661Z",
-                     "updatedAt":  "2026-07-19T03:33:25.661Z"
-                 },
-                 {
-                     "id":  "rpp-demo-2",
-                     "teacherId":  "teacher-2",
-                     "subjectId":  "sub-5",
-                     "classId":  "cls-5",
-                     "academicYearId":  "ay-1",
-                     "profilPelajar":  "Beriman \u0026 Bertakwa kepada Tuhan YME, Bernalar Kritis, Mandiri",
-                     "sarana":  "Kitab Aqidah (Ushul Tsalatsah), Papan Tulis, Slide Presentasi (opsional)",
-                     "capaiPembelajaran":  "Pada akhir fase ini, peserta didik memahami pokok-pokok aqidah Islam (rukun iman dan tauhid) berdasarkan dalil Al-Qur\u0027an dan Sunnah shahih, serta mengimplementasikannya dalam kehidupan.",
-                     "tujuanPembelajaran":  "1. Santri mampu menjelaskan 6 rukun iman beserta dalilnya.\n2. Santri memahami tiga landasan utama (Ushul Tsalatsah).\n3. Santri mampu membedakan tauhid rububiyyah, uluhiyyah, dan asma wa sifat.",
-                     "alurTP":  "Tes Diagnostik → Pengenalan Aqidah Islam → Rukun Iman → Tauhid → Asmaul Husna → Iman kepada Rasul → Hari Akhir → Qadha-Qadar → Evaluasi Semester",
-                     "materiGanjil":  "Rukun Iman (6 Rukun), Iman kepada Allah (Tauhid Rububiyyah \u0026 Uluhiyyah), Asmaul Husna 1-40, Iman kepada Malaikat \u0026 Kitab",
-                     "materiGenap":  "Iman kepada Rasul (sifat wajib/mustahil), Hari Kiamat \u0026 tanda-tandanya, Qadha dan Qadar, Aplikasi Aqidah dalam kehidupan",
-                     "totalMeetingsGanjil":  16,
-                     "totalMeetingsGenap":  16,
-                     "pendahuluan":  "1. Salam dan doa pembuka — 5 mnt.\n2. Muroja\u0027ah materi minggu lalu (tanya jawab singkat).\n3. Apersepsi: kaitan materi baru dengan kehidupan nyata — 5 mnt.",
-                     "kegiatanInti":  "1. Pembacaan teks kitab beserta terjemah harfiah — 15 mnt.\n2. Penjelasan (syarah) oleh pengajar + contoh nyata — 25 mnt.\n3. Diskusi kelompok / tanya jawab santri — 20 mnt.\n4. Santri merangkum poin utama di buku catatan — 10 mnt.",
-                     "penutup":  "1. Pengajar merangkum poin-poin utama — 5 mnt.\n2. Penugasan: hafalan dalil atau rangkuman.\n3. Doa penutup majelis.",
-                     "metode":  "Ceramah Interaktif, Syarah Kitab, Halaqah Diskusi, Tanya Jawab",
-                     "media":  "Kitab Ushul Tsalatsah, Papan Tulis, Kartu Dalil (opsional)",
-                     "asesmenDiagnostik":  "Pertanyaan lisan di awal semester: apa yang santri ketahui tentang aqidah Islam.",
-                     "asesmenFormatif":  "Keaktifan tanya jawab, kelancaran hafalan dalil, kualitas rangkuman catatan tiap pertemuan.",
-                     "asesmenSumatif":  "Ujian lisan dan tertulis di akhir semester: menjelaskan rukun iman + menyebutkan dalil.",
-                     "diferensiasi":  "Santri yang kesulitan mendapat kartu dalil bergambar. Santri maju mendapat soal analisis kasus.",
-                     "pengayaan":  "Santri berprestasi mengkaji kitab Qawa\u0027id Al-Arba\u0027 sebagai tambahan.",
-                     "catatan":  "Hindari pembahasan khilafiyah yang tidak produktif. Fokus pada aqidah ahlus sunnah wal jama\u0027ah.",
-                     "syllabusItems":  [
-                                           {
-                                               "meetingNo":  1,
-                                               "semester":  "Ganjil",
-                                               "topic":  "Pengantar Aqidah Islam \u0026 Ushul Tsalatsah",
-                                               "date":  "2026-07-14"
-                                           },
-                                           {
-                                               "meetingNo":  2,
-                                               "semester":  "Ganjil",
-                                               "topic":  "Rukun Iman: Pengertian \u0026 Dalil Global",
-                                               "date":  "2026-07-21"
-                                           },
-                                           {
-                                               "meetingNo":  3,
-                                               "semester":  "Ganjil",
-                                               "topic":  "Iman kepada Allah: Tauhid Rububiyyah",
-                                               "date":  "2026-07-28"
-                                           },
-                                           {
-                                               "meetingNo":  1,
-                                               "semester":  "Genap",
-                                               "topic":  "Iman kepada Rasul: Sifat Wajib \u0026 Mustahil",
-                                               "date":  "2027-01-13"
-                                           },
-                                           {
-                                               "meetingNo":  2,
-                                               "semester":  "Genap",
-                                               "topic":  "Iman kepada Hari Kiamat",
-                                               "date":  "2027-01-20"
-                                           }
-                                       ],
-                     "status":  "Menunggu Persetujuan",
-                     "createdAt":  "2026-07-19T03:33:25.661Z",
-                     "updatedAt":  "2026-07-19T03:33:25.661Z"
-                 }
-             ],
-    "attendances":  [
-
-                    ],
-    "santriAttendances":  [
-
-                          ],
-    "waliKelas":  [
-
-                  ],
-    "santri":  [
-                   {
-                       "id":  "santri-1",
-                       "nis":  "2026001",
-                       "name":  "Ahmad Ajyad Syamil Sutrisno",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.661Z",
-                       "updatedAt":  "2026-07-19T03:33:25.661Z"
-                   },
-                   {
-                       "id":  "santri-2",
-                       "nis":  "2026002",
-                       "name":  "Ahmad Fakhry Athallah",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.661Z",
-                       "updatedAt":  "2026-07-19T03:33:25.661Z"
-                   },
-                   {
-                       "id":  "santri-3",
-                       "nis":  "2026003",
-                       "name":  "Athilasyah Rifqi Sulistyo",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.661Z",
-                       "updatedAt":  "2026-07-19T03:33:25.661Z"
-                   },
-                   {
-                       "id":  "santri-4",
-                       "nis":  "2026004",
-                       "name":  "Baihaqi Hanif Abrorni",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.661Z",
-                       "updatedAt":  "2026-07-19T03:33:25.661Z"
-                   },
-                   {
-                       "id":  "santri-5",
-                       "nis":  "2026005",
-                       "name":  "Fairuz Fahri Firmansyah",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.661Z",
-                       "updatedAt":  "2026-07-19T03:33:25.661Z"
-                   },
-                   {
-                       "id":  "santri-6",
-                       "nis":  "2026006",
-                       "name":  "Hasbi Nafsi Jalalullah",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.661Z",
-                       "updatedAt":  "2026-07-19T03:33:25.661Z"
-                   },
-                   {
-                       "id":  "santri-7",
-                       "nis":  "2026007",
-                       "name":  "Hisyam Zuhdi",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.661Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-8",
-                       "nis":  "2026008",
-                       "name":  "Israr At Taufik",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-9",
-                       "nis":  "2026009",
-                       "name":  "Keven Maghribi Darmaresta",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-10",
-                       "nis":  "2026010",
-                       "name":  "Khoirul Akbar Nur Hidayatulloh",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-11",
-                       "nis":  "2026011",
-                       "name":  "M Rajendra Ali Mudzakir",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-12",
-                       "nis":  "2026012",
-                       "name":  "Muhammad Fatih Izzan An-Naqy",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-13",
-                       "nis":  "2026013",
-                       "name":  "Muhammad Ilyas Anrisyab",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-14",
-                       "nis":  "2026014",
-                       "name":  "Muhammad Yahya Izzuddin",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-15",
-                       "nis":  "2026015",
-                       "name":  "Muhammad Yusuf Rifa\u0027i",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-16",
-                       "nis":  "2026016",
-                       "name":  "Ramdhan Ridhwanullah",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-17",
-                       "nis":  "2026017",
-                       "name":  "Shofyan Abdillah Achmad",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-18",
-                       "nis":  "2026018",
-                       "name":  "Tsaabit Qawiyyul Himmah",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-19",
-                       "nis":  "2026019",
-                       "name":  "Yahya",
-                       "classId":  "cls-3",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-20",
-                       "nis":  "2026020",
-                       "name":  "Abigail Madhalee Ariya Fatihah",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-21",
-                       "nis":  "2026021",
-                       "name":  "Alya Mukhbita",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-22",
-                       "nis":  "2026022",
-                       "name":  "Ammara taqiyya khoirunnisa",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-23",
-                       "nis":  "2026023",
-                       "name":  "Annisauzzahro as-salamah Parapat",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-24",
-                       "nis":  "2026024",
-                       "name":  "Ayesha khayla Salsabila",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-25",
-                       "nis":  "2026025",
-                       "name":  "Cataleya Azzahwa Fieary",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-26",
-                       "nis":  "2026026",
-                       "name":  "Filzah Taqy Hilmiyah Hanief",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-27",
-                       "nis":  "2026027",
-                       "name":  "Marwa Az Zahira Ibrahim Pribadi",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-28",
-                       "nis":  "2026028",
-                       "name":  "Maryam Muthiah Tafdlila",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-29",
-                       "nis":  "2026029",
-                       "name":  "Shabiha Nadira Azzahra",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-30",
-                       "nis":  "2026030",
-                       "name":  "Syakila Nada Salsabila",
-                       "classId":  "cls-4",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-31",
-                       "nis":  "2026031",
-                       "name":  "Attahir Zarkasya Ramadhan",
-                       "classId":  "cls-1",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-32",
-                       "nis":  "2026032",
-                       "name":  "Bintang Bumi Langit Biru",
-                       "classId":  "cls-1",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-33",
-                       "nis":  "2026033",
-                       "name":  "Handade Yonca Satya Harjuna",
-                       "classId":  "cls-1",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-34",
-                       "nis":  "2026034",
-                       "name":  "Kenzie Iffat Itoniwa",
-                       "classId":  "cls-1",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-35",
-                       "nis":  "2026035",
-                       "name":  "Miqdaad Dzakiyy Hasan Faishal",
-                       "classId":  "cls-1",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-36",
-                       "nis":  "2026036",
-                       "name":  "Sae Sibghotallah",
-                       "classId":  "cls-1",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-37",
-                       "nis":  "2026037",
-                       "name":  "Imtihan Syarifatul \u0027Ula",
-                       "classId":  "cls-2",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-38",
-                       "nis":  "2026038",
-                       "name":  "Iskanda Aulia Neisya",
-                       "classId":  "cls-2",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-39",
-                       "nis":  "2026039",
-                       "name":  "Naura Auni Qonita",
-                       "classId":  "cls-2",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-40",
-                       "nis":  "2026040",
-                       "name":  "Adit Wahyu Pratama",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-41",
-                       "nis":  "2026041",
-                       "name":  "Azka Rasya Darmawan",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-42",
-                       "nis":  "2026042",
-                       "name":  "Badar Farisul Qital",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-43",
-                       "nis":  "2026043",
-                       "name":  "Farzan Fiza Ananta",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-44",
-                       "nis":  "2026044",
-                       "name":  "Hamidurohman Hudzaifi",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-45",
-                       "nis":  "2026045",
-                       "name":  "Hilmi Dzabihulloh",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-46",
-                       "nis":  "2026046",
-                       "name":  "Muhammad Faathir Rusyada Azhar",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-47",
-                       "nis":  "2026047",
-                       "name":  "Nizar Haidar Rahman",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-48",
-                       "nis":  "2026048",
-                       "name":  "Raushan Akhtar Majid",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-49",
-                       "nis":  "2026049",
-                       "name":  "Tristan Firafisa Parsa",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-50",
-                       "nis":  "2026050",
-                       "name":  "Yafiq Alvaro",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-51",
-                       "nis":  "2026051",
-                       "name":  "Yuwhay Haura Anbiiya",
-                       "classId":  "cls-5",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-52",
-                       "nis":  "2026052",
-                       "name":  "Raisa Shakila Putri",
-                       "classId":  "cls-6",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-53",
-                       "nis":  "2026053",
-                       "name":  "Shofiyyah Afnan",
-                       "classId":  "cls-6",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-54",
-                       "nis":  "2026054",
-                       "name":  "Dzakira Tsania Fahmi",
-                       "classId":  "cls-6",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-55",
-                       "nis":  "2026055",
-                       "name":  "Rafanda Rayyan Adeeva",
-                       "classId":  "cls-6",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-56",
-                       "nis":  "2026056",
-                       "name":  "Hafidzah Mumtaazah Ni\u0027matullah",
-                       "classId":  "cls-6",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-57",
-                       "nis":  "2026057",
-                       "name":  "Hurin Iin Luluil Maknun",
-                       "classId":  "cls-6",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-58",
-                       "nis":  "2026058",
-                       "name":  "Queena Kayyisa Nararya",
-                       "classId":  "cls-6",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-59",
-                       "nis":  "2026059",
-                       "name":  "Abdurrahman Az Zubair",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-60",
-                       "nis":  "2026060",
-                       "name":  "Achmad Akmal Alhakim",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-61",
-                       "nis":  "2026061",
-                       "name":  "Ahza Ibnu Hafiz",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-62",
-                       "nis":  "2026062",
-                       "name":  "Albanna Sheeva",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-63",
-                       "nis":  "2026063",
-                       "name":  "Arman Abdurrahman Nasution",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-64",
-                       "nis":  "2026064",
-                       "name":  "Faiq Kamal Yazid Al-Bara",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-65",
-                       "nis":  "2026065",
-                       "name":  "Jaisy Aliy Al Khalil",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-66",
-                       "nis":  "2026066",
-                       "name":  "Mirza Alzam Azhari",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-67",
-                       "nis":  "2026067",
-                       "name":  "Moh Khalifatullah Rosyad Al Amin",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-68",
-                       "nis":  "2026068",
-                       "name":  "Muhammad Faruq Baharta",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-69",
-                       "nis":  "2026069",
-                       "name":  "Muhammad Faqih Multazim",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-70",
-                       "nis":  "2026070",
-                       "name":  "Muhammad Zidan Dhiyauddin",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-71",
-                       "nis":  "2026071",
-                       "name":  "Rafasya Muhammad Firdaus An\u0027Naba",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-72",
-                       "nis":  "2026072",
-                       "name":  "Vajradhatu Keinan Noor",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   },
-                   {
-                       "id":  "santri-73",
-                       "nis":  "2026073",
-                       "name":  "Ziyad Alhaq",
-                       "classId":  "cls-7",
-                       "createdAt":  "2026-07-19T03:33:25.662Z",
-                       "updatedAt":  "2026-07-19T03:33:25.662Z"
-                   }
-               ],
-    "nilai":  [
-
-              ],
-    "activityLogs":  [
-                         {
-                             "id":  "log-1786207351495-0uqq",
-                             "userId":  "user-admin-1",
-                             "userName":  "Aqli",
-                             "userRole":  "Admin",
-                             "action":  "Tunjuk Wali Kelas",
-                             "details":  "Menunjuk Ustadz Muhammad Arya Mukti, Al Hafizh sebagai wali kelas I\u0027dad Putra",
-                             "timestamp":  "2026-08-08T16:42:31.495Z"
-                         },
-                         {
-                             "id":  "log-1784615457604-z3vy",
-                             "userId":  "user-admin-1",
-                             "userName":  "Aqli",
-                             "userRole":  "Admin",
-                             "action":  "Login",
-                             "details":  "Berhasil melakukan login ke sistem.",
-                             "timestamp":  "2026-07-21T06:30:57.604Z"
-                         },
-                         {
-                             "id":  "log-seed-1",
-                             "userId":  "user-admin-1",
-                             "userName":  "Aidil Ibnu Salam",
-                             "userRole":  "Admin",
-                             "action":  "System Seed",
-                             "details":  "Sistem berhasil diinisialisasi dan data master berhasil di-seed.",
-                             "timestamp":  "2026-07-19T03:33:25.661Z"
-                         }
-                     ],
-    "raporDetails":  [
-
-                     ],
-    "pengumuman":  [
-
-                   ],
-    "evaluasiPembelajaran":  [
-
-                             ]
+  "users": [
+    {
+      "id": "user-admin-1",
+      "name": "Aqli",
+      "email": "aidilibnusalam3@gmail.com",
+      "passwordHash": "eecc688fe23899560c8ab7e77c2daf9c1ef71b0b80b4575c6fc58937957c512b",
+      "role": "Admin"
+    },
+    {
+      "id": "user-guru-teacher-1",
+      "name": "Ustadz Muhammad Arya Mukti, Al Hafizh",
+      "email": "aryamukti@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-1"
+    },
+    {
+      "id": "user-guru-teacher-2",
+      "name": "Ustadz Akmal Firmana, ST.",
+      "email": "akmal@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-2"
+    },
+    {
+      "id": "user-guru-teacher-3",
+      "name": "Ustadz Abdul Kholif",
+      "email": "abdulkholif@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-3"
+    },
+    {
+      "id": "user-guru-teacher-4",
+      "name": "Ustadz Sahmura Maula Maghribi, S.Mat.",
+      "email": "sahmura@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-4"
+    },
+    {
+      "id": "user-guru-teacher-5",
+      "name": "Ustadz Muhammad Hafizh Hibatullah, S.Si.",
+      "email": "hafizh@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-5"
+    },
+    {
+      "id": "user-guru-teacher-6",
+      "name": "Ustadz Faqih Hidayat, Lc.",
+      "email": "faqih@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-6"
+    },
+    {
+      "id": "user-guru-teacher-7",
+      "name": "Ustadz Muhammad Abdul Malik Ibrahim, S.Kom.",
+      "email": "abdulmalik@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-7"
+    },
+    {
+      "id": "user-guru-teacher-8",
+      "name": "Ustadz Dzulfikar Tri Bagaskara, S.Ag., M.Pd.",
+      "email": "dzulfikar@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-8"
+    },
+    {
+      "id": "user-guru-teacher-9",
+      "name": "Ustadzah Hasri Haryani Direja, S.Ds.",
+      "email": "hasri@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-9"
+    },
+    {
+      "id": "user-guru-teacher-10",
+      "name": "Ustadzah Saiba Musyayia",
+      "email": "saibamusyayia@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-10"
+    },
+    {
+      "id": "user-guru-teacher-11",
+      "name": "Ustadz Rezkidar",
+      "email": "rezkidar@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-11"
+    },
+    {
+      "id": "user-guru-teacher-12",
+      "name": "Ustadz Azri Robani Indra Robbi, S.Ag.",
+      "email": "azri@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-12"
+    },
+    {
+      "id": "user-guru-teacher-13",
+      "name": "Ustadzah Indri Nurbidari, S.Si",
+      "email": "indri@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-13"
+    },
+    {
+      "id": "user-guru-teacher-14",
+      "name": "Ustadzah Bela Dwi Lestari, S.Pd.",
+      "email": "bela@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-14"
+    },
+    {
+      "id": "user-guru-teacher-15",
+      "name": "Ustadzah Nurika Nuralifah, S.Ag.",
+      "email": "nurika@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-15"
+    },
+    {
+      "id": "user-guru-teacher-16",
+      "name": "Ustadzah Azizah Nur Aini, S.Pd.",
+      "email": "azizah@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-16"
+    },
+    {
+      "id": "user-guru-teacher-17",
+      "name": "Ustadz Umar Alamuddin, Lc., Al-Hafizh",
+      "email": "umar@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-17"
+    },
+    {
+      "id": "user-guru-teacher-18",
+      "name": "Ustadz Nashiruddin Karim, Lc., Al-Hafizh",
+      "email": "karim@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-18"
+    },
+    {
+      "id": "user-guru-teacher-19",
+      "name": "Ustadz Yunan Hidayat, Al Hafizh",
+      "email": "yunan@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-19"
+    },
+    {
+      "id": "user-guru-teacher-20",
+      "name": "Ustadz Muhammad Latief Amiruddin, S.T.",
+      "email": "latief@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-20"
+    },
+    {
+      "id": "user-guru-teacher-21",
+      "name": "Ustadzah Hasna Halimatun Basyaria, S.Ag., Al Hafizhah",
+      "email": "hasna@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-21"
+    },
+    {
+      "id": "user-guru-teacher-22",
+      "name": "Ustadz Tubagus Ahadiyat Rachmadi Luhur, S. Ag.",
+      "email": "tubagus@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-22"
+    },
+    {
+      "id": "user-guru-teacher-23",
+      "name": "Ustadz Fredy Susilo Supriyanto, S.Ag., Al Hafizh",
+      "email": "fredy@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-23"
+    },
+    {
+      "id": "user-guru-teacher-24",
+      "name": "Ustadz Aidil Aqli, S.Ag.",
+      "email": "aidil@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-24"
+    },
+    {
+      "id": "user-guru-teacher-25",
+      "name": "Ustadzah Aulia Anim Amanillah",
+      "email": "anim@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-25"
+    },
+    {
+      "id": "user-guru-teacher-26",
+      "name": "Ustadzah Lina Ayu Fitriyyah, S. Ag.",
+      "email": "lina@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-26"
+    },
+    {
+      "id": "user-guru-teacher-27",
+      "name": "Ustadz Farhan Akhandi",
+      "email": "farhan@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-27"
+    },
+    {
+      "id": "user-guru-teacher-28",
+      "name": "Ustadz Abdullah",
+      "email": "abdullah@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-28"
+    },
+    {
+      "id": "user-guru-teacher-29",
+      "name": "Ustadz Aqib",
+      "email": "aqib@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-29"
+    },
+    {
+      "id": "user-guru-teacher-30",
+      "name": "Ustadzah Iffah",
+      "email": "iffah@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-30"
+    },
+    {
+      "id": "user-guru-teacher-31",
+      "name": "Ustadzah Fani",
+      "email": "fani@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-31"
+    },
+    {
+      "id": "user-guru-teacher-32",
+      "name": "Ustadzah Dila",
+      "email": "dila@mqba.sch.id",
+      "passwordHash": "ae81343369944399b70de862dbe75536faa8e44c50ad0a312e380303173f4756",
+      "role": "Guru",
+      "teacherId": "teacher-32"
+    }
+  ],
+  "teachers": [
+    {
+      "id": "teacher-1",
+      "name": "Ustadz Muhammad Arya Mukti, Al Hafizh",
+      "email": "aryamukti@mqba.sch.id"
+    },
+    {
+      "id": "teacher-2",
+      "name": "Ustadz Akmal Firmana, ST.",
+      "email": "akmal@mqba.sch.id"
+    },
+    {
+      "id": "teacher-3",
+      "name": "Ustadz Abdul Kholif",
+      "email": "abdulkholif@mqba.sch.id"
+    },
+    {
+      "id": "teacher-4",
+      "name": "Ustadz Sahmura Maula Maghribi, S.Mat.",
+      "email": "sahmura@mqba.sch.id"
+    },
+    {
+      "id": "teacher-5",
+      "name": "Ustadz Muhammad Hafizh Hibatullah, S.Si.",
+      "email": "hafizh@mqba.sch.id"
+    },
+    {
+      "id": "teacher-6",
+      "name": "Ustadz Faqih Hidayat, Lc.",
+      "email": "faqih@mqba.sch.id"
+    },
+    {
+      "id": "teacher-7",
+      "name": "Ustadz Muhammad Abdul Malik Ibrahim, S.Kom.",
+      "email": "abdulmalik@mqba.sch.id"
+    },
+    {
+      "id": "teacher-8",
+      "name": "Ustadz Dzulfikar Tri Bagaskara, S.Ag., M.Pd.",
+      "email": "dzulfikar@mqba.sch.id"
+    },
+    {
+      "id": "teacher-9",
+      "name": "Ustadzah Hasri Haryani Direja, S.Ds.",
+      "email": "hasri@mqba.sch.id"
+    },
+    {
+      "id": "teacher-10",
+      "name": "Ustadzah Saiba Musyayia",
+      "email": "saibamusyayia@mqba.sch.id"
+    },
+    {
+      "id": "teacher-11",
+      "name": "Ustadz Rezkidar",
+      "email": "rezkidar@mqba.sch.id"
+    },
+    {
+      "id": "teacher-12",
+      "name": "Ustadz Azri Robani Indra Robbi, S.Ag.",
+      "email": "azri@mqba.sch.id"
+    },
+    {
+      "id": "teacher-13",
+      "name": "Ustadzah Indri Nurbidari, S.Si",
+      "email": "indri@mqba.sch.id"
+    },
+    {
+      "id": "teacher-14",
+      "name": "Ustadzah Bela Dwi Lestari, S.Pd.",
+      "email": "bela@mqba.sch.id"
+    },
+    {
+      "id": "teacher-15",
+      "name": "Ustadzah Nurika Nuralifah, S.Ag.",
+      "email": "nurika@mqba.sch.id"
+    },
+    {
+      "id": "teacher-16",
+      "name": "Ustadzah Azizah Nur Aini, S.Pd.",
+      "email": "azizah@mqba.sch.id"
+    },
+    {
+      "id": "teacher-17",
+      "name": "Ustadz Umar Alamuddin, Lc., Al-Hafizh",
+      "email": "umar@mqba.sch.id"
+    },
+    {
+      "id": "teacher-18",
+      "name": "Ustadz Nashiruddin Karim, Lc., Al-Hafizh",
+      "email": "karim@mqba.sch.id"
+    },
+    {
+      "id": "teacher-19",
+      "name": "Ustadz Yunan Hidayat, Al Hafizh",
+      "email": "yunan@mqba.sch.id"
+    },
+    {
+      "id": "teacher-20",
+      "name": "Ustadz Muhammad Latief Amiruddin, S.T.",
+      "email": "latief@mqba.sch.id"
+    },
+    {
+      "id": "teacher-21",
+      "name": "Ustadzah Hasna Halimatun Basyaria, S.Ag., Al Hafizhah",
+      "email": "hasna@mqba.sch.id"
+    },
+    {
+      "id": "teacher-22",
+      "name": "Ustadz Tubagus Ahadiyat Rachmadi Luhur, S. Ag.",
+      "email": "tubagus@mqba.sch.id"
+    },
+    {
+      "id": "teacher-23",
+      "name": "Ustadz Fredy Susilo Supriyanto, S.Ag., Al Hafizh",
+      "email": "fredy@mqba.sch.id"
+    },
+    {
+      "id": "teacher-24",
+      "name": "Ustadz Aidil Aqli, S.Ag.",
+      "email": "aidil@mqba.sch.id"
+    },
+    {
+      "id": "teacher-25",
+      "name": "Ustadzah Aulia Anim Amanillah",
+      "email": "anim@mqba.sch.id"
+    },
+    {
+      "id": "teacher-26",
+      "name": "Ustadzah Lina Ayu Fitriyyah, S. Ag.",
+      "email": "lina@mqba.sch.id"
+    },
+    {
+      "id": "teacher-27",
+      "name": "Ustadz Farhan Akhandi",
+      "email": "farhan@mqba.sch.id"
+    },
+    {
+      "id": "teacher-28",
+      "name": "Ustadz Abdullah",
+      "email": "abdullah@mqba.sch.id"
+    },
+    {
+      "id": "teacher-29",
+      "name": "Ustadz Aqib",
+      "email": "aqib@mqba.sch.id"
+    },
+    {
+      "id": "teacher-30",
+      "name": "Ustadzah Iffah",
+      "email": "iffah@mqba.sch.id"
+    },
+    {
+      "id": "teacher-31",
+      "name": "Ustadzah Fani",
+      "email": "fani@mqba.sch.id"
+    },
+    {
+      "id": "teacher-32",
+      "name": "Ustadzah Dila",
+      "email": "dila@mqba.sch.id"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "sub-2",
+      "name": "Tahsin",
+      "category": "Al-Qur'an"
+    },
+    {
+      "id": "sub-3",
+      "name": "Tajwid",
+      "category": "Al-Qur'an"
+    },
+    {
+      "id": "sub-20",
+      "name": "Muraja'ah Hafalan",
+      "category": "Al-Qur'an"
+    },
+    {
+      "id": "sub-5",
+      "name": "Aqidah",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-6",
+      "name": "Akhlaq",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-7",
+      "name": "Fiqih",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-8",
+      "name": "Adab wa Tarbiyah",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-9",
+      "name": "Siroh",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-10",
+      "name": "Manhaji",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-11",
+      "name": "Jazary",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-12",
+      "name": "Khot",
+      "category": "Diniyah"
+    },
+    {
+      "id": "sub-13",
+      "name": "Arabiyah Baina Yadaik (ABY)",
+      "category": "Bahasa"
+    },
+    {
+      "id": "sub-14",
+      "name": "Bahasa Indonesia",
+      "category": "Bahasa"
+    },
+    {
+      "id": "sub-15",
+      "name": "Bahasa Inggris",
+      "category": "Bahasa"
+    },
+    {
+      "id": "sub-16",
+      "name": "Matematika",
+      "category": "Umum"
+    },
+    {
+      "id": "sub-17",
+      "name": "IPA",
+      "category": "Umum"
+    },
+    {
+      "id": "sub-18",
+      "name": "Furusiyah",
+      "category": "Umum"
+    },
+    {
+      "id": "sub-19",
+      "name": "Tai Chi / Olah Raga",
+      "category": "Umum"
+    }
+  ],
+  "classes": [
+    {
+      "id": "cls-1",
+      "name": "I'dad Putra",
+      "level": "I'dad"
+    },
+    {
+      "id": "cls-2",
+      "name": "I'dad Putri",
+      "level": "I'dad"
+    },
+    {
+      "id": "cls-3",
+      "name": "Kelas VII Putra",
+      "level": "Wustho"
+    },
+    {
+      "id": "cls-4",
+      "name": "Kelas VII Putri",
+      "level": "Wustho"
+    },
+    {
+      "id": "cls-5",
+      "name": "Kelas VIII Putra",
+      "level": "Wustho"
+    },
+    {
+      "id": "cls-6",
+      "name": "Kelas VIII Putri",
+      "level": "Wustho"
+    },
+    {
+      "id": "cls-7",
+      "name": "Kelas IX Putra",
+      "level": "Wustho"
+    }
+  ],
+  "academicYears": [
+    {
+      "id": "ay-1",
+      "name": "2026 / 2027"
+    }
+  ],
+  "semesters": [
+    {
+      "id": "sem-1",
+      "name": "Ganjil"
+    },
+    {
+      "id": "sem-2",
+      "name": "Genap"
+    }
+  ],
+  "teachingSchedules": [
+    {
+      "id": "sch-1",
+      "day": "Sabtu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-1",
+      "subjectId": "sub-12",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-2",
+      "day": "Sabtu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-2",
+      "subjectId": "sub-5",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-3",
+      "day": "Sabtu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-3",
+      "subjectId": "sub-15",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-4",
+      "day": "Sabtu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-4",
+      "subjectId": "sub-7",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-5",
+      "day": "Sabtu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-5",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-6",
+      "day": "Sabtu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-7",
+      "day": "Sabtu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-8",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-8",
+      "day": "Sabtu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-2",
+      "subjectId": "sub-16",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-9",
+      "day": "Sabtu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-1",
+      "subjectId": "sub-12",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-10",
+      "day": "Sabtu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-5",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-11",
+      "day": "Sabtu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-12",
+      "day": "Sabtu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-3",
+      "subjectId": "sub-15",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-13",
+      "day": "Sabtu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-14",
+      "day": "Sabtu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-20",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-15",
+      "day": "Ahad",
+      "time": "10:00 - 11:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-3",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-16",
+      "day": "Ahad",
+      "time": "10:00 - 11:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-17",
+      "day": "Ahad",
+      "time": "10:00 - 11:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-14",
+      "subjectId": "sub-5",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-18",
+      "day": "Ahad",
+      "time": "10:00 - 11:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-15",
+      "subjectId": "sub-9",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-19",
+      "day": "Ahad",
+      "time": "10:00 - 11:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-5",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-20",
+      "day": "Ahad",
+      "time": "10:00 - 11:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-3",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-21",
+      "day": "Ahad",
+      "time": "10:00 - 11:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-22",
+      "day": "Ahad",
+      "time": "12:30 - 13:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-6",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-23",
+      "day": "Ahad",
+      "time": "12:30 - 13:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-24",
+      "day": "Ahad",
+      "time": "12:30 - 13:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-15",
+      "subjectId": "sub-9",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-25",
+      "day": "Ahad",
+      "time": "12:30 - 13:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-26",
+      "day": "Ahad",
+      "time": "12:30 - 13:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-27",
+      "day": "Ahad",
+      "time": "12:30 - 13:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-28",
+      "day": "Ahad",
+      "time": "12:30 - 13:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-29",
+      "day": "Senin",
+      "time": "10:00 - 11:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-14",
+      "subjectId": "sub-5",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-30",
+      "day": "Senin",
+      "time": "10:00 - 11:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-31",
+      "day": "Senin",
+      "time": "10:00 - 11:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-13",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-32",
+      "day": "Senin",
+      "time": "10:00 - 11:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-13",
+      "subjectId": "sub-15",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-33",
+      "day": "Senin",
+      "time": "10:00 - 11:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-7",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-34",
+      "day": "Senin",
+      "time": "10:00 - 11:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-35",
+      "day": "Senin",
+      "time": "10:00 - 11:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-36",
+      "day": "Senin",
+      "time": "12:30 - 13:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-37",
+      "day": "Senin",
+      "time": "12:30 - 13:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-38",
+      "day": "Senin",
+      "time": "12:30 - 13:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-39",
+      "day": "Senin",
+      "time": "12:30 - 13:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-40",
+      "day": "Senin",
+      "time": "12:30 - 13:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-16",
+      "subjectId": "sub-17",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-41",
+      "day": "Senin",
+      "time": "12:30 - 13:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-42",
+      "day": "Senin",
+      "time": "12:30 - 13:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-43",
+      "day": "Selasa",
+      "time": "10:00 - 11:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-44",
+      "day": "Selasa",
+      "time": "10:00 - 11:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-45",
+      "day": "Selasa",
+      "time": "10:00 - 11:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-18",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-46",
+      "day": "Selasa",
+      "time": "10:00 - 11:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-14",
+      "subjectId": "sub-16",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-47",
+      "day": "Selasa",
+      "time": "10:00 - 11:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-5",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-48",
+      "day": "Selasa",
+      "time": "10:00 - 11:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-49",
+      "day": "Selasa",
+      "time": "10:00 - 11:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-50",
+      "day": "Selasa",
+      "time": "12:30 - 13:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-51",
+      "day": "Selasa",
+      "time": "12:30 - 13:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-3",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-52",
+      "day": "Selasa",
+      "time": "12:30 - 13:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-16",
+      "subjectId": "sub-17",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-53",
+      "day": "Selasa",
+      "time": "12:30 - 13:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-9",
+      "subjectId": "sub-17",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-54",
+      "day": "Selasa",
+      "time": "12:30 - 13:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-14",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-55",
+      "day": "Selasa",
+      "time": "12:30 - 13:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-20",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-56",
+      "day": "Selasa",
+      "time": "12:30 - 13:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-3",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-57",
+      "day": "Rabu",
+      "time": "07:30 - 08:45",
+      "classId": "cls-3",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-19",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-58",
+      "day": "Rabu",
+      "time": "07:30 - 08:45",
+      "classId": "cls-4",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-19",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-59",
+      "day": "Rabu",
+      "time": "07:30 - 08:45",
+      "classId": "cls-5",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-19",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-60",
+      "day": "Rabu",
+      "time": "07:30 - 08:45",
+      "classId": "cls-6",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-19",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-61",
+      "day": "Rabu",
+      "time": "07:30 - 08:45",
+      "classId": "cls-7",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-19",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-62",
+      "day": "Rabu",
+      "time": "07:30 - 08:45",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-19",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-63",
+      "day": "Rabu",
+      "time": "07:30 - 08:45",
+      "classId": "cls-2",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-19",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-64",
+      "day": "Rabu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-65",
+      "day": "Rabu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-66",
+      "day": "Rabu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-5",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-67",
+      "day": "Rabu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-68",
+      "day": "Rabu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-69",
+      "day": "Rabu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-70",
+      "day": "Rabu",
+      "time": "10:00 - 11:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-71",
+      "day": "Rabu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-72",
+      "day": "Rabu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-3",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-73",
+      "day": "Rabu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-13",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-74",
+      "day": "Rabu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-75",
+      "day": "Rabu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-15",
+      "subjectId": "sub-9",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-76",
+      "day": "Rabu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-77",
+      "day": "Rabu",
+      "time": "12:30 - 13:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-10",
+      "subjectId": "sub-3",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-78",
+      "day": "Kamis",
+      "time": "10:00 - 11:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-79",
+      "day": "Kamis",
+      "time": "10:00 - 11:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-9",
+      "subjectId": "sub-16",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-80",
+      "day": "Kamis",
+      "time": "10:00 - 11:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-4",
+      "subjectId": "sub-16",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-81",
+      "day": "Kamis",
+      "time": "10:00 - 11:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-2",
+      "subjectId": "sub-5",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-82",
+      "day": "Kamis",
+      "time": "10:00 - 11:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-2",
+      "subjectId": "sub-16",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-83",
+      "day": "Kamis",
+      "time": "10:00 - 11:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-84",
+      "day": "Kamis",
+      "time": "10:00 - 11:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-8",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-85",
+      "day": "Kamis",
+      "time": "12:30 - 13:30",
+      "classId": "cls-3",
+      "teacherId": "teacher-12",
+      "subjectId": "sub-2",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-86",
+      "day": "Kamis",
+      "time": "12:30 - 13:30",
+      "classId": "cls-4",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-6",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-87",
+      "day": "Kamis",
+      "time": "12:30 - 13:30",
+      "classId": "cls-5",
+      "teacherId": "teacher-11",
+      "subjectId": "sub-7",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-88",
+      "day": "Kamis",
+      "time": "12:30 - 13:30",
+      "classId": "cls-6",
+      "teacherId": "teacher-7",
+      "subjectId": "sub-13",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-89",
+      "day": "Kamis",
+      "time": "12:30 - 13:30",
+      "classId": "cls-7",
+      "teacherId": "teacher-4",
+      "subjectId": "sub-8",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-90",
+      "day": "Kamis",
+      "time": "12:30 - 13:30",
+      "classId": "cls-1",
+      "teacherId": "teacher-6",
+      "subjectId": "sub-20",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    },
+    {
+      "id": "sch-91",
+      "day": "Kamis",
+      "time": "12:30 - 13:30",
+      "classId": "cls-2",
+      "teacherId": "teacher-8",
+      "subjectId": "sub-20",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1"
+    }
+  ],
+  "rpps": [
+    {
+      "id": "rpp-demo-1",
+      "teacherId": "teacher-1",
+      "subjectId": "sub-2",
+      "classId": "cls-3",
+      "academicYearId": "ay-1",
+      "profilPelajar": "Beriman & Bertakwa kepada Tuhan YME, Mandiri, Bergotong Royong",
+      "sarana": "Mushaf Al-Qur'an Pojok, Lembar Monitor Hafalan, Papan Tulis, Spidol",
+      "capaiPembelajaran": "Pada akhir fase ini, peserta didik mampu membaca Al-Qur'an dengan tajwid yang benar, menghafal juz-juz pilihan secara tartil, dan memahami makna kandungan ayat yang dihafal.",
+      "tujuanPembelajaran": "1. Santri dapat menyetorkan hafalan baru minimal 1 halaman per pertemuan dengan makhraj yang benar.\n2. Santri dapat memuroja'ah hafalan lama dengan lancar dan tanpa kesalahan.\n3. Santri memahami adab berinteraksi dengan Al-Qur'an.",
+      "alurTP": "Tes Diagnostik Awal → Talaqqi Hafalan Baru → Tikrar Mandiri → Setoran ke Pengajar → Muroja'ah → Evaluasi Akhir Semester",
+      "materiGanjil": "Hafalan Juz 30 (An-Naba' s.d. Al-Fajr) — muroja'ah harian, tajwid, adab tilawah",
+      "materiGenap": "Hafalan Juz 29 (Al-Mulk s.d. Al-Mursalat) — muroja'ah gabungan Juz 29-30",
+      "totalMeetingsGanjil": 18,
+      "totalMeetingsGenap": 18,
+      "pendahuluan": "1. Salam dan doa bersama (5 mnt).\n2. Absensi dan cek kondisi santri.\n3. Motivasi adab menghafal Al-Qur'an.\n4. Muroja'ah bersama hafalan pertemuan sebelumnya (10 mnt).",
+      "kegiatanInti": "1. Pengajar mencontohkan bacaan ayat baru (talaqqi) — 15 mnt.\n2. Santri mengikuti bacaan pengajar 3x berulang.\n3. Santri tikrar mandiri/berpasangan — 30 mnt.\n4. Setoran hafalan individual ke pengajar — 30 mnt.\n5. Koreksi makhraj dan tajwid secara langsung.",
+      "penutup": "1. Pengajar merangkum pencapaian hari ini.\n2. Santri mencatat target hafalan berikutnya.\n3. Doa penutup majelis — 5 mnt.",
+      "metode": "Talaqqi, Tikrar (Pengulangan), Sima'i, Setoran Individual",
+      "media": "Mushaf Al-Qur'an Pojok, Lembar Monitor Hafalan, Papan Tulis",
+      "asesmenDiagnostik": "Tes kelancaran hafalan awal semester untuk menentukan posisi hafalan tiap santri.",
+      "asesmenFormatif": "Observasi kelancaran setoran tiap pertemuan; catatan makhraj dan tajwid per santri.",
+      "asesmenSumatif": "Ujian setoran hafalan di akhir semester disaksikan pengajar dan koordinator halaqah.",
+      "diferensiasi": "Santri yang belum lancar mendapat sesi muroja'ah tambahan. Santri yang sudah hafal maju ke juz berikutnya.",
+      "pengayaan": "Santri berprestasi mendapat kesempatan menjadi musami' (penyimak) untuk santri lain.",
+      "catatan": "Prioritas semester ganjil: kelancaran dan konsistensi. Semester genap: tartil dan penguatan makna.",
+      "syllabusItems": [
+        {
+          "meetingNo": 1,
+          "semester": "Ganjil",
+          "topic": "Tes Diagnostik Awal & Orientasi Program Halaqah",
+          "date": "2026-07-14"
+        },
+        {
+          "meetingNo": 2,
+          "semester": "Ganjil",
+          "topic": "Hafalan An-Naba' (78:1-20) + Pengenalan Tajwid",
+          "date": "2026-07-21"
+        },
+        {
+          "meetingNo": 3,
+          "semester": "Ganjil",
+          "topic": "Hafalan An-Naba' (78:21-40) + Muroja'ah",
+          "date": "2026-07-28"
+        },
+        {
+          "meetingNo": 1,
+          "semester": "Genap",
+          "topic": "Muroja'ah Juz 30 + Orientasi Juz 29",
+          "date": "2027-01-13"
+        },
+        {
+          "meetingNo": 2,
+          "semester": "Genap",
+          "topic": "Hafalan Al-Mulk (67:1-15)",
+          "date": "2027-01-20"
+        }
+      ],
+      "status": "Disetujui",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    },
+    {
+      "id": "rpp-demo-2",
+      "teacherId": "teacher-2",
+      "subjectId": "sub-5",
+      "classId": "cls-5",
+      "academicYearId": "ay-1",
+      "profilPelajar": "Beriman & Bertakwa kepada Tuhan YME, Bernalar Kritis, Mandiri",
+      "sarana": "Kitab Aqidah (Ushul Tsalatsah), Papan Tulis, Slide Presentasi (opsional)",
+      "capaiPembelajaran": "Pada akhir fase ini, peserta didik memahami pokok-pokok aqidah Islam (rukun iman dan tauhid) berdasarkan dalil Al-Qur'an dan Sunnah shahih, serta mengimplementasikannya dalam kehidupan.",
+      "tujuanPembelajaran": "1. Santri mampu menjelaskan 6 rukun iman beserta dalilnya.\n2. Santri memahami tiga landasan utama (Ushul Tsalatsah).\n3. Santri mampu membedakan tauhid rububiyyah, uluhiyyah, dan asma wa sifat.",
+      "alurTP": "Tes Diagnostik → Pengenalan Aqidah Islam → Rukun Iman → Tauhid → Asmaul Husna → Iman kepada Rasul → Hari Akhir → Qadha-Qadar → Evaluasi Semester",
+      "materiGanjil": "Rukun Iman (6 Rukun), Iman kepada Allah (Tauhid Rububiyyah & Uluhiyyah), Asmaul Husna 1-40, Iman kepada Malaikat & Kitab",
+      "materiGenap": "Iman kepada Rasul (sifat wajib/mustahil), Hari Kiamat & tanda-tandanya, Qadha dan Qadar, Aplikasi Aqidah dalam kehidupan",
+      "totalMeetingsGanjil": 16,
+      "totalMeetingsGenap": 16,
+      "pendahuluan": "1. Salam dan doa pembuka — 5 mnt.\n2. Muroja'ah materi minggu lalu (tanya jawab singkat).\n3. Apersepsi: kaitan materi baru dengan kehidupan nyata — 5 mnt.",
+      "kegiatanInti": "1. Pembacaan teks kitab beserta terjemah harfiah — 15 mnt.\n2. Penjelasan (syarah) oleh pengajar + contoh nyata — 25 mnt.\n3. Diskusi kelompok / tanya jawab santri — 20 mnt.\n4. Santri merangkum poin utama di buku catatan — 10 mnt.",
+      "penutup": "1. Pengajar merangkum poin-poin utama — 5 mnt.\n2. Penugasan: hafalan dalil atau rangkuman.\n3. Doa penutup majelis.",
+      "metode": "Ceramah Interaktif, Syarah Kitab, Halaqah Diskusi, Tanya Jawab",
+      "media": "Kitab Ushul Tsalatsah, Papan Tulis, Kartu Dalil (opsional)",
+      "asesmenDiagnostik": "Pertanyaan lisan di awal semester: apa yang santri ketahui tentang aqidah Islam.",
+      "asesmenFormatif": "Keaktifan tanya jawab, kelancaran hafalan dalil, kualitas rangkuman catatan tiap pertemuan.",
+      "asesmenSumatif": "Ujian lisan dan tertulis di akhir semester: menjelaskan rukun iman + menyebutkan dalil.",
+      "diferensiasi": "Santri yang kesulitan mendapat kartu dalil bergambar. Santri maju mendapat soal analisis kasus.",
+      "pengayaan": "Santri berprestasi mengkaji kitab Qawa'id Al-Arba' sebagai tambahan.",
+      "catatan": "Hindari pembahasan khilafiyah yang tidak produktif. Fokus pada aqidah ahlus sunnah wal jama'ah.",
+      "syllabusItems": [
+        {
+          "meetingNo": 1,
+          "semester": "Ganjil",
+          "topic": "Pengantar Aqidah Islam & Ushul Tsalatsah",
+          "date": "2026-07-14"
+        },
+        {
+          "meetingNo": 2,
+          "semester": "Ganjil",
+          "topic": "Rukun Iman: Pengertian & Dalil Global",
+          "date": "2026-07-21"
+        },
+        {
+          "meetingNo": 3,
+          "semester": "Ganjil",
+          "topic": "Iman kepada Allah: Tauhid Rububiyyah",
+          "date": "2026-07-28"
+        },
+        {
+          "meetingNo": 1,
+          "semester": "Genap",
+          "topic": "Iman kepada Rasul: Sifat Wajib & Mustahil",
+          "date": "2027-01-13"
+        },
+        {
+          "meetingNo": 2,
+          "semester": "Genap",
+          "topic": "Iman kepada Hari Kiamat",
+          "date": "2027-01-20"
+        }
+      ],
+      "status": "Menunggu Persetujuan",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    }
+  ],
+  "attendances": [],
+  "santriAttendances": [],
+  "waliKelas": [
+    {
+      "id": "wali-1786244939092-0",
+      "classId": "cls-3",
+      "teacherId": "teacher-24",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-1",
+      "classId": "cls-3",
+      "teacherId": "teacher-24",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-2",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-2",
+      "classId": "cls-5",
+      "teacherId": "teacher-23",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-3",
+      "classId": "cls-5",
+      "teacherId": "teacher-23",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-2",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-4",
+      "classId": "cls-7",
+      "teacherId": "teacher-20",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-5",
+      "classId": "cls-7",
+      "teacherId": "teacher-20",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-2",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-6",
+      "classId": "cls-1",
+      "teacherId": "teacher-28",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-7",
+      "classId": "cls-1",
+      "teacherId": "teacher-28",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-2",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-8",
+      "classId": "cls-4",
+      "teacherId": "teacher-26",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-9",
+      "classId": "cls-4",
+      "teacherId": "teacher-26",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-2",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-10",
+      "classId": "cls-2",
+      "teacherId": "teacher-21",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-11",
+      "classId": "cls-2",
+      "teacherId": "teacher-21",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-2",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-12",
+      "classId": "cls-6",
+      "teacherId": "teacher-21",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-1",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    },
+    {
+      "id": "wali-1786244939093-13",
+      "classId": "cls-6",
+      "teacherId": "teacher-21",
+      "academicYearId": "ay-1",
+      "semesterId": "sem-2",
+      "assignedBy": "user-admin-1",
+      "createdAt": "2026-08-09T03:08:59.093Z",
+      "updatedAt": "2026-08-09T03:08:59.093Z"
+    }
+  ],
+  "santri": [
+    {
+      "id": "santri-1",
+      "nis": "2026001",
+      "name": "Ahmad Ajyad Syamil Sutrisno",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    },
+    {
+      "id": "santri-2",
+      "nis": "2026002",
+      "name": "Ahmad Fakhry Athallah",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    },
+    {
+      "id": "santri-3",
+      "nis": "2026003",
+      "name": "Athilasyah Rifqi Sulistyo",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    },
+    {
+      "id": "santri-4",
+      "nis": "2026004",
+      "name": "Baihaqi Hanif Abrorni",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    },
+    {
+      "id": "santri-5",
+      "nis": "2026005",
+      "name": "Fairuz Fahri Firmansyah",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    },
+    {
+      "id": "santri-6",
+      "nis": "2026006",
+      "name": "Hasbi Nafsi Jalalullah",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.661Z"
+    },
+    {
+      "id": "santri-7",
+      "nis": "2026007",
+      "name": "Hisyam Zuhdi",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.661Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-8",
+      "nis": "2026008",
+      "name": "Israr At Taufik",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-9",
+      "nis": "2026009",
+      "name": "Keven Maghribi Darmaresta",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-10",
+      "nis": "2026010",
+      "name": "Khoirul Akbar Nur Hidayatulloh",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-11",
+      "nis": "2026011",
+      "name": "M Rajendra Ali Mudzakir",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-12",
+      "nis": "2026012",
+      "name": "Muhammad Fatih Izzan An-Naqy",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-13",
+      "nis": "2026013",
+      "name": "Muhammad Ilyas Anrisyab",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-14",
+      "nis": "2026014",
+      "name": "Muhammad Yahya Izzuddin",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-15",
+      "nis": "2026015",
+      "name": "Muhammad Yusuf Rifa'i",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-16",
+      "nis": "2026016",
+      "name": "Ramdhan Ridhwanullah",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-17",
+      "nis": "2026017",
+      "name": "Shofyan Abdillah Achmad",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-18",
+      "nis": "2026018",
+      "name": "Tsaabit Qawiyyul Himmah",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-19",
+      "nis": "2026019",
+      "name": "Yahya",
+      "classId": "cls-3",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-20",
+      "nis": "2026020",
+      "name": "Abigail Madhalee Ariya Fatihah",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-21",
+      "nis": "2026021",
+      "name": "Alya Mukhbita",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-22",
+      "nis": "2026022",
+      "name": "Ammara taqiyya khoirunnisa",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-23",
+      "nis": "2026023",
+      "name": "Annisauzzahro as-salamah Parapat",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-24",
+      "nis": "2026024",
+      "name": "Ayesha khayla Salsabila",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-25",
+      "nis": "2026025",
+      "name": "Cataleya Azzahwa Fieary",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-26",
+      "nis": "2026026",
+      "name": "Filzah Taqy Hilmiyah Hanief",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-27",
+      "nis": "2026027",
+      "name": "Marwa Az Zahira Ibrahim Pribadi",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-28",
+      "nis": "2026028",
+      "name": "Maryam Muthiah Tafdlila",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-29",
+      "nis": "2026029",
+      "name": "Shabiha Nadira Azzahra",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-30",
+      "nis": "2026030",
+      "name": "Syakila Nada Salsabila",
+      "classId": "cls-4",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-31",
+      "nis": "2026031",
+      "name": "Attahir Zarkasya Ramadhan",
+      "classId": "cls-1",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-32",
+      "nis": "2026032",
+      "name": "Bintang Bumi Langit Biru",
+      "classId": "cls-1",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-33",
+      "nis": "2026033",
+      "name": "Handade Yonca Satya Harjuna",
+      "classId": "cls-1",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-34",
+      "nis": "2026034",
+      "name": "Kenzie Iffat Itoniwa",
+      "classId": "cls-1",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-35",
+      "nis": "2026035",
+      "name": "Miqdaad Dzakiyy Hasan Faishal",
+      "classId": "cls-1",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-36",
+      "nis": "2026036",
+      "name": "Sae Sibghotallah",
+      "classId": "cls-1",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-37",
+      "nis": "2026037",
+      "name": "Imtihan Syarifatul 'Ula",
+      "classId": "cls-2",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-38",
+      "nis": "2026038",
+      "name": "Iskanda Aulia Neisya",
+      "classId": "cls-2",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-39",
+      "nis": "2026039",
+      "name": "Naura Auni Qonita",
+      "classId": "cls-2",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-40",
+      "nis": "2026040",
+      "name": "Adit Wahyu Pratama",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-41",
+      "nis": "2026041",
+      "name": "Azka Rasya Darmawan",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-42",
+      "nis": "2026042",
+      "name": "Badar Farisul Qital",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-43",
+      "nis": "2026043",
+      "name": "Farzan Fiza Ananta",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-44",
+      "nis": "2026044",
+      "name": "Hamidurohman Hudzaifi",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-45",
+      "nis": "2026045",
+      "name": "Hilmi Dzabihulloh",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-46",
+      "nis": "2026046",
+      "name": "Muhammad Faathir Rusyada Azhar",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-47",
+      "nis": "2026047",
+      "name": "Nizar Haidar Rahman",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-48",
+      "nis": "2026048",
+      "name": "Raushan Akhtar Majid",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-49",
+      "nis": "2026049",
+      "name": "Tristan Firafisa Parsa",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-50",
+      "nis": "2026050",
+      "name": "Yafiq Alvaro",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-51",
+      "nis": "2026051",
+      "name": "Yuwhay Haura Anbiiya",
+      "classId": "cls-5",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-52",
+      "nis": "2026052",
+      "name": "Raisa Shakila Putri",
+      "classId": "cls-6",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-53",
+      "nis": "2026053",
+      "name": "Shofiyyah Afnan",
+      "classId": "cls-6",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-54",
+      "nis": "2026054",
+      "name": "Dzakira Tsania Fahmi",
+      "classId": "cls-6",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-55",
+      "nis": "2026055",
+      "name": "Rafanda Rayyan Adeeva",
+      "classId": "cls-6",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-56",
+      "nis": "2026056",
+      "name": "Hafidzah Mumtaazah Ni'matullah",
+      "classId": "cls-6",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-57",
+      "nis": "2026057",
+      "name": "Hurin Iin Luluil Maknun",
+      "classId": "cls-6",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-58",
+      "nis": "2026058",
+      "name": "Queena Kayyisa Nararya",
+      "classId": "cls-6",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-59",
+      "nis": "2026059",
+      "name": "Abdurrahman Az Zubair",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-60",
+      "nis": "2026060",
+      "name": "Achmad Akmal Alhakim",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-61",
+      "nis": "2026061",
+      "name": "Ahza Ibnu Hafiz",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-62",
+      "nis": "2026062",
+      "name": "Albanna Sheeva",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-63",
+      "nis": "2026063",
+      "name": "Arman Abdurrahman Nasution",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-64",
+      "nis": "2026064",
+      "name": "Faiq Kamal Yazid Al-Bara",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-65",
+      "nis": "2026065",
+      "name": "Jaisy Aliy Al Khalil",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-66",
+      "nis": "2026066",
+      "name": "Mirza Alzam Azhari",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-67",
+      "nis": "2026067",
+      "name": "Moh Khalifatullah Rosyad Al Amin",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-68",
+      "nis": "2026068",
+      "name": "Muhammad Faruq Baharta",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-69",
+      "nis": "2026069",
+      "name": "Muhammad Faqih Multazim",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-70",
+      "nis": "2026070",
+      "name": "Muhammad Zidan Dhiyauddin",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-71",
+      "nis": "2026071",
+      "name": "Rafasya Muhammad Firdaus An'Naba",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-72",
+      "nis": "2026072",
+      "name": "Vajradhatu Keinan Noor",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    },
+    {
+      "id": "santri-73",
+      "nis": "2026073",
+      "name": "Ziyad Alhaq",
+      "classId": "cls-7",
+      "createdAt": "2026-07-19T03:33:25.662Z",
+      "updatedAt": "2026-07-19T03:33:25.662Z"
+    }
+  ],
+  "nilai": [],
+  "activityLogs": [
+    {
+      "id": "log-1786207351495-0uqq",
+      "userId": "user-admin-1",
+      "userName": "Aqli",
+      "userRole": "Admin",
+      "action": "Tunjuk Wali Kelas",
+      "details": "Menunjuk Ustadz Muhammad Arya Mukti, Al Hafizh sebagai wali kelas I'dad Putra",
+      "timestamp": "2026-08-08T16:42:31.495Z"
+    },
+    {
+      "id": "log-1784615457604-z3vy",
+      "userId": "user-admin-1",
+      "userName": "Aqli",
+      "userRole": "Admin",
+      "action": "Login",
+      "details": "Berhasil melakukan login ke sistem.",
+      "timestamp": "2026-07-21T06:30:57.604Z"
+    },
+    {
+      "id": "log-seed-1",
+      "userId": "user-admin-1",
+      "userName": "Aidil Ibnu Salam",
+      "userRole": "Admin",
+      "action": "System Seed",
+      "details": "Sistem berhasil diinisialisasi dan data master berhasil di-seed.",
+      "timestamp": "2026-07-19T03:33:25.661Z"
+    }
+  ],
+  "raporDetails": [],
+  "pengumuman": [],
+  "evaluasiPembelajaran": []
 }

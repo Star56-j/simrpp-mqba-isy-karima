@@ -277,6 +277,7 @@ export interface RaporDetail {
   catatanWaliKelas: string;
   keputusanKenaikan: string;
   tanggapanOrangTua?: string;
+  nisn?: string;
   createdAt: string;
   updatedAt: string;
 }

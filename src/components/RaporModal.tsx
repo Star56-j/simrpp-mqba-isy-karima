@@ -24,6 +24,7 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
   const [ketidakhadiran, setKetidakhadiran] = React.useState({ sakit: 0, izin: 0, tanpaKeterangan: 0 });
   const [catatanWaliKelas, setCatatanWaliKelas] = React.useState('');
   const [keputusanKenaikan, setKeputusanKenaikan] = React.useState('');
+  const [nisn, setNisn] = React.useState('');
 
   React.useEffect(() => {
     api.getRaporDetail({ santriId: santri.id, academicYearId, semesterId }).then(res => {
@@ -36,6 +37,7 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
         setKetidakhadiran(data.ketidakhadiran || { sakit: 0, izin: 0, tanpaKeterangan: 0 });
         setCatatanWaliKelas(data.catatanWaliKelas || '');
         setKeputusanKenaikan(data.keputusanKenaikan || '');
+        setNisn(data.nisn || '');
       } else {
         // Init default empty values if not exists
         setKepribadian([
@@ -71,7 +73,8 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
       ekstrakurikuler,
       ketidakhadiran,
       catatanWaliKelas,
-      keputusanKenaikan
+      keputusanKenaikan,
+      nisn
     };
 
     try {
@@ -114,6 +117,21 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
             <div className="p-3 bg-rose-50 text-rose-700 text-sm rounded-xl">{error}</div>
           )}
 
+          {/* Student Identitas & NISN */}
+          <section className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+            <h4 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest mb-3">Identitas Administrasi</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-slate-500 block mb-1">Nama / NIS</label>
+                <input type="text" disabled value={`${santri.name} (${santri.nis})`} className="w-full px-3 py-2 border rounded-lg bg-slate-100 dark:bg-slate-800 dark:border-slate-700 text-sm text-slate-500 cursor-not-allowed" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 block mb-1">Nomor Induk Siswa Nasional (NISN)</label>
+                <input type="text" value={nisn} onChange={e => setNisn(e.target.value)} className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Masukkan NISN santri" />
+              </div>
+            </div>
+          </section>
+
           {/* Kepribadian */}
           <section>
             <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-3 border-b pb-2">A. KEPRIBADIAN</h3>
@@ -129,6 +147,9 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
                   <input type="text" value={item.deskripsi} onChange={e => {
                     const newArr = [...kepribadian]; newArr[idx].deskripsi = e.target.value; setKepribadian(newArr);
                   }} className="flex-[2] px-3 py-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700 text-sm" placeholder="Deskripsi" />
+                  <button onClick={() => {
+                    const newArr = [...kepribadian]; newArr.splice(idx, 1); setKepribadian(newArr);
+                  }} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg" title="Hapus"><Trash2 className="w-4 h-4"/></button>
                 </div>
               ))}
               <button onClick={() => setKepribadian([...kepribadian, { aspek: '', predikat: '', deskripsi: '' }])} className="text-xs text-indigo-600 font-semibold flex items-center">
@@ -149,6 +170,9 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
                   <input type="text" value={item.penilaian} onChange={e => {
                     const newArr = [...ketahfizhan]; newArr[idx].penilaian = e.target.value; setKetahfizhan(newArr);
                   }} className="flex-1 px-3 py-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700 text-sm" placeholder="Penilaian (Mampu/Kurang)" />
+                  <button onClick={() => {
+                    const newArr = [...ketahfizhan]; newArr.splice(idx, 1); setKetahfizhan(newArr);
+                  }} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg" title="Hapus"><Trash2 className="w-4 h-4"/></button>
                 </div>
               ))}
               <button onClick={() => setKetahfizhan([...ketahfizhan, { capaian: '', penilaian: '' }])} className="text-xs text-indigo-600 font-semibold flex items-center">

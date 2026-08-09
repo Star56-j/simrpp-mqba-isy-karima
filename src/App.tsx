@@ -42,6 +42,7 @@ import MasterSantri from './components/MasterSantri';
 import NilaiSantri from './components/NilaiSantri';
 import WaliDashboard from './components/WaliDashboard';
 import EvaluasiPembelajaranPage from './components/EvaluasiPembelajaran';
+import RekapRaporWaliKelas from './components/RekapRaporWaliKelas';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -421,6 +422,19 @@ export default function App() {
           />
         );
 
+      case 'rekap-rapor-wali-kelas':
+        return (
+          <RekapRaporWaliKelas
+            classes={classes}
+            academicYears={academicYears}
+            semesters={semesters}
+            subjects={subjects}
+            waliKelasList={waliKelas}
+            currentUser={user}
+            teachers={teachers}
+          />
+        );
+
       case 'evaluasi-pembelajaran':
         return (
           <EvaluasiPembelajaranPage
@@ -459,6 +473,7 @@ export default function App() {
       case 'santri-attendance': return 'Absensi Santri';
       case 'my-santri-attendance': return 'Absensi Santri';
       case 'wali-kelas': return 'Wali Kelas';
+      case 'rekap-rapor-wali-kelas': return 'Rekap Rapor Kelas Binaan';
       case 'profile-settings': return 'Pengaturan Profil';
       case 'pengumuman': return 'Pengumuman Akademik';
       case 'evaluasi-pembelajaran': return 'Evaluasi Pembelajaran Bulanan';

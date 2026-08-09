@@ -1,11 +1,12 @@
 import React from 'react';
 import {
   ClipboardList, Plus, Search, Filter, Edit, Trash2, X,
-  CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download
+  CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download, Printer
 } from 'lucide-react';
 import { Attendance, AttendanceSummary, Teacher, AcademicYear, Semester } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
+import { printRekapKehadiran } from '../utils/printRekapKehadiran';
 
 interface AttendanceAdminProps {
   teachers: Teacher[];
@@ -326,10 +327,20 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
 
           {/* Per-teacher table */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
                 Rekap Per Guru — {rekapLabel}
               </span>
+              <button
+                onClick={() => {
+                  const mName = MONTHS[Number(filterMonth) - 1];
+                  printRekapKehadiran(summary, academicYears, filterAY, mName, filterYear);
+                }}
+                className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Cetak Rekap</span>
+              </button>
             </div>
             {summary.length === 0 ? (
               <div className="p-10 text-center text-slate-400 text-sm">Belum ada data untuk periode ini.</div>

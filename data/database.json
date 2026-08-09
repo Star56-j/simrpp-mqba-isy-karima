@@ -703,16 +703,6 @@
       "semesterId": "sem-1"
     },
     {
-      "id": "sch-14",
-      "day": "Sabtu",
-      "time": "12:30 - 13:30",
-      "classId": "cls-2",
-      "teacherId": "teacher-7",
-      "subjectId": "sub-20",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
       "id": "sch-15",
       "day": "Ahad",
       "time": "10:00 - 11:30",
@@ -1013,16 +1003,6 @@
       "semesterId": "sem-1"
     },
     {
-      "id": "sch-45",
-      "day": "Selasa",
-      "time": "10:00 - 11:30",
-      "classId": "cls-5",
-      "teacherId": "teacher-10",
-      "subjectId": "sub-18",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
       "id": "sch-46",
       "day": "Selasa",
       "time": "10:00 - 11:30",
@@ -1113,92 +1093,12 @@
       "semesterId": "sem-1"
     },
     {
-      "id": "sch-55",
-      "day": "Selasa",
-      "time": "12:30 - 13:30",
-      "classId": "cls-1",
-      "teacherId": "teacher-6",
-      "subjectId": "sub-20",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
       "id": "sch-56",
       "day": "Selasa",
       "time": "12:30 - 13:30",
       "classId": "cls-2",
       "teacherId": "teacher-10",
       "subjectId": "sub-3",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-57",
-      "day": "Rabu",
-      "time": "07:30 - 08:45",
-      "classId": "cls-3",
-      "teacherId": "teacher-10",
-      "subjectId": "sub-19",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-58",
-      "day": "Rabu",
-      "time": "07:30 - 08:45",
-      "classId": "cls-4",
-      "teacherId": "teacher-7",
-      "subjectId": "sub-19",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-59",
-      "day": "Rabu",
-      "time": "07:30 - 08:45",
-      "classId": "cls-5",
-      "teacherId": "teacher-10",
-      "subjectId": "sub-19",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-60",
-      "day": "Rabu",
-      "time": "07:30 - 08:45",
-      "classId": "cls-6",
-      "teacherId": "teacher-7",
-      "subjectId": "sub-19",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-61",
-      "day": "Rabu",
-      "time": "07:30 - 08:45",
-      "classId": "cls-7",
-      "teacherId": "teacher-10",
-      "subjectId": "sub-19",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-62",
-      "day": "Rabu",
-      "time": "07:30 - 08:45",
-      "classId": "cls-1",
-      "teacherId": "teacher-6",
-      "subjectId": "sub-19",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-63",
-      "day": "Rabu",
-      "time": "07:30 - 08:45",
-      "classId": "cls-2",
-      "teacherId": "teacher-7",
-      "subjectId": "sub-19",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
     },
@@ -1459,26 +1359,6 @@
       "classId": "cls-7",
       "teacherId": "teacher-4",
       "subjectId": "sub-8",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-90",
-      "day": "Kamis",
-      "time": "12:30 - 13:30",
-      "classId": "cls-1",
-      "teacherId": "teacher-6",
-      "subjectId": "sub-20",
-      "academicYearId": "ay-1",
-      "semesterId": "sem-1"
-    },
-    {
-      "id": "sch-91",
-      "day": "Kamis",
-      "time": "12:30 - 13:30",
-      "classId": "cls-2",
-      "teacherId": "teacher-8",
-      "subjectId": "sub-20",
       "academicYearId": "ay-1",
       "semesterId": "sem-1"
     }

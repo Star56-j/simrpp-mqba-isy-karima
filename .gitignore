@@ -18,3 +18,8 @@ public/uploads/*
 data/*
 !data/.gitkeep
 !data/database.json
+
+# Ignore temporary browser user data and build pdf files
+.edge-user-data/
+panduan.html
+panduan.pdf

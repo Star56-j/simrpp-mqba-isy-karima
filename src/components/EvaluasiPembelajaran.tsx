@@ -17,10 +17,12 @@ import {
   Save,
   Users,
   BarChart3,
-  FileText
+  FileText,
+  Printer
 } from 'lucide-react';
 import { api } from '../api';
 import { EvaluasiPembelajaran, Teacher, Subject, SchoolClass, AcademicYear, Semester, TeachingSchedule } from '../types';
+import { printEvaluasi } from '../utils/printEvaluasi';
 
 const BULAN_NAMES = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
@@ -516,6 +518,10 @@ export default function EvaluasiPembelajaranPage({
                   <Trash2 className="w-3.5 h-3.5" /> Hapus
                 </button>
               )}
+              <button onClick={() => printEvaluasi(detailItem, academicYears, semesters)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 transition cursor-pointer">
+                <Printer className="w-3.5 h-3.5" /> Cetak
+              </button>
               <button onClick={() => setDetailItem(null)}
                 className="ml-auto px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer">
                 Tutup
@@ -672,13 +678,20 @@ export default function EvaluasiPembelajaranPage({
                         className="flex-1 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer flex items-center justify-center gap-1.5">
                         <BookOpen className="w-3.5 h-3.5" /> Detail
                       </button>
+                      <button onClick={() => printEvaluasi(ev, academicYears, semesters)}
+                        className="py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 transition cursor-pointer"
+                        title="Cetak Evaluasi">
+                        <Printer className="w-3.5 h-3.5" />
+                      </button>
                       <button onClick={() => handleOpenEdit(ev)}
-                        className="py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition cursor-pointer">
+                        className="py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition cursor-pointer"
+                        title="Edit">
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       {isAdmin && (
                         <button onClick={() => handleDelete(ev.id)}
-                          className="py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 transition cursor-pointer">
+                          className="py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 transition cursor-pointer"
+                          title="Hapus">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}

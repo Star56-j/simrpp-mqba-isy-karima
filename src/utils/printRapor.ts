@@ -417,7 +417,7 @@ export function printRapor(
         <!-- PAGE 1 FOOTER -->
         <div class="footer-logo-area">
           <div class="footer-logo-left">
-            <img src="/logo-mqba.png" alt="Logo MQBA" onerror="this.src='https://simrpp-mqba-isy-karima.pages.dev/logo-mqba.png'" />
+            <img src="/logo-mqba.png" alt="Logo MQBA" onerror="this.src='https://akademikmqbaisykarima.pages.dev/logo-mqba.png'" />
             <div class="footer-logo-left-text">
               <div class="yps">YAYASAN SOSIAL & PENDIDIKAN ISLAM ISY KARIMA</div>
               <div class="mqba">MA'HAD TAHFIZHUL QUR'AN ISY KARIMA</div>

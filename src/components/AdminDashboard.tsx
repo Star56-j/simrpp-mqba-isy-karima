@@ -289,25 +289,34 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
                     ? { bg: '#fef3c7', text: '#d97706' }
                     : { bg: '#f1f5f9', text: '#64748b' };
 
-                  const formatLogTime = (ts: string | number) => {
-                    if (!ts) return '-';
+                  const formatLogTime = (rawTs: any) => {
+                    if (!rawTs) return new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                     let date: Date;
-                    if (typeof ts === 'number') {
-                      date = new Date(ts > 1e11 ? ts : ts * 1000);
-                    } else if (!isNaN(Number(ts))) {
-                      const num = Number(ts);
-                      date = new Date(num > 1e11 ? num : num * 1000);
+                    if (rawTs instanceof Date) {
+                      date = rawTs;
+                    } else if (typeof rawTs === 'number') {
+                      date = new Date(rawTs > 1e11 ? rawTs : rawTs * 1000);
                     } else {
-                      date = new Date(ts);
+                      const str = String(rawTs).trim();
+                      if (!isNaN(Number(str)) && str.length > 0) {
+                        const num = Number(str);
+                        date = new Date(num > 1e11 ? num : num * 1000);
+                      } else {
+                        date = new Date(str);
+                      }
                     }
-                    if (isNaN(date.getTime())) return String(ts);
+
+                    if (isNaN(date.getTime())) {
+                      date = new Date();
+                    }
+
                     return date.toLocaleString('id-ID', {
                       day: 'numeric',
                       month: 'short',
                       hour: '2-digit',
                       minute: '2-digit',
                       hour12: false
-                    });
+                    }).replace('.', ':');
                   };
 
                   const roleDotColor = 

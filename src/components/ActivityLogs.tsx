@@ -92,18 +92,25 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
         <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
           {filteredLogs.length > 0 ? (
             filteredLogs.map((log) => {
-              const formatLogTimeFull = (ts: string | number) => {
-                if (!ts) return '-';
+              const formatLogTimeFull = (rawTs: any) => {
+                if (!rawTs) return new Date().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 let date: Date;
-                if (typeof ts === 'number') {
-                  date = new Date(ts > 1e11 ? ts : ts * 1000);
-                } else if (!isNaN(Number(ts))) {
-                  const num = Number(ts);
-                  date = new Date(num > 1e11 ? num : num * 1000);
+                if (rawTs instanceof Date) {
+                  date = rawTs;
+                } else if (typeof rawTs === 'number') {
+                  date = new Date(rawTs > 1e11 ? rawTs : rawTs * 1000);
                 } else {
-                  date = new Date(ts);
+                  const str = String(rawTs).trim();
+                  if (!isNaN(Number(str)) && str.length > 0) {
+                    const num = Number(str);
+                    date = new Date(num > 1e11 ? num : num * 1000);
+                  } else {
+                    date = new Date(str);
+                  }
                 }
-                if (isNaN(date.getTime())) return String(ts);
+                if (isNaN(date.getTime())) {
+                  date = new Date();
+                }
                 return date.toLocaleString('id-ID', {
                   day: 'numeric',
                   month: 'long',
@@ -112,7 +119,7 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
                   minute: '2-digit',
                   second: '2-digit',
                   hour12: false
-                });
+                }).replace('.', ':');
               };
 
               return (

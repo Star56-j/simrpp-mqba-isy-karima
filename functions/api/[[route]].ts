@@ -333,15 +333,15 @@ app.delete('/schedules/:id', async (c) => {
 // --- ACTIVITY LOGS ---
 app.get('/activity_logs', async (c) => {
   try {
-    const { results } = await c.env.DB.prepare(`SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT 100`).all();
+    const { results } = await c.env.DB.prepare(`SELECT * FROM activity_logs ORDER BY rowid DESC LIMIT 100`).all();
     const mapped = results.map((r: any) => ({
       id: r.id,
       userId: r.user_id,
-      userName: r.user_name,
-      userRole: r.user_role,
-      action: r.action,
-      details: r.details,
-      timestamp: r.timestamp
+      userName: r.user_name || 'Sistem',
+      userRole: r.user_role || 'Sistem',
+      action: r.action || 'Aktivitas',
+      details: r.details || '',
+      timestamp: r.timestamp || new Date().toISOString()
     }));
     return c.json(mapped);
   } catch (e: any) {
@@ -353,10 +353,11 @@ app.post('/activity_logs', async (c) => {
   try {
     const body = await c.req.json();
     const id = `log-${crypto.randomUUID()}`;
+    const nowIso = new Date().toISOString();
     await c.env.DB.prepare(`
       INSERT INTO activity_logs (id, user_id, user_name, user_role, action, details, timestamp)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(id, body.userId, body.userName, body.userRole, body.action, body.details, body.timestamp || new Date().toISOString()).run();
+    `).bind(id, body.userId, body.userName, body.userRole, body.action, body.details, body.timestamp || nowIso).run();
     return c.json({ success: true, id });
   } catch (e: any) {
     return c.json({ error: e.message }, 500);

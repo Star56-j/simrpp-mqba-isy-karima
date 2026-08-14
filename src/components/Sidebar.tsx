@@ -29,6 +29,8 @@ interface SidebarProps {
   onLogout: () => void;
   darkMode: boolean;
   setDarkMode: (dark: boolean) => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }
 
 export default function Sidebar({ 
@@ -37,9 +39,12 @@ export default function Sidebar({
   setView, 
   onLogout, 
   darkMode, 
-  setDarkMode 
+  setDarkMode,
+  isOpen,
+  setIsOpen
 }: SidebarProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+
+  const isWaliKelas = user.role === 'WaliKelas';
 
   const menuItems = user.role === 'Admin' ? [
     { id: 'admin-dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -48,18 +53,24 @@ export default function Sidebar({
     { id: 'master-classes', label: 'Data Kelas', icon: GraduationCap },
     { id: 'master-santri', label: 'Data Santri', icon: Users2 },
     { id: 'master-schedules', label: 'Jadwal KBM', icon: Calendar },
-    { id: 'my-rpps', label: 'Buat RPP', icon: FileText },
     { id: 'manage-rpps', label: 'Persetujuan RPP', icon: FileText },
-    { id: 'attendance', label: 'Rekap Absensi Guru', icon: FileSpreadsheet },
-    { id: 'my-attendance', label: 'Isi Absensi Guru', icon: FileSpreadsheet },
-    { id: 'santri-attendance', label: 'Rekap Absensi Santri', icon: Users2 },
-    { id: 'my-santri-attendance', label: 'Isi Absensi Santri', icon: Users2 },
+    { id: 'attendance', label: 'Data Absensi Guru', icon: FileSpreadsheet },
+    { id: 'santri-attendance', label: 'Data Absensi Santri', icon: Users2 },
     { id: 'wali-kelas', label: 'Wali Kelas', icon: Crown },
     { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
     { id: 'rekap-rapor-wali-kelas', label: 'Rekap Rapor Kelas', icon: FileSpreadsheet },
     { id: 'evaluasi-pembelajaran', label: 'Evaluasi Bulanan', icon: Activity },
     { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
     { id: 'activity-logs', label: 'Activity Log', icon: Activity },
+    { id: 'reset-requests', label: 'Reset Sandi Guru', icon: Lock },
+    { id: 'profile-settings', label: 'Profil Saya', icon: User },
+  ] : isWaliKelas ? [
+    { id: 'guru-dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'my-santri-attendance', label: 'Absensi Santri', icon: Users2 },
+    { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
+    { id: 'rekap-rapor-wali-kelas', label: 'Rekap Rapor Kelas', icon: FileSpreadsheet },
+    { id: 'evaluasi-pembelajaran', label: 'Evaluasi Bulanan', icon: Activity },
+    { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ] : [
     { id: 'guru-dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -75,32 +86,6 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Mobile Top Header */}
-      <header className="lg:hidden bg-indigo-800 text-white flex items-center justify-between px-4 py-3 sticky top-0 z-50 shadow-md">
-        <div className="flex items-center space-x-2">
-          <img src="/logo-mqba.png" alt="Logo MQBA" className="w-8 h-8 object-contain" />
-          <div>
-            <h1 className="text-xs font-bold leading-tight uppercase tracking-wider">Akademik MQBA Isy Karima</h1>
-            <p className="text-[9px] text-indigo-100 font-medium">Sistem Akademik</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <button 
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-1.5 rounded-lg hover:bg-indigo-700 transition"
-            title="Toggle Tema"
-          >
-            {darkMode ? <Sun className="w-5 h-5 text-amber-300" /> : <Moon className="w-5 h-5" />}
-          </button>
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-1.5 rounded-lg hover:bg-indigo-700 transition"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </header>
-
       {/* Sidebar Overlay for Mobile */}
       {isOpen && (
         <div 
@@ -111,61 +96,62 @@ export default function Sidebar({
 
       {/* Main Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-indigo-900 text-slate-100 flex flex-col justify-between shadow-xl transition-transform duration-300 transform 
+        fixed inset-y-0 left-0 z-40 w-64 text-slate-100 flex flex-col justify-between shadow-2xl transition-transform duration-300 transform 
         lg:translate-x-0 lg:static lg:h-full
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+      `} style={{background: 'linear-gradient(180deg, #0c4a6e 0%, #075985 40%, #0369a1 100%)'}}>
         {/* Logo Section */}
-        <div className="px-4 pt-5 pb-4 border-b border-indigo-800/60">
+        <div className="px-4 pt-5 pb-4 border-b border-sky-800/40">
           <div className="flex flex-col items-center text-center space-y-2">
-            <img
-              src="/logo-mqba.png"
-              alt="Logo MQBA Isy Karima"
-              className="w-20 h-20 object-contain drop-shadow-lg animate-float"
-            />
-            <div>
-              <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-tight">Akademik MQBA Isy Karima</h2>
-              <p className="text-[10px] text-indigo-300 font-semibold tracking-wider mt-0.5 uppercase">Sistem Akademik</p>
+            <div className="relative">
+              <img
+                src="/logo-mqba.png"
+                alt="Logo MQBA Isy Karima"
+                className="w-20 h-20 object-contain drop-shadow-lg animate-float"
+              />
+              <div className="absolute -inset-1 rounded-full" style={{background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)'}} />
             </div>
+            <div>
+              <h2 className="font-extrabold text-sm text-white uppercase tracking-widest leading-tight">Akademik MQBA</h2>
+              <p className="text-[10px] text-sky-300 font-semibold tracking-wider mt-0.5 uppercase">Isy Karima</p>
+            </div>
+            {/* Islamic star divider */}
+            <div className="text-sky-400/50 text-xs tracking-widest" aria-hidden="true">✦ ✦ ✦</div>
           </div>
         </div>
 
         {/* User Info Card + Actions */}
-        <div className="px-4 py-4.5 border-b border-indigo-800/40 bg-indigo-950/40 m-3 rounded-2xl border border-indigo-700/20 shadow-inner">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-indigo-700 flex items-center justify-center font-black text-sm text-white shadow-md border border-indigo-400/30 flex-shrink-0">
+        <div className="px-3 py-3 m-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-inner flex flex-col justify-center">
+          <div className="flex items-center space-x-3 text-left w-full">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-white shadow-md flex-shrink-0 bg-gradient-to-br from-sky-400 to-sky-600 ring-2 ring-transparent transition overflow-hidden">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-black text-white truncate tracking-wide leading-tight">{user.name}</p>
-              <span className="inline-flex items-center px-2 py-0.5 mt-1 rounded text-[8px] font-black bg-indigo-800/80 text-amber-300 uppercase tracking-widest border border-indigo-700/50">
-                {user.role === 'WaliSantri' ? 'Wali Santri' : user.role}
-              </span>
+              <p className="text-sm font-extrabold text-white truncate tracking-wide leading-tight" title={user.name}>{user.name}</p>
+              <div className="flex items-center space-x-2 mt-1">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black bg-sky-900/80 text-sky-200 uppercase tracking-widest border border-sky-600/50">
+                  {user.role === 'WaliSantri' ? 'Wali Santri' : user.role}
+                </span>
+                
+                {/* Actions next to role */}
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={() => setDarkMode(!darkMode)}
+                    className="p-1 rounded bg-white/5 hover:bg-white/20 text-sky-200 transition cursor-pointer"
+                    title={darkMode ? 'Mode Terang' : 'Mode Gelap'}
+                  >
+                    {darkMode ? <Sun className="w-3.5 h-3.5 text-amber-300" /> : <Moon className="w-3.5 h-3.5 text-sky-300" />}
+                  </button>
+                  <button
+                    onClick={() => { if (window.confirm('Apakah Anda yakin ingin keluar dari sistem?')) onLogout(); }}
+                    className="p-1 rounded bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 hover:text-rose-200 transition cursor-pointer"
+                    title="Keluar Sistem"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-indigo-800/30">
-            {/* Dark mode toggle */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-xl bg-indigo-900/50 hover:bg-indigo-800 text-indigo-100 transition cursor-pointer"
-              title={darkMode ? 'Mode Terang' : 'Mode Gelap'}
-            >
-              {darkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-indigo-300" />}
-            </button>
-            
-            {/* Quick dashboard shortcut */}
-            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">
-              MQBA SYS
-            </span>
-
-            {/* Logout */}
-            <button
-              onClick={() => { if (window.confirm('Apakah Anda yakin ingin keluar dari sistem?')) onLogout(); }}
-              className="p-2 rounded-xl bg-rose-950/20 hover:bg-rose-900/30 text-rose-300 hover:text-rose-200 transition cursor-pointer"
-              title="Keluar Sistem"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
         </div>
 
@@ -182,14 +168,14 @@ export default function Sidebar({
                   setIsOpen(false);
                 }}
                 className={`
-                  w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-xs uppercase tracking-wider transition-all duration-250 cursor-pointer hover:scale-[1.02] active:scale-[0.98]
+                  w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-semibold text-sm uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-[0.98]
                   ${isActive 
-                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-950/40 border border-indigo-500/20' 
-                    : 'text-indigo-200/90 hover:bg-indigo-800/40 hover:text-white'
+                    ? 'bg-white/20 text-white shadow-sm border border-white/15' 
+                    : 'text-white/90 hover:bg-white/10 hover:text-white'
                   }
                 `}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-indigo-300'}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-sky-100'}`} />
                 <span>{item.label}</span>
               </button>
             );
@@ -197,8 +183,8 @@ export default function Sidebar({
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-indigo-800/60 bg-indigo-950/40">
-          <p className="text-[10px] text-indigo-600 text-center font-semibold uppercase tracking-wider">Akademik MQBA Isy Karima © 2026</p>
+        <div className="p-4" style={{borderTop: '1px solid rgba(255,255,255,0.1)'}}>
+          <p className="text-[10px] text-white/70 text-center font-semibold uppercase tracking-wider">MQBA Isy Karima © 2026</p>
         </div>
       </aside>
     </>

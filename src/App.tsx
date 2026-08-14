@@ -16,9 +16,9 @@ import {
   GuruStats,
   Santri
 } from './types';
-import { Bell, Plus, Megaphone } from 'lucide-react';
+import { Bell, Plus, Megaphone, Menu } from 'lucide-react';
 import Pengumuman from './components/Pengumuman';
-import { dailyThemes } from './utils/themes';
+
 
 // Component Imports
 import Sidebar from './components/Sidebar';
@@ -43,10 +43,12 @@ import NilaiSantri from './components/NilaiSantri';
 import WaliDashboard from './components/WaliDashboard';
 import EvaluasiPembelajaranPage from './components/EvaluasiPembelajaran';
 import RekapRaporWaliKelas from './components/RekapRaporWaliKelas';
+import ResetRequests from './components/ResetRequests';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
   const [currentView, setView] = React.useState<string>('login');
+  const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(false);
   const [darkMode, setDarkMode] = React.useState<boolean>(() => {
     return localStorage.getItem('simrpp_theme') === 'dark' || 
       (!('simrpp_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -54,7 +56,6 @@ export default function App() {
   const [showNotif, setShowNotif] = React.useState(false);
   const notifRef = React.useRef<HTMLDivElement>(null);
   const [activeToast, setActiveToast] = React.useState<{ title: string; body: string } | null>(null);
-  const [themeName, setThemeName] = React.useState('');
 
   // Tutup notif kalau klik di luar
   React.useEffect(() => {
@@ -102,7 +103,10 @@ export default function App() {
     const activeUser = api.getCurrentUser();
     if (activeUser) {
       setUser(activeUser);
-      setView(activeUser.role === 'Admin' ? 'admin-dashboard' : 'guru-dashboard');
+      if (activeUser.role === 'Admin') setView('admin-dashboard');
+      else if (activeUser.role === 'WaliKelas') setView('wali-dashboard');
+      else if (activeUser.role === 'WaliSantri') setView('wali-santri-dashboard');
+      else setView('guru-dashboard');
     }
   }, []);
 
@@ -145,16 +149,7 @@ export default function App() {
     return () => clearInterval(interval);
   }, [user]);
 
-  // Penerapan Tema Islami Harian
-  React.useEffect(() => {
-    const day = new Date().getDay();
-    const activeTheme = dailyThemes[day];
-    setThemeName(activeTheme.description);
-    
-    Object.entries(activeTheme.colors).forEach(([shade, hex]) => {
-      document.documentElement.style.setProperty(`--islamic-indigo-${shade}`, hex);
-    });
-  }, []);
+
 
   // Fetch all app data when logged in
   const fetchData = async (currentUser: User | null = user) => {
@@ -258,28 +253,28 @@ export default function App() {
     }
 
     const defaultAdminStats: AdminStats = {
-      teachers: teachers.length || 27,
-      subjects: subjects.length || 18,
-      classes: classes.length || 7,
-      schedules: schedules.length || 91,
-      santri: santriList.length || 73,
+      teachers: teachers.length,
+      subjects: subjects.length,
+      classes: classes.length,
+      schedules: schedules.length,
+      santri: santriList.length,
       rpp: {
-        total: rpps.length || 2,
+        total: rpps.length,
         draft: rpps.filter(r => r.status === 'Draft').length,
         pending: rpps.filter(r => r.status === 'Menunggu Persetujuan').length,
-        approved: rpps.filter(r => r.status === 'Disetujui').length || 2,
+        approved: rpps.filter(r => r.status === 'Disetujui').length,
         revision: rpps.filter(r => r.status === 'Revisi').length,
       },
       activityLogs: activityLogs || []
     };
 
     const defaultGuruStats: GuruStats = {
-      mySchedulesCount: schedules.filter(s => s.teacherId === user?.teacherId).length || 4,
+      mySchedulesCount: schedules.filter(s => s.teacherId === user?.teacherId).length,
       rpp: {
-        total: rpps.filter(r => r.teacherId === user?.teacherId).length || 1,
+        total: rpps.filter(r => r.teacherId === user?.teacherId).length,
         draft: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Draft').length,
         pending: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Menunggu Persetujuan').length,
-        approved: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Disetujui').length || 1,
+        approved: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Disetujui').length,
         revision: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Revisi').length
       }
     };
@@ -352,6 +347,9 @@ export default function App() {
       case 'activity-logs':
         return <ActivityLogs logs={activityLogs} onRefresh={fetchData} />;
 
+      case 'reset-requests':
+        return <ResetRequests />;
+
       case 'attendance':
         return (
           <AttendanceAdmin
@@ -375,6 +373,7 @@ export default function App() {
             classes={classes}
             academicYears={academicYears}
             semesters={semesters}
+            santriList={santriList}
           />
         );
 
@@ -385,6 +384,7 @@ export default function App() {
             academicYears={academicYears}
             semesters={semesters}
             schedules={schedules}
+            santriList={santriList}
           />
         );
 
@@ -491,13 +491,23 @@ export default function App() {
         onLogout={handleLogout}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        isOpen={sidebarOpen}
+        setIsOpen={setSidebarOpen}
       />
 
       {/* Main Panel Content with Header & Footer */}
       <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden bg-slate-50 dark:bg-slate-950">
         {/* Dynamic Polished Header */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 flex items-center justify-between px-6 lg:px-8 shrink-0">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0">
           <div className="flex items-center space-x-3 min-w-0">
+            {/* Hamburger button for Mobile */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer"
+              title="Buka Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <h2 className="text-slate-800 dark:text-slate-100 font-extrabold text-sm lg:text-base tracking-tight truncate">
               {getViewTitle()}
             </h2>
@@ -587,7 +597,7 @@ export default function App() {
                 <span className="sm:hidden">Guru</span>
               </button>
             )}
-            {currentView === 'guru-dashboard' && (
+            {currentView === 'guru-dashboard' && user?.role === 'Guru' && (
               <button 
                 onClick={() => setView('my-rpps')}
                 className="px-3.5 py-1.5 lg:px-4 lg:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-extrabold uppercase tracking-wide shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
@@ -601,7 +611,7 @@ export default function App() {
         </header>
 
         {/* Scrollable Page Body */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto w-full mx-auto space-y-6">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full mx-auto space-y-4 sm:space-y-6">
           {renderContent()}
         </main>
 
@@ -609,11 +619,9 @@ export default function App() {
         <footer className="h-10 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 lg:px-8 flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 shrink-0 select-none">
           <div className="truncate flex items-center space-x-2">
             <span>© 2026 Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima. All rights reserved.</span>
-            {themeName && (
-              <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 font-bold uppercase tracking-wider">
-                Tema: {themeName}
-              </span>
-            )}
+            <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30 font-bold uppercase tracking-wider">
+              Tema: {darkMode ? 'Gelap' : 'Terang'}
+            </span>
           </div>
           <div className="flex items-center space-x-4 uppercase tracking-wider font-extrabold shrink-0">
             <span>v1.0.4 - React Node</span>

@@ -75,6 +75,8 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
             <option value="Semua">Semua Peran</option>
             <option value="Admin">Admin</option>
             <option value="Guru">Guru</option>
+            <option value="WaliKelas">Wali Kelas</option>
+            <option value="WaliSantri">Wali Santri</option>
           </select>
         </div>
       </div>
@@ -89,47 +91,71 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
 
         <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
           {filteredLogs.length > 0 ? (
-            filteredLogs.map((log) => (
-              <div 
-                key={log.id}
-                className="p-5 flex flex-col md:flex-row md:items-start justify-between gap-4 hover:bg-slate-50/30 dark:hover:bg-slate-950/10 transition"
-              >
-                <div className="flex items-start space-x-4 min-w-0">
-                  <div className={`p-2 rounded-xl flex-shrink-0
-                    ${log.userRole === 'Admin' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/25 dark:text-amber-400' : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/25 dark:text-indigo-400'}
-                  `}>
-                    <User className="w-4.5 h-4.5" />
-                  </div>
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center flex-wrap gap-2">
-                      <span className="font-extrabold text-xs text-slate-800 dark:text-slate-100">{log.userName}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider
-                        ${log.userRole === 'Admin' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'}
-                      `}>
-                        {log.userRole}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-mono">
-                      <strong className="text-slate-700 dark:text-slate-300">[{log.action}]</strong> — {log.details}
-                    </p>
-                  </div>
-                </div>
+            filteredLogs.map((log) => {
+              const formatLogTimeFull = (ts: string | number) => {
+                if (!ts) return '-';
+                let date: Date;
+                if (typeof ts === 'number') {
+                  date = new Date(ts > 1e11 ? ts : ts * 1000);
+                } else if (!isNaN(Number(ts))) {
+                  const num = Number(ts);
+                  date = new Date(num > 1e11 ? num : num * 1000);
+                } else {
+                  date = new Date(ts);
+                }
+                if (isNaN(date.getTime())) return String(ts);
+                return date.toLocaleString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false
+                });
+              };
 
-                <div className="flex items-center space-x-1.5 text-[10px] text-slate-400 font-mono flex-shrink-0 self-end md:self-start">
-                  <CalendarDays className="w-3.5 h-3.5 text-slate-300" />
-                  <span>
-                    {new Date(log.timestamp).toLocaleString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    })}
-                  </span>
+              return (
+                <div 
+                  key={log.id}
+                  className="p-5 flex flex-col md:flex-row md:items-start justify-between gap-4 hover:bg-slate-50/30 dark:hover:bg-slate-950/10 transition"
+                >
+                  <div className="flex items-start space-x-4 min-w-0">
+                    <div className={`p-2 rounded-xl flex-shrink-0
+                      ${log.userRole === 'Admin' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/25 dark:text-amber-400' :
+                        log.userRole === 'WaliKelas' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/25 dark:text-emerald-400' :
+                        log.userRole === 'WaliSantri' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/25 dark:text-purple-400' :
+                        'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/25 dark:text-indigo-400'}
+                    `}>
+                      <User className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center flex-wrap gap-2">
+                        <span className="font-extrabold text-xs text-slate-800 dark:text-slate-100">{log.userName}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider
+                          ${log.userRole === 'Admin' ? 'bg-amber-100 text-amber-800' :
+                            log.userRole === 'WaliKelas' ? 'bg-emerald-100 text-emerald-800' :
+                            log.userRole === 'WaliSantri' ? 'bg-purple-100 text-purple-800' :
+                            'bg-indigo-100 text-indigo-800'}
+                        `}>
+                          {log.userRole === 'WaliKelas' ? 'Wali Kelas' : log.userRole === 'WaliSantri' ? 'Wali Santri' : log.userRole}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-mono">
+                        <strong className="text-slate-700 dark:text-slate-300">[{log.action}]</strong> — {log.details}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5 text-[10px] text-slate-400 font-mono flex-shrink-0 self-end md:self-start">
+                    <CalendarDays className="w-3.5 h-3.5 text-slate-300" />
+                    <span>
+                      {formatLogTimeFull(log.timestamp)}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="py-16 text-center text-slate-400 space-y-2">
               <ShieldAlert className="w-12 h-12 text-slate-200 mx-auto" />

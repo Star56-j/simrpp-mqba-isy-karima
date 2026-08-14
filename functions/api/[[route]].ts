@@ -30,6 +30,21 @@ app.post('/auth/login', async (c) => {
         (user.passwordHash && user.passwordHash.toLowerCase() === password.toLowerCase());
 
       if (isPassValid) {
+        // Catat aktivitas login ke D1 Database
+        const logId = `log-${crypto.randomUUID()}`;
+        await c.env.DB.prepare(`
+          INSERT INTO activity_logs (id, user_id, user_name, user_role, action, details, timestamp)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          logId,
+          user.id,
+          user.name,
+          user.role,
+          'Login',
+          `Pengguna ${user.name} (${user.role}) berhasil masuk ke sistem.`,
+          new Date().toISOString()
+        ).run().catch(() => {});
+
         if (user.teacher_id) {
            const teacher = await c.env.DB.prepare('SELECT * FROM teachers WHERE id = ?').bind(user.teacher_id).first();
            user.teacher = teacher;
@@ -56,6 +71,22 @@ app.post('/auth/wali-login', async (c) => {
       role: 'WaliSantri',
       santriId: `santri-demo`
     };
+
+    // Catat aktivitas login wali ke D1 Database
+    const logId = `log-${crypto.randomUUID()}`;
+    await c.env.DB.prepare(`
+      INSERT INTO activity_logs (id, user_id, user_name, user_role, action, details, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      logId,
+      user.id,
+      user.name,
+      user.role,
+      'Login Wali',
+      `Wali Santri (${user.name}) berhasil masuk ke portal wali.`,
+      new Date().toISOString()
+    ).run().catch(() => {});
+
     return c.json({ token: user.id, user });
   }
   return c.json({ error: 'Data santri tidak ditemukan.' }, 401);

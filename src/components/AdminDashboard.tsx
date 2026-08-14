@@ -11,10 +11,11 @@ import {
   FileEdit,
   ArrowRight,
   Activity,
-  User,
   ExternalLink,
-  Star,
-  Sparkles
+  Sparkles,
+  TrendingUp,
+  Bell,
+  LayoutGrid
 } from 'lucide-react';
 import { AdminStats, RPP } from '../types';
 import { api } from '../api';
@@ -26,330 +27,219 @@ interface AdminDashboardProps {
   rpps: RPP[];
 }
 
-/* ═══ SVG Ornamen Bintang Octagonal Abbasiyah ═══ */
-function OctagonalStar({ className = '', size = 40 }: { className?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" className={className} fill="none">
-      {/* Bintang octagonal — simbol ilmu pengetahuan era Abbasiyah */}
-      <polygon
-        points="50,2 61,28 90,10 72,39 98,50 72,61 90,90 61,72 50,98 39,72 10,90 28,61 2,50 28,39 10,10 39,28"
-        fill="currentColor"
-        opacity="0.15"
-      />
-      <polygon
-        points="50,15 58,35 80,22 67,42 85,50 67,58 80,78 58,65 50,85 42,65 20,78 33,58 15,50 33,42 20,22 42,35"
-        fill="currentColor"
-        opacity="0.25"
-      />
-    </svg>
-  );
-}
-
-/* ═══ SVG Lengkungan Tapal Kuda (Horseshoe Arch) ═══ */
-function HorseshoeArch({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 200 60" className={className} fill="none" preserveAspectRatio="none">
-      <path
-        d="M0,60 L0,30 Q0,0 30,0 L170,0 Q200,0 200,30 L200,60"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        opacity="0.15"
-      />
-      <path
-        d="M10,60 L10,32 Q10,8 35,8 L165,8 Q190,8 190,32 L190,60"
-        stroke="currentColor"
-        strokeWidth="0.8"
-        opacity="0.08"
-      />
-    </svg>
-  );
-}
-
-/* ═══ Dekoratif border emas di bawah header ═══ */
-function GoldDivider() {
-  return (
-    <div className="flex items-center justify-center space-x-2 py-1">
-      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-      <svg width="16" height="16" viewBox="0 0 100 100" className="text-amber-500/40 flex-shrink-0">
-        <polygon
-          points="50,0 61,28 93,10 72,39 100,50 72,61 93,90 61,72 50,100 39,72 7,90 28,61 0,50 28,39 7,10 39,28"
-          fill="currentColor"
-        />
-      </svg>
-      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-    </div>
-  );
-}
+const HADITH = [
+  { text: '"Tuntutlah ilmu walau sampai ke negeri Tiongkok."', src: 'HR. Ibnu Majah' },
+  { text: '"Barang siapa menempuh jalan untuk mencari ilmu, Allah akan memudahkan jalannya menuju surga."', src: 'HR. Muslim' },
+  { text: '"Sebaik-baik manusia adalah yang paling bermanfaat bagi orang lain."', src: 'HR. Ahmad' },
+];
 
 export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboardProps) {
   const pendingRpps = rpps.filter(r => r.status === 'Menunggu Persetujuan').slice(0, 5);
+  const hadith = HADITH[new Date().getDate() % HADITH.length];
+
+  const statCards = [
+    { label: 'Data Guru', val: stats.teachers, icon: Users,          color: '#0ea5e9', bg: '#e0f2fe', view: 'master-teachers',  desc: 'Pengajar aktif', trend: '+2 bulan ini' },
+    { label: 'Data Santri', val: stats.santri, icon: GraduationCap,  color: '#8b5cf6', bg: '#ede9fe', view: 'master-santri',   desc: 'Santri terdaftar', trend: `${stats.santri} total` },
+    { label: 'Mata Pelajaran', val: stats.subjects, icon: BookOpen,  color: '#10b981', bg: '#d1fae5', view: 'master-subjects', desc: 'Mapel terdaftar', trend: 'I\'dad & Wustho' },
+    { label: 'Data Kelas', val: stats.classes, icon: LayoutGrid,     color: '#f59e0b', bg: '#fef3c7', view: 'master-classes',  desc: 'Kelas aktif', trend: '7 kelas' },
+    { label: 'Jadwal KBM', val: stats.schedules, icon: Calendar,     color: '#ef4444', bg: '#fee2e2', view: 'master-schedules',desc: 'Sesi mengajar', trend: 'Semester ini' },
+  ];
+
+  const quickActions = [
+    { label: 'RPP Masuk', val: stats.rpp.pending, color: '#f59e0b', view: 'manage-rpps', icon: Clock },
+    { label: 'Disetujui', val: stats.rpp.approved, color: '#10b981', view: 'manage-rpps', icon: CheckCircle },
+    { label: 'Perlu Revisi', val: stats.rpp.revision, color: '#ef4444', view: 'manage-rpps', icon: AlertCircle },
+    { label: 'Total RPP', val: stats.rpp.total, color: '#0ea5e9', view: 'manage-rpps', icon: FileText },
+  ];
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* ═══════════ HERO HEADER — Tema Dinasti Abbasiyah ═══════════ */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-950 rounded-2xl shadow-2xl shadow-indigo-950/40 border border-indigo-800/40">
-        {/* Layer 1: Background Image — Baghdad / Baitul Hikmah */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-2xl">
-          <img 
-            src="/abbasid-bg.png" 
-            alt="Kejayaan Dinasti Abbasiyah — Baghdad" 
-            className="w-full h-full object-cover object-center opacity-30 mix-blend-screen"
-          />
-        </div>
+    <div className="space-y-6 animate-fade-in">
 
-        {/* Layer 2: Pola Geometris Abbasiyah */}
-        <div className="absolute inset-0 z-[1] abbasid-geometric pointer-events-none" />
+      {/* ── HERO BANNER ── */}
+      <div className="relative overflow-hidden rounded-3xl" style={{
+        background: 'linear-gradient(135deg, #0c4a6e 0%, #0369a1 45%, #0ea5e9 100%)',
+        minHeight: 200
+      }}>
+        {/* Islamic geometric pattern overlay */}
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpolygon points='50,5 61,35 93,35 68,57 79,88 50,70 21,88 32,57 7,35 39,35' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E")`,
+          backgroundSize: '100px 100px'
+        }} />
+        {/* Gradient blobs */}
+        <div className="absolute top-0 right-0 w-80 h-80 rounded-full opacity-20" style={{background: 'radial-gradient(circle, #38bdf8 0%, transparent 70%)', transform: 'translate(30%, -30%)'}} />
+        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-15" style={{background: 'radial-gradient(circle, #0c4a6e 0%, transparent 70%)', transform: 'translate(-30%, 30%)'}} />
 
-        {/* Layer 3: Gradient Overlay */}
-        <div className="absolute inset-0 z-[2] bg-gradient-to-r from-indigo-950/95 via-indigo-900/70 to-indigo-950/50 pointer-events-none" />
-        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-indigo-950/80 via-transparent to-transparent pointer-events-none" />
-
-        {/* Layer 4: Decorative Stars */}
-        <OctagonalStar className="absolute top-3 right-8 z-[3] text-amber-400 animate-twinkle" size={32} />
-        <OctagonalStar className="absolute top-12 right-32 z-[3] text-amber-400 animate-twinkle-delay" size={20} />
-        <OctagonalStar className="absolute bottom-8 right-16 z-[3] text-amber-400 animate-twinkle-slow" size={24} />
-        <OctagonalStar className="absolute top-6 right-56 z-[3] text-amber-300 animate-twinkle-slow" size={14} />
-
-        {/* Gold shimmer line di atas */}
-        <div className="absolute top-0 left-0 right-0 h-1 z-[4] gold-shimmer" />
-
-        {/* Konten Header */}
-        <div className="relative z-10 p-6 lg:p-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-3">
-              {/* Label & Ornamen */}
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-1.5">
-                  <svg width="14" height="14" viewBox="0 0 100 100" className="text-amber-400">
-                    <polygon points="50,0 61,28 93,10 72,39 100,50 72,61 93,90 61,72 50,100 39,72 7,90 28,61 0,50 28,39 7,10 39,28" fill="currentColor" />
-                  </svg>
-                  <span className="w-8 h-0.5 bg-amber-400 rounded-full" />
-                </div>
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-[0.2em]">
-                  Akademik MQBA Isy Karima
-                </span>
+        <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-4 max-w-2xl">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5">
+                <span className="w-2 h-2 bg-sky-300 rounded-full animate-pulse" />
+                <span className="text-sky-100 text-xs font-bold uppercase tracking-widest">Akademik MQBA Isy Karima</span>
               </div>
 
-              {/* Judul */}
-              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-                Dashboard Administrasi
-              </h1>
-
-              {/* Deskripsi */}
-              <p className="text-indigo-200/80 text-sm max-w-lg leading-relaxed">
-                Ringkasan data akademik dan status rencana pembelajaran
-                Markaz Qur'an dan Bahasa Arab Isy Karima.
-              </p>
-
-              {/* Quote Inspiratif */}
-              <div className="flex items-start space-x-2 mt-1 pt-3 border-t border-amber-400/10">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400/60 mt-0.5 flex-shrink-0" />
-                <p className="text-[11px] text-amber-200/50 italic leading-relaxed max-w-md font-arabic">
-                  "Tuntutlah ilmu walau sampai ke negeri Tiongkok."
-                  <span className="not-italic text-[10px] text-amber-400/40 ml-1.5 font-sans">— HR. Ibnu Majah</span>
+              {/* Title */}
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+                  Dashboard Administrasi
+                </h1>
+                <p className="text-sky-200/80 text-sm mt-2 leading-relaxed">
+                  Kelola seluruh data akademik, RPP, dan aktivitas pembelajaran secara terpusat.
                 </p>
               </div>
-            </div>
-            
-            <RealTimeClock />
-          </div>
 
-          {/* Gold Divider di bawah */}
-          <div className="mt-6">
-            <GoldDivider />
+              {/* Hadith */}
+              <div className="flex items-start gap-2 bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 border border-white/10 max-w-lg">
+                <Sparkles className="w-3.5 h-3.5 text-sky-300 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sky-100/80 text-xs italic leading-relaxed">{hadith.text}</p>
+                  <p className="text-sky-300/60 text-[10px] mt-1 font-semibold">— {hadith.src}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side: Clock */}
+            <div className="flex-shrink-0 flex flex-col items-center gap-4 hidden sm:flex">
+              <RealTimeClock />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ═══════════ STATS GRID — Aksen Emas Abbasiyah ═══════════ */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[
-          { 
-            label: 'Data Guru', 
-            val: stats.teachers, 
-            icon: Users, 
-            gradient: 'from-indigo-600 to-indigo-700',
-            glow: 'bg-indigo-500',
-            view: 'master-teachers',
-            desc: 'Pengajar MQBA'
-          },
-          { 
-            label: 'Data Santri', 
-            val: stats.santri, 
-            icon: Users, 
-            gradient: 'from-amber-500 to-amber-600',
-            glow: 'bg-amber-500',
-            view: 'master-santri',
-            desc: 'Santri aktif'
-          },
-          { 
-            label: 'Mata Pelajaran', 
-            val: stats.subjects, 
-            icon: BookOpen, 
-            gradient: 'from-teal-500 to-teal-600',
-            glow: 'bg-teal-500',
-            view: 'master-subjects',
-            desc: 'Mapel terdaftar'
-          },
-          { 
-            label: 'Data Kelas', 
-            val: stats.classes, 
-            icon: GraduationCap, 
-            gradient: 'from-indigo-700 to-indigo-800',
-            glow: 'bg-indigo-600',
-            view: 'master-classes',
-            desc: 'I\'dad & Wustho'
-          },
-          { 
-            label: 'Jadwal KBM', 
-            val: stats.schedules, 
-            icon: Calendar, 
-            gradient: 'from-teal-600 to-teal-700',
-            glow: 'bg-teal-600',
-            view: 'master-schedules',
-            desc: 'Sesi aktif mengajar'
-          },
-        ].map((item, idx) => (
-          <div 
-            key={idx} 
+      {/* ── STAT CARDS ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {statCards.map((item, i) => (
+          <button
+            key={i}
             onClick={() => onNavigate(item.view)}
-            className="group relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm transition-all duration-300 cursor-pointer overflow-hidden abbasid-border-top premium-card"
+            className="group relative bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left overflow-hidden cursor-pointer"
           >
-            {/* Decorative glow */}
-            <div className={`absolute top-0 right-0 w-28 h-28 ${item.glow} opacity-[0.04] blur-2xl rounded-full transition-all duration-300 group-hover:scale-150 group-hover:opacity-[0.08]`} />
-            
-            <div className="flex items-start justify-between relative z-10">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</span>
-                <p className="text-3xl font-black text-slate-800 dark:text-white">{item.val}</p>
-                <span className="text-[11px] text-slate-400 dark:text-slate-500 block">{item.desc}</span>
-              </div>
-              <div className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-md shadow-indigo-950/10`}>
-                <item.icon className="w-5 h-5" />
-              </div>
+            {/* Glow bg */}
+            <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: `radial-gradient(circle, ${item.color}20 0%, transparent 70%)`, transform: 'translate(30%, -30%)'}} />
+
+            {/* Icon */}
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-transform duration-200 group-hover:scale-110" style={{background: item.bg}}>
+              <item.icon className="w-5 h-5" style={{color: item.color}} />
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800/50 flex items-center text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-1 transition-transform duration-200">
-              <span>Kelola data</span>
-              <ArrowRight className="w-3.5 h-3.5 ml-1" />
+
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</p>
+              <p className="text-3xl font-black text-slate-800 dark:text-white">{item.val}</p>
+              <p className="text-[11px] text-slate-400">{item.desc}</p>
             </div>
-          </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide transition-all duration-200 group-hover:gap-2" style={{color: item.color}}>
+              <span>Kelola</span>
+              <ArrowRight className="w-3 h-3" />
+            </div>
+          </button>
         ))}
       </div>
 
-      {/* ═══════════ RPP STATUS — Alur Persetujuan ═══════════ */}
+      {/* ── MAIN CONTENT GRID ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* RPP Overview Circular Chart */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs flex flex-col justify-between abbasid-border-top">
-          <div className="border-b border-slate-100 dark:border-slate-800/60 pb-4">
-            <h3 className="font-bold text-slate-800 dark:text-white text-base">Alur Persetujuan RPP</h3>
-            <p className="text-slate-400 text-xs mt-0.5">Statistik sebaran status RPP</p>
-          </div>
-          
-          <div className="py-6 flex items-center justify-center relative">
-            {/* Visual Progress Doughnut Ring using SVG */}
-            <svg className="w-36 h-36 transform -rotate-90">
-              <circle cx="72" cy="72" r="60" className="stroke-slate-100 dark:stroke-slate-800 fill-none" strokeWidth="12" />
-              {/* Approved Arc */}
-              <circle 
-                cx="72" 
-                cy="72" 
-                r="60" 
-                className="stroke-indigo-500 fill-none" 
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 60}`}
-                strokeDashoffset={`${2 * Math.PI * 60 * (1 - (stats.rpp.approved / (stats.rpp.total || 1)))}`}
-                style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
-              />
-            </svg>
-            <div className="absolute text-center">
-              <span className="text-2xl font-black text-slate-800 dark:text-white">{stats.rpp.total}</span>
-              <span className="block text-[10px] text-slate-400 uppercase tracking-widest font-bold">Total RPP</span>
+
+        {/* RPP Status Card */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+          {/* Header */}
+          <div className="px-6 py-5 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-800 dark:text-white text-sm">Status RPP</h3>
+              <p className="text-slate-400 text-xs mt-0.5">Rencana Pelaksanaan Pembelajaran</p>
+            </div>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background: '#e0f2fe'}}>
+              <FileText className="w-4 h-4" style={{color: '#0284c7'}} />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/60">
-            <div className="bg-indigo-50 dark:bg-indigo-950/20 p-2.5 rounded-xl border border-indigo-100/55 dark:border-indigo-900/30 flex items-center space-x-2.5">
-              <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
-              <div>
-                <span className="block text-[10px] text-indigo-700 dark:text-indigo-400 font-semibold leading-none uppercase">Disetujui</span>
-                <span className="text-sm font-extrabold text-indigo-900 dark:text-white mt-0.5 block">{stats.rpp.approved}</span>
+          {/* Donut chart */}
+          <div className="px-6 py-6 flex items-center justify-center">
+            <div className="relative">
+              <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#f1f5f9" strokeWidth="12" />
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#0ea5e9" strokeWidth="12"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 50}`}
+                  strokeDashoffset={`${2 * Math.PI * 50 * (1 - (stats.rpp.approved / (stats.rpp.total || 1)))}`}
+                  style={{transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1)'}}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-black text-slate-800 dark:text-white">{stats.rpp.total}</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total RPP</span>
               </div>
             </div>
-            <div className="bg-amber-50 dark:bg-amber-950/20 p-2.5 rounded-xl border border-amber-100/55 dark:border-amber-900/30 flex items-center space-x-2.5">
-              <Clock className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              <div>
-                <span className="block text-[10px] text-amber-700 dark:text-amber-400 font-semibold leading-none uppercase">Menunggu</span>
-                <span className="text-sm font-extrabold text-amber-900 dark:text-white mt-0.5 block">{stats.rpp.pending}</span>
-              </div>
-            </div>
-            <div className="bg-rose-50 dark:bg-rose-950/20 p-2.5 rounded-xl border border-rose-100/55 dark:border-rose-900/30 flex items-center space-x-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-              <div>
-                <span className="block text-[10px] text-rose-700 dark:text-rose-400 font-semibold leading-none uppercase">Revisi</span>
-                <span className="text-sm font-extrabold text-rose-900 dark:text-white mt-0.5 block">{stats.rpp.revision}</span>
-              </div>
-            </div>
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center space-x-2.5">
-              <FileEdit className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <div>
-                <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-semibold leading-none uppercase">Draft</span>
-                <span className="text-sm font-extrabold text-slate-800 dark:text-white mt-0.5 block">{stats.rpp.draft}</span>
-              </div>
-            </div>
+          </div>
+
+          {/* Stats grid */}
+          <div className="px-6 pb-6 grid grid-cols-2 gap-2.5">
+            {quickActions.map((a, i) => (
+              <button key={i} onClick={() => onNavigate(a.view)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl border transition-all hover:opacity-80 cursor-pointer text-left"
+                style={{background: `${a.color}10`, borderColor: `${a.color}25`}}
+              >
+                <a.icon className="w-4 h-4 flex-shrink-0" style={{color: a.color}} />
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-wide" style={{color: a.color}}>{a.label}</p>
+                  <p className="text-sm font-black text-slate-800 dark:text-white">{a.val}</p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Pending Approval List */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs flex flex-col justify-between abbasid-border-top">
-          <div>
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-4">
-              <div>
-                <h3 className="font-bold text-slate-800 dark:text-white text-base">Antrean Persetujuan RPP</h3>
-                <p className="text-slate-400 text-xs mt-0.5">Rencana pembelajaran baru dari guru menunggu review</p>
-              </div>
-              <button 
-                onClick={() => onNavigate('manage-rpps')}
-                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center space-x-1"
-              >
-                <span>Semua</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
+        {/* Pending RPP list */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+          <div className="px-6 py-5 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-800 dark:text-white text-sm">Antrean Persetujuan RPP</h3>
+              <p className="text-slate-400 text-xs mt-0.5">RPP baru dari guru yang menunggu review</p>
             </div>
+            <button
+              onClick={() => onNavigate('manage-rpps')}
+              className="flex items-center gap-1.5 text-xs font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 transition"
+            >
+              <span>Semua</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
+          <div className="flex-1 p-6">
             {pendingRpps.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 space-y-2">
-                <CheckCircle className="w-12 h-12 text-indigo-500/20 mx-auto" />
-                <p className="text-sm font-medium">Bagus sekali! Semua RPP telah direview.</p>
-                <p className="text-xs text-slate-400">Tidak ada pengajuan RPP baru yang masuk.</p>
+              <div className="h-full flex flex-col items-center justify-center py-12 gap-3 text-center">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{background: '#e0f2fe'}}>
+                  <CheckCircle className="w-8 h-8" style={{color: '#0284c7'}} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Semua RPP telah direview!</p>
+                  <p className="text-xs text-slate-400 mt-1">Tidak ada pengajuan RPP baru yang masuk.</p>
+                </div>
               </div>
             ) : (
-              <div className="space-y-3.5">
+              <div className="space-y-3">
                 {pendingRpps.map((rpp) => (
-                  <div 
-                    key={rpp.id}
-                    className="flex items-center justify-between p-3.5 rounded-xl border border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition"
+                  <div key={rpp.id}
+                    className="group flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-sky-200 dark:hover:border-sky-900/50 hover:bg-sky-50/30 dark:hover:bg-sky-950/10 transition-all duration-200"
                   >
-                    <div className="flex items-start space-x-3.5 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold flex-shrink-0 text-sm">
-                        {rpp.teacher?.name.replace(/Ust\.?\s*|Usth\.?\s*/g, '').charAt(0)}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #0ea5e9, #0284c7)'}}>
+                        {(rpp.teacher?.name || 'U').replace(/Ust\.?\s*|Usth\.?\s*/g, '').charAt(0)}
                       </div>
                       <div className="min-w-0">
-                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rpp.teacher?.name}</span>
-                        <span className="text-[11px] text-slate-400 flex items-center space-x-1.5 mt-0.5">
-                          <span className="font-semibold text-indigo-600 dark:text-indigo-400">{rpp.subject?.name}</span>
-                          <span>•</span>
-                          <span>Kelas {rpp.class?.name}</span>
-                          <span>•</span>
-                          <span>TA {rpp.academicYear?.name || '-'}</span>
-                        </span>
+                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rpp.teacher?.name}</p>
+                        <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-0.5">
+                          <span className="font-semibold text-sky-600 dark:text-sky-400">{rpp.subject?.name}</span>
+                          <span>·</span>
+                          <span>{rpp.class?.name}</span>
+                        </div>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => onNavigate('manage-rpps')}
-                      className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] tracking-wide uppercase shadow-xs transition"
+                      className="ml-3 px-3 py-1.5 rounded-lg text-white text-[11px] font-bold tracking-wide uppercase transition-all hover:opacity-90 active:scale-95 flex-shrink-0"
+                      style={{background: 'linear-gradient(135deg, #0284c7, #0369a1)'}}
                     >
-                      Proses
+                      Review
                     </button>
                   </div>
                 ))}
@@ -357,73 +247,98 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
             )}
           </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-center">
-            <span className="text-xs text-slate-400">
-              Menampilkan {Math.min(pendingRpps.length, 5)} dari {stats.rpp.pending} antrean persetujuan.
-            </span>
-          </div>
+          {pendingRpps.length > 0 && (
+            <div className="px-6 pb-4 pt-0 text-center">
+              <p className="text-xs text-slate-400">
+                Menampilkan {Math.min(pendingRpps.length, 5)} dari {stats.rpp.pending} antrean
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ═══════════ ACTIVITY LOGS ═══════════ */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs abbasid-border-top">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-4">
+      {/* ── ACTIVITY LOG ── */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-slate-800 dark:text-white text-base">Log Aktivitas Terbaru</h3>
-            <p className="text-slate-400 text-xs mt-0.5">Rekam jejak tindakan admin dan pengajar secara real-time</p>
+            <h3 className="font-bold text-slate-800 dark:text-white text-sm">Log Aktivitas Terbaru</h3>
+            <p className="text-slate-400 text-xs mt-0.5">Rekam jejak tindakan admin & pengajar secara realtime</p>
           </div>
-          <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/30">
-            <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background: '#e0f2fe'}}>
+            <Activity className="w-4 h-4" style={{color: '#0284c7'}} />
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th className="pb-3 w-40">Waktu</th>
-                <th className="pb-3 w-44">Pengguna</th>
-                <th className="pb-3 w-40">Tindakan</th>
-                <th className="pb-3">Keterangan</th>
+              <tr className="border-b border-slate-50 dark:border-slate-800">
+                {['Waktu', 'Pengguna', 'Tindakan', 'Keterangan'].map((h) => (
+                  <th key={h} className="px-6 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-xs">
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
               {stats.activityLogs && stats.activityLogs.length > 0 ? (
-                stats.activityLogs.slice(0, 5).map((log) => (
-                  <tr key={log.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                    <td className="py-3 text-slate-400">
-                      {new Date(log.timestamp).toLocaleString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </td>
-                    <td className="py-3 font-semibold text-slate-800 dark:text-slate-200">
-                      <div className="flex items-center space-x-2">
-                        <span className={`w-2 h-2 rounded-full ${log.userRole === 'Admin' ? 'bg-amber-500' : 'bg-indigo-500'}`}></span>
-                        <span className="truncate max-w-40">{log.userName}</span>
-                      </div>
-                    </td>
-                    <td className="py-3">
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
-                        ${log.action.includes('Buat') || log.action.includes('Tambah') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30' : ''}
-                        ${log.action.includes('Hapus') ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30' : ''}
-                        ${log.action.includes('Review') || log.action.includes('Salin') ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30' : ''}
-                        ${!log.action.includes('Buat') && !log.action.includes('Tambah') && !log.action.includes('Hapus') && !log.action.includes('Review') && !log.action.includes('Salin') ? 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-100 dark:border-slate-700' : ''}
-                      `}>
-                        {log.action}
-                      </span>
-                    </td>
-                    <td className="py-3 text-slate-500 dark:text-slate-400 max-w-xs truncate" title={log.details}>
-                      {log.details}
-                    </td>
-                  </tr>
-                ))
+                stats.activityLogs.slice(0, 6).map((log) => {
+                  const actionColor = log.action.includes('Buat') || log.action.includes('Tambah')
+                    ? { bg: '#e0f2fe', text: '#0284c7' }
+                    : log.action.includes('Hapus')
+                    ? { bg: '#fee2e2', text: '#dc2626' }
+                    : log.action.includes('Review') || log.action.includes('Salin')
+                    ? { bg: '#fef3c7', text: '#d97706' }
+                    : { bg: '#f1f5f9', text: '#64748b' };
+
+                  const formatLogTime = (ts: string | number) => {
+                    if (!ts) return '-';
+                    let date: Date;
+                    if (typeof ts === 'number') {
+                      date = new Date(ts > 1e11 ? ts : ts * 1000);
+                    } else if (!isNaN(Number(ts))) {
+                      const num = Number(ts);
+                      date = new Date(num > 1e11 ? num : num * 1000);
+                    } else {
+                      date = new Date(ts);
+                    }
+                    if (isNaN(date.getTime())) return String(ts);
+                    return date.toLocaleString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    });
+                  };
+
+                  const roleDotColor = 
+                    log.userRole === 'Admin' ? 'bg-amber-500' :
+                    log.userRole === 'WaliKelas' ? 'bg-emerald-500' :
+                    log.userRole === 'WaliSantri' ? 'bg-purple-500' :
+                    'bg-sky-500';
+
+                  return (
+                    <tr key={log.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                      <td className="px-6 py-3.5 text-xs text-slate-400 whitespace-nowrap">
+                        {formatLogTime(log.timestamp)}
+                      </td>
+                      <td className="px-6 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${roleDotColor}`} />
+                          <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[140px]">{log.userName}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide" style={{background: actionColor.bg, color: actionColor.text}}>
+                          {log.action}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3.5 text-xs text-slate-500 dark:text-slate-400 max-w-xs truncate">{log.details}</td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-slate-400">
+                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-slate-400">
                     Belum ada log aktivitas terdaftar.
                   </td>
                 </tr>
@@ -432,6 +347,7 @@ export default function AdminDashboard({ stats, onNavigate, rpps }: AdminDashboa
           </table>
         </div>
       </div>
+
     </div>
   );
 }

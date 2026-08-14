@@ -32,9 +32,9 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
   const [errorMessage, setErrorMessage] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
 
-  const filteredTeachers = teachers.filter(t => 
-    t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTeachers = (teachers || []).filter(t => 
+    (t.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (t.email || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const openAddModal = () => {
@@ -141,7 +141,8 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
 
         {/* Teachers Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          {/* Desktop Table */}
+          <table className="w-full text-left border-collapse hidden sm:table">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50/10">
                 <th className="p-4 w-12 text-center">No</th>
@@ -168,7 +169,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                       {teacher.email}
                     </td>
                     <td className="p-4 text-center">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 uppercase tracking-wider border border-indigo-100 dark:border-indigo-900/30">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 uppercase tracking-wider border border-indigo-100/50 dark:border-indigo-900/30">
                         Aktif
                       </span>
                     </td>
@@ -201,6 +202,50 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
               )}
             </tbody>
           </table>
+
+          {/* Mobile Card List */}
+          <div className="block sm:hidden divide-y divide-slate-50 dark:divide-slate-800">
+            {filteredTeachers.length > 0 ? (
+              filteredTeachers.map((teacher, index) => (
+                <div key={teacher.id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-400 font-bold text-xs flex items-center justify-center">
+                        {teacher.name.replace(/Ust\.\s*|Usth\.\s*/g, '').charAt(0)}
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-xs">{teacher.name}</h4>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">{teacher.email}</p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 uppercase tracking-wider border border-indigo-100/50 dark:border-indigo-900/30">
+                      Aktif
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-50 dark:border-slate-800/80">
+                    <button
+                      onClick={() => openEditModal(teacher)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold cursor-pointer"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(teacher)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-500 text-xs font-semibold cursor-pointer"
+                    >
+                      <Trash className="w-3.5 h-3.5" />
+                      <span>Hapus</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-8 text-center text-slate-400 text-xs">
+                Tidak ditemukan guru yang cocok dengan pencarian Anda.
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

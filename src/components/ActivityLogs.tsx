@@ -19,12 +19,14 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [roleFilter, setRoleFilter] = React.useState<string>('Semua');
 
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = 
-      log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.details.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredLogs = (logs || []).filter(log => {
+    if (!log) return false;
+    const q = (searchQuery || '').toLowerCase();
+    const name = (log.userName || '').toLowerCase();
+    const action = (log.action || '').toLowerCase();
+    const details = (log.details || '').toLowerCase();
 
+    const matchesSearch = !q || name.includes(q) || action.includes(q) || details.includes(q);
     const matchesRole = roleFilter === 'Semua' || log.userRole === roleFilter;
 
     return matchesSearch && matchesRole;

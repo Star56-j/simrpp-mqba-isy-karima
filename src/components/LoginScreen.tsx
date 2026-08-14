@@ -6,7 +6,11 @@ import {
   ArrowRight,
   Sparkles,
   Users,
-  GraduationCap
+  GraduationCap,
+  X,
+  BookOpen,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { api } from '../api';
 
@@ -19,9 +23,93 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  const [loginType, setLoginType] = React.useState<'guru' | 'wali'>('guru');
+  const [loginType, setLoginType] = React.useState<'guru' | 'walikelas' | 'walisantri'>('guru');
   const [nis, setNis] = React.useState('');
+
+  // Forgot Password Modal States
+  const [showForgotModal, setShowForgotModal] = React.useState(false);
+  const [resetStep, setResetStep] = React.useState<number>(1);
+  const [forgotEmail, setForgotEmail] = React.useState('');
+  const [forgotQuestion, setForgotQuestion] = React.useState('');
+  const [hasQuestion, setHasQuestion] = React.useState(false);
+  const [forgotAnswer, setForgotAnswer] = React.useState('');
+  const [forgotNewPass, setForgotNewPass] = React.useState('');
+  const [forgotConfirmPass, setForgotConfirmPass] = React.useState('');
+  
+  const [forgotLoading, setForgotLoading] = React.useState(false);
+  const [forgotError, setForgotError] = React.useState('');
+  const [forgotSuccess, setForgotSuccess] = React.useState('');
+
+  const handleCheckEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError('');
+    setForgotSuccess('');
+    setForgotLoading(true);
+
+    try {
+      const res = await api.getResetQuestion(forgotEmail);
+      setHasQuestion(res.hasQuestion);
+      if (res.hasQuestion) {
+        setForgotQuestion(res.question || '');
+        setResetStep(2);
+      } else {
+        setResetStep(3);
+      }
+    } catch (err: any) {
+      setForgotError(err.message || 'Akun tidak ditemukan.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleResetSelf = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError('');
+    setForgotSuccess('');
+    
+    if (!forgotAnswer) {
+      setForgotError('Jawaban keamanan harus diisi.');
+      return;
+    }
+    if (forgotNewPass.length < 6) {
+      setForgotError('Kata sandi baru minimal terdiri dari 6 karakter.');
+      return;
+    }
+    if (forgotNewPass !== forgotConfirmPass) {
+      setForgotError('Konfirmasi kata sandi tidak cocok.');
+      return;
+    }
+
+    setForgotLoading(true);
+    try {
+      const res = await api.resetSelf(forgotEmail, forgotAnswer, forgotNewPass);
+      setForgotSuccess(res.message || 'Kata sandi berhasil diperbarui.');
+      setTimeout(() => {
+        setShowForgotModal(false);
+      }, 2000);
+    } catch (err: any) {
+      setForgotError(err.message || 'Terjadi kesalahan saat mereset kata sandi.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleRequestAdmin = async () => {
+    setForgotError('');
+    setForgotSuccess('');
+    setForgotLoading(true);
+
+    try {
+      const res = await api.requestAdminReset(forgotEmail);
+      setForgotSuccess(res.message || 'Permintaan reset sandi berhasil dikirim.');
+    } catch (err: any) {
+      setForgotError(err.message || 'Gagal mengirim permintaan reset.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +117,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     setLoading(true);
 
     try {
-      if (loginType === 'guru') {
+      if (loginType === 'guru' || loginType === 'walikelas') {
         try {
           const res = await api.login(email, password);
           onLoginSuccess(res.user);
@@ -50,166 +138,362 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-50 px-4 py-8 font-sans selection:bg-indigo-600 selection:text-white dark:bg-slate-950 sm:px-6">
-      <div className="login-batik-pattern absolute inset-0 opacity-55 dark:opacity-20" aria-hidden="true" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(248,250,252,0.92)_0%,rgba(226,232,240,0.7)_46%,rgba(79,70,229,0.08)_100%)] dark:bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.9)_0%,rgba(2,6,23,0.95)_65%,rgba(0,0,0,0.98)_100%)]" aria-hidden="true" />
-      <div className="absolute left-0 top-0 h-2.5 w-full bg-gradient-to-r from-indigo-900 via-indigo-500 to-indigo-900 shadow-sm" aria-hidden="true" />
+    <main className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 sm:px-6 font-sans text-slate-800  selection:bg-sky-500 selection:text-white" style={{background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%)'}}>
+      {/* Islamic Pattern Background */}
+      <div className="absolute inset-0 opacity-30" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpolygon points='40,4 50,30 77,30 55,47 63,73 40,57 17,73 25,47 3,30 30,30' fill='none' stroke='%230369a1' stroke-width='1.5' opacity='0.3'/%3E%3C/svg%3E")`, backgroundSize: '80px 80px'}} aria-hidden="true" />
+      <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-20" style={{background: 'radial-gradient(circle, #0284c7 0%, transparent 70%)', transform: 'translate(-40%, -40%)'}} />
+      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-15" style={{background: 'radial-gradient(circle, #0ea5e9 0%, transparent 70%)', transform: 'translate(40%, 40%)'}} />
+      
+      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row rounded-3xl overflow-hidden animate-fade-in shadow-2xl" style={{boxShadow: '0 25px 80px rgba(3,105,161,0.25)'}}>
+        
+        {/* Left Side - Illustration Panel */}
+        <div className="hidden md:flex flex-col justify-between w-5/12 bg-white  p-7 relative overflow-hidden">
+          {/* Islamic Geometric Overlay (light) */}
+          <div className="absolute inset-0 opacity-5" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%230284c7' stroke-width='1.5'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%230284c7' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: '60px 60px'}} />
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10" style={{background: 'radial-gradient(circle, #0284c7 0%, transparent 70%)', transform: 'translate(30%, -30%)'}} />
 
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-4xl items-center justify-center">
-        <section className="grid w-full max-w-3xl overflow-hidden rounded-[2.5rem] border border-indigo-500/20 dark:border-indigo-500/10 bg-white/70 dark:bg-slate-900/60 shadow-[0_25px_70px_-15px_rgba(31,38,135,0.12)] dark:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl md:grid-cols-[0.85fr_1.15fr] glass-panel">
-          <div className="relative flex min-h-60 flex-col justify-between overflow-hidden bg-indigo-950 px-6 py-8 sm:px-8 sm:py-9 text-white md:min-h-[520px]">
-            <div className="login-batik-pattern absolute inset-0 opacity-25" aria-hidden="true" />
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/20 via-transparent to-indigo-900/80" aria-hidden="true" />
-            <div className="absolute -bottom-20 -right-16 h-48 w-48 rounded-full border-[30px] border-indigo-500/10" aria-hidden="true" />
- 
-            <div className="relative">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-100/30 bg-white p-1.5 shadow-lg shadow-indigo-950/20">
-                  <img src="/logo-mqba.png" alt="Logo MQBA Isy Karima" className="h-full w-full object-contain" />
-                </div>
-                <div className="h-px flex-1 bg-gradient-to-r from-indigo-400/50 to-transparent" />
-              </div>
-              <p className="mb-2.5 flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.28em] text-indigo-300">
-                <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
-                Sistem Akademik Digital
-              </p>
-              <h1 className="max-w-sm text-2xl font-black leading-tight sm:text-3xl tracking-tight">
-                Akademik MQBA<br /><span className="bg-gradient-to-r from-amber-200 to-indigo-200 bg-clip-text text-transparent">Isy Karima</span>
-              </h1>
-              <p className="mt-3.5 max-w-xs text-[11px] leading-5 text-indigo-200/70">
-                Ruang terpadu untuk mengelola pembelajaran dengan semangat pendidikan qur'ani.
-              </p>
+          {/* Logo & Title */}
+          <div className="relative z-10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50  border border-sky-100  p-2 shadow-md mb-4">
+              <img src="/logo-mqba.png" alt="Logo MQBA Isy Karima" className="h-full w-full object-contain" />
             </div>
- 
-            <div className="relative mt-8 border-l-2 border-amber-400/80 pl-4">
-              <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-amber-400">Motif Kawung Solo</p>
-              <p className="mt-1 text-[10px] leading-4 text-indigo-100/60 font-medium">Melambangkan kesucian niat, keteraturan, dan kebijaksanaan.</p>
+            <h1 className="text-2xl font-black leading-tight tracking-tight mb-2 text-slate-800 ">
+              Akademik MQBA<br/>
+              <span className="text-sky-600 ">Isy Karima</span>
+            </h1>
+            <p className="text-slate-500  text-sm leading-relaxed font-medium">
+              Platform terpadu untuk mengelola pembelajaran dengan semangat pendidikan Qur'ani.
+            </p>
+
+          </div>
+
+          {/* Illustration - Simple Islamic Flat */}
+          <div className="relative z-10 flex items-center justify-center my-4 flex-1">
+            <div className="relative">
+              {/* No circle background, image directly on white panel to hide its white bg */}
+              <div className="flex items-center justify-center">
+                <img
+                  src="/islamic_login_simple.png"
+                  alt="Ilustrasi Ustadz"
+                  className="w-48 h-48 object-cover object-top mix-blend-multiply  rounded-full"
+                />
+              </div>
+              {/* Floating Islamic stars */}
+              <div className="absolute top-2 -right-6 text-sky-400/40 text-3xl animate-float">✦</div>
+              <div className="absolute bottom-6 -left-6 text-sky-500/30 text-2xl" style={{animationDelay: '1s'}}>✦</div>
             </div>
           </div>
- 
-          <div className="flex items-center px-6 py-8 sm:px-10 sm:py-10 bg-transparent">
-            <form onSubmit={handleSubmit} className="mx-auto w-full max-w-sm space-y-4">
-              <div>
-                <span className="inline-block rounded-full border border-indigo-200/30 bg-indigo-50/50 dark:bg-indigo-950/40 px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-indigo-700 dark:text-indigo-300">
-                  Selamat Datang
-                </span>
-                <h2 className="mt-2.5 text-2xl font-black tracking-tight text-slate-800 dark:text-white">Silakan Masuk</h2>
-                <p className="mt-1 text-[11px] leading-4 text-slate-500 dark:text-slate-400">Masukkan kredensial Anda untuk mengakses sistem pembelajaran MQBA.</p>
-              </div>
- 
-              <div className="flex items-center gap-2" aria-hidden="true">
-                <span className="h-px flex-1 bg-slate-200/80 dark:bg-slate-800/80" />
-                <span className="h-1.5 w-1.5 rotate-45 border border-slate-300 dark:border-slate-700" />
-                <span className="h-px flex-1 bg-slate-200/80 dark:bg-slate-800/80" />
-              </div>
- 
-              {error && (
-                <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50/80 dark:border-rose-900/30 dark:bg-rose-950/20 p-3 text-[11px] text-rose-700 dark:text-rose-400">
-                  <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                  <span className="leading-relaxed font-semibold">{error}</span>
-                </div>
-              )}
- 
-              {/* Tabs */}
-              <div className="flex rounded-xl bg-slate-100/80 dark:bg-slate-950/80 p-1 border border-slate-200/30 dark:border-slate-800/40">
-                <button
-                  type="button"
-                  onClick={() => { setLoginType('guru'); setError(''); }}
-                  className={`flex-1 rounded-lg py-2.5 text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${loginType === 'guru' ? 'bg-white dark:bg-slate-800 text-indigo-700 dark:text-white shadow-md' : 'text-slate-500 hover:text-indigo-700 dark:text-slate-400 dark:hover:text-white'}`}
-                >
-                  <Users className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5" />
-                  Ustadz / Ustadzah
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setLoginType('wali'); setError(''); }}
-                  className={`flex-1 rounded-lg py-2.5 text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${loginType === 'wali' ? 'bg-white dark:bg-slate-800 text-indigo-700 dark:text-white shadow-md' : 'text-slate-500 hover:text-indigo-700 dark:text-slate-400 dark:hover:text-white'}`}
-                >
-                  <GraduationCap className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5" />
-                  Login Wali Santri
-                </button>
-              </div>
- 
-              {loginType === 'guru' ? (
-                <>
-                  <div className="space-y-1.5">
-                    <label htmlFor="email" className="block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Email atau Username</label>
-                    <div className="relative">
-                      <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400" aria-hidden="true" />
-                      <input
-                        id="email"
-                        name="email"
-                        type="text"
-                        autoComplete="username"
-                        required
-                        placeholder="Contoh: aryamukti atau aryamukti@mqba.sch.id"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-2.5 pl-10 pr-3 text-xs text-slate-800 dark:text-slate-100 outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-600 input-premium"
-                      />
-                    </div>
-                  </div>
 
-                  <div className="space-y-1.5">
-                    <label htmlFor="password" className="block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Kata Sandi</label>
-                    <div className="relative">
-                      <KeyRound className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400" aria-hidden="true" />
-                      <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        autoComplete="current-password"
-                        required
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-2.5 pl-10 pr-3 text-xs text-slate-800 dark:text-slate-100 outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-600 input-premium"
-                      />
-                    </div>
-                    <p className="text-[10px] leading-4 text-indigo-600 dark:text-indigo-400 font-medium pt-0.5">
-                      💡 Kata sandi default pengajar: <code className="font-bold bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded text-indigo-700 dark:text-indigo-300">guru123</code>
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-1.5">
-                  <label htmlFor="nis" className="block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Nama Lengkap Santri</label>
+        </div>
+
+        {/* Right Side - Form */}
+        <div className="relative w-full md:w-7/12 p-6 sm:p-8 flex flex-col justify-center text-white overflow-hidden" style={{background: 'linear-gradient(160deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%)'}}>
+          {/* Form Islamic Ornament Background */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E")`, 
+            backgroundSize: '60px 60px'
+          }} />
+          
+          <div className="relative z-10 mb-5">
+            <div className="md:hidden flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 p-2 shadow-lg mb-6">
+              <img src="/logo-mqba.png" alt="Logo MQBA" className="h-full w-full object-contain brightness-0 invert" />
+            </div>
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 text-sky-100 text-xs font-bold mb-4">
+              <span className="w-1.5 h-1.5 bg-sky-300 rounded-full animate-pulse"></span>
+              SISTEM AKADEMIK ONLINE
+            </div>
+            <h2 className="text-2xl font-black tracking-tight text-white">Ahlan wa Sahlan</h2>
+            <p className="mt-1.5 text-sm text-sky-200/80">Masukkan kredensial Anda untuk mengakses sistem.</p>
+          </div>
+
+          {error && (
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700   ">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span className="font-medium">{error}</span>
+            </div>
+          )}
+
+          {/* Login Type Toggle */}
+          <div className="flex rounded-xl bg-sky-900/40 p-1 mb-5 border border-white/10 relative z-10 backdrop-blur-sm overflow-x-auto whitespace-nowrap">
+            <button
+              type="button"
+              onClick={() => { setLoginType('guru'); setError(''); }}
+              className={`flex-1 min-w-[100px] rounded-lg py-2.5 px-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 ${loginType === 'guru' ? 'bg-white text-sky-800 shadow-sm' : 'text-sky-200 hover:text-white'}`}
+            >
+              <Users className="h-4 w-4 shrink-0" />Pengajar
+            </button>
+            <button
+              type="button"
+              onClick={() => { setLoginType('walikelas'); setError(''); }}
+              className={`flex-1 min-w-[100px] rounded-lg py-2.5 px-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 ${loginType === 'walikelas' ? 'bg-white text-sky-800 shadow-sm' : 'text-sky-200 hover:text-white'}`}
+            >
+              <GraduationCap className="h-4 w-4 shrink-0" />Wali Kelas
+            </button>
+            <button
+              type="button"
+              onClick={() => { setLoginType('walisantri'); setError(''); }}
+              className={`flex-1 min-w-[100px] rounded-lg py-2.5 px-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 ${loginType === 'walisantri' ? 'bg-white text-sky-800 shadow-sm' : 'text-sky-200 hover:text-white'}`}
+            >
+              <Users className="h-4 w-4 shrink-0" />Wali Santri
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {loginType === 'guru' || loginType === 'walikelas' ? (
+              <>
+                <div className="space-y-2 relative z-10">
+                  <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wide text-sky-200">Username / Email</label>
                   <div className="relative">
-                    <GraduationCap className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400" aria-hidden="true" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-sky-300/70" />
                     <input
-                      id="nis"
-                      name="nis"
+                      id="email"
+                      name="email"
                       type="text"
+                      autoComplete="username"
                       required
-                      placeholder="Contoh: Ahmad Abdullah"
-                      value={nis}
-                      onChange={(e) => setNis(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-2.5 pl-10 pr-3 text-xs text-slate-800 dark:text-slate-100 outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-600 input-premium"
+                      placeholder={loginType === 'walikelas' ? "contoh: wali.hasri" : "contoh: ustadz.aidil"}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-xl border border-white/20 bg-black/10 backdrop-blur-sm py-3 pl-11 pr-4 text-sm text-white focus:border-white focus:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-1 focus-visible:ring-offset-sky-900 transition placeholder:text-sky-200/50"
                     />
                   </div>
-                  <p className="text-[10px] leading-4 text-slate-400 dark:text-slate-500">
-                    Masukkan nama lengkap anak Anda untuk melihat nilai dan rapor. Hubungi bagian akademik jika nama tidak ditemukan.
-                  </p>
+                </div>
+
+                <div className="space-y-2 relative z-10">
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wide text-sky-200">Kata Sandi</label>
+                    <button
+                      type="button"
+                      onClick={() => { setShowForgotModal(true); setForgotEmail(''); setForgotError(''); setForgotSuccess(''); setForgotAnswer(''); setForgotNewPass(''); setForgotConfirmPass(''); setResetStep(1); }}
+                      className="text-xs font-bold text-sky-300 hover:text-white cursor-pointer transition hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 rounded-sm"
+                    >Lupa Sandi?</button>
+                  </div>
+                  <div className="relative">
+                    <KeyRound className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-sky-300/70" />
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full rounded-xl border border-white/20 bg-black/10 backdrop-blur-sm py-3 pl-11 pr-10 text-sm text-white focus:border-white focus:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-1 focus-visible:ring-offset-sky-900 transition placeholder:text-sky-200/50"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-300/70 hover:text-white transition cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2 relative z-10">
+                <label htmlFor="nis" className="block text-xs font-bold uppercase tracking-wide text-sky-200">Nama Lengkap Santri</label>
+                <div className="relative">
+                  <GraduationCap className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-sky-300/70" />
+                  <input
+                    id="nis"
+                    name="nis"
+                    type="text"
+                    required
+                    placeholder="Contoh: Ahmad Abdullah"
+                    value={nis}
+                    onChange={(e) => setNis(e.target.value)}
+                    className="w-full rounded-xl border border-white/20 bg-black/10 backdrop-blur-sm py-3 pl-11 pr-4 text-sm text-white focus:border-white focus:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-1 focus-visible:ring-offset-sky-900 transition placeholder:text-sky-200/50"
+                  />
+                </div>
+                <p className="text-xs text-sky-200/60 pt-1">Masukkan nama lengkap santri untuk mengakses portal wali.</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold tracking-wide text-white transition-all disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer active:scale-95 shadow-md shadow-sky-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900"
+              style={{background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)'}}
+            >
+              <span>{loading ? 'Menghubungkan...' : 'Masuk ke Sistem'}</span>
+              {!loading && <ArrowRight className="h-4 w-4" />}
+            </button>
+          </form>
+
+          <div className="relative z-10 mt-5 pt-4 border-t border-white/10 text-center">
+            <p className="text-xs font-medium text-white">
+              © {new Date().getFullYear()} Akademik MQBA Isy Karima · Powered by <span className="text-white font-bold">Active Node</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-fade-in" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md bg-white  rounded-3xl shadow-xl overflow-hidden border border-slate-200 ">
+            <div className="relative px-6 py-5 border-b border-slate-100  bg-slate-50 ">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100  text-indigo-600 ">
+                  <KeyRound className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-800 ">Lupa Kata Sandi</h3>
+                  <p className="text-xs text-slate-500">Khusus Pengajar</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowForgotModal(false)}
+                className="absolute top-5 right-5 text-slate-400 hover:text-slate-600  p-1 rounded-full hover:bg-slate-200  transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {forgotError && (
+                <div className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700    animate-fade-in">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span className="font-medium">{forgotError}</span>
                 </div>
               )}
- 
-              <button
-                type="submit"
-                disabled={loading}
-                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-500 hover:to-indigo-750 py-3 text-xs font-black uppercase tracking-[0.14em] text-white shadow-lg shadow-indigo-950/20 hover:shadow-indigo-500/25 hover:-translate-y-0.5 transition-all duration-350 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 cursor-pointer"
-              >
-                <span>{loading ? 'Menghubungkan...' : 'Masuk ke Sistem'}</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-              </button>
- 
-              <p className="pt-1.5 text-center text-[9px] leading-4 text-slate-400 dark:text-slate-500 font-medium">
-                Akademik MQBA Isy Karima · Karanganyar<br />
-                © 2026 Sistem Manajemen Pembelajaran Terpadu
-              </p>
-            </form>
+
+              {forgotSuccess && (
+                <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-700    animate-fade-in">
+                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                  <span className="font-medium">{forgotSuccess}</span>
+                </div>
+              )}
+
+              {resetStep === 1 && (
+                <form onSubmit={handleCheckEmail} className="space-y-4">
+                  <p className="text-sm text-slate-600  leading-relaxed">
+                    Masukkan username atau email Anda untuk mereset kata sandi.
+                  </p>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wide text-slate-500 ">Username / Email</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="contoh: ustadz.aidil"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300  bg-white  text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition text-slate-800 "
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold transition shadow-md disabled:opacity-70 cursor-pointer"
+                  >
+                    {forgotLoading ? 'Memeriksa...' : 'Lanjutkan'}
+                  </button>
+                </form>
+              )}
+
+              {resetStep === 2 && (
+                <form onSubmit={handleResetSelf} className="space-y-4 animate-fade-in">
+                  <div className="p-4 bg-slate-50  rounded-xl border border-slate-200 ">
+                    <p className="text-xs text-slate-500 mb-1">Pertanyaan Keamanan:</p>
+                    <p className="text-sm font-bold text-slate-800 ">{forgotQuestion}</p>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wide text-slate-500 ">Jawaban Anda</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ketik jawaban di sini"
+                        value={forgotAnswer}
+                        onChange={(e) => setForgotAnswer(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300  bg-white  text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wide text-slate-500 ">Kata Sandi Baru</label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="Minimal 6 karakter"
+                        value={forgotNewPass}
+                        onChange={(e) => setForgotNewPass(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300  bg-white  text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wide text-slate-500 ">Konfirmasi Sandi</label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="Ketik ulang kata sandi baru"
+                        value={forgotConfirmPass}
+                        onChange={(e) => setForgotConfirmPass(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300  bg-white  text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setResetStep(1)}
+                      className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700    rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      Kembali
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      className="flex-[2] py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold transition shadow-md disabled:opacity-70 cursor-pointer"
+                    >
+                      {forgotLoading ? 'Menyimpan...' : 'Simpan Sandi Baru'}
+                    </button>
+                  </div>
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={handleRequestAdmin}
+                      disabled={forgotLoading}
+                      className="text-xs font-bold text-slate-500 hover:text-indigo-500 cursor-pointer transition hover:underline"
+                    >
+                      Lupa jawaban? Ajukan reset ke Admin
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {resetStep === 3 && (
+                <div className="space-y-4 animate-fade-in">
+                  <p className="text-sm text-slate-600 ">
+                    Akun <span className="font-bold text-slate-800 ">{forgotEmail}</span> belum mengatur pertanyaan keamanan.
+                  </p>
+                  <div className="p-4 bg-amber-50  border border-amber-200  rounded-xl text-sm text-amber-800  font-medium">
+                    Silakan ajukan permohonan reset sandi ke Admin. Setelah disetujui, sandi Anda akan diatur ke sandi default (<span className="font-bold">guru123</span>).
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setResetStep(1)}
+                      className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700    rounded-xl text-sm font-bold transition cursor-pointer"
+                    >
+                      Kembali
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRequestAdmin}
+                      disabled={forgotLoading}
+                      className="flex-[2] py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold transition shadow-md disabled:opacity-70 cursor-pointer"
+                    >
+                      {forgotLoading ? 'Mengirim...' : 'Ajukan Reset ke Admin'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </section>
-      </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -134,6 +134,9 @@ export const api = {
     return res;
   },
   async createAttendance(data: Omit<Attendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<Attendance> { return fetchJson<Attendance>('/api/attendances', { method: 'POST', body: JSON.stringify(data) }); },
+  async createAttendanceBulk(attendances: Omit<Attendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>[]): Promise<void> {
+    await fetchJson('/api/attendances/bulk', { method: 'POST', body: JSON.stringify({ attendances }) });
+  },
   async selfAttendance(data: any): Promise<Attendance> { 
     const u = this.getCurrentUser();
     return fetchJson<Attendance>('/api/attendances', { method: 'POST', body: JSON.stringify({ ...data, teacherId: u?.teacherId }) }); 

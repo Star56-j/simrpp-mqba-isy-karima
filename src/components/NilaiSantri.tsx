@@ -60,14 +60,15 @@ export default function NilaiSantri({
   // Rapor modal state
   const [raporModalSantri, setRaporModalSantri] = React.useState<Santri | null>(null);
 
-  // Filter schedules that the current teacher teaches
-  const mySchedules = currentUser.role === 'Admin' ? schedules : schedules.filter(s => s.teacherId === currentUser.teacherId);
+  // Filter schedules yang diajar oleh guru saat ini (mencocokkan teacherId, user id, atau teacher_id)
+  const teacherIds = [currentUser.teacherId, currentUser.id, (currentUser as any).teacher_id].filter(Boolean);
+  const mySchedules = currentUser.role === 'Admin' ? schedules : schedules.filter(s => teacherIds.includes(s.teacherId));
   // Get unique classes and subjects the teacher teaches
   const myClassIds = Array.from(new Set(mySchedules.map(s => s.classId)));
   const mySubjectIds = Array.from(new Set(mySchedules.map(s => s.subjectId)));
   
   // Classes where current teacher is Wali Kelas
-  const myWaliClasses = waliKelasList.filter(w => w.teacherId === currentUser.teacherId && w.academicYearId === filterAY && w.semesterId === filterSem).map(w => w.classId);
+  const myWaliClasses = waliKelasList.filter(w => teacherIds.includes(w.teacherId) && w.academicYearId === filterAY && w.semesterId === filterSem).map(w => w.classId);
   
   const isWaliKelas = currentUser.role === 'Admin' || myWaliClasses.length > 0;
   
@@ -154,7 +155,9 @@ export default function NilaiSantri({
 
   const availableSubjects = (currentUser.role === 'Admin' || myWaliClasses.includes(filterClass)) 
     ? subjects 
-    : subjects.filter(s => mySchedules.some(sch => sch.classId === filterClass && sch.subjectId === s.id));
+    : (mySubjectIds.length > 0 
+        ? subjects.filter(s => mySubjectIds.includes(s.id)) 
+        : subjects);
 
   React.useEffect(() => {
     if (mode === 'input' && availableSubjects.length > 0 && !availableSubjects.find(s => s.id === filterSubject)) {

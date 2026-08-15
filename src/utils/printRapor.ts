@@ -1,4 +1,5 @@
 import { Santri, Nilai, Subject, RaporDetail, SchoolClass, AcademicYear, Semester } from '../types';
+import { computeRaporScore } from './nilaiWeights';
 
 export function printRapor(
   santri: Santri,
@@ -12,9 +13,7 @@ export function printRapor(
   ketuaUnitName: string = "Ust. Umar Alamuddin, Lc."
 ) {
   const getAverage = (n: Nilai): number => {
-    const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;
-    if (count === 0) return 0;
-    return Math.round((n.harian + n.bulanan + n.uts + n.uas + (n.uasLisan || 0)) / count);
+    return computeRaporScore(n).nilaiAkhirTulis;
   };
 
   // Compute rata-rata kelas for each subject
@@ -49,12 +48,19 @@ export function printRapor(
   const totalSantriInClass = classSantriIds.includes(santri.id) ? classSantriIds.length : classSantriIds.length + 1;
   const rankStr = `${rankNumber} dari ${totalSantriInClass} santri`;
 
-  // This santri's scores
+  const absen = raporDetail?.ketidakhadiran || { sakit: 0, izin: 0, tanpaKeterangan: 0 };
+  const attendanceVal = Math.max(70, 100 - ((absen.tanpaKeterangan || 0) * 5 + (absen.izin || 0) * 2 + (absen.sakit || 0) * 1));
+
+  // This santri's scores with weighted components
   const santriNilai = allSubjects.map(subj => {
     const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === subj.id);
+    const weighted = n ? computeRaporScore(n, 90, attendanceVal) : { midAvg: 0, uasTulis: 0, uasLisan: null, nilaiAkhirTulis: 0 };
     return {
       subject: subj.name,
-      score: n ? getAverage(n) : 0,
+      midAvg: weighted.midAvg,
+      uasTulis: weighted.uasTulis,
+      uasLisan: weighted.uasLisan,
+      score: weighted.nilaiAkhirTulis,
       classAvg: subjectAverages[subj.id] || 0
     };
   });
@@ -78,7 +84,6 @@ export function printRapor(
     { namaKegiatan: 'Furusiyyah', nilai: 'A+', keterangan: 'Semangat dan sangat bagus dalam praktek latihan berkuda, hafal setengah dari matan.' }
   ];
 
-  const absen = raporDetail?.ketidakhadiran || { sakit: 0, izin: 0, tanpaKeterangan: 0 };
   const catatan = raporDetail?.catatanWaliKelas || '';
   const kenaikan = raporDetail?.keputusanKenaikan || '';
   const tanggapan = raporDetail?.tanggapanOrangTua || '';
@@ -339,10 +344,13 @@ export function printRapor(
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 55%;">Mata Pelajaran</th>
-                <th style="width: 20%;">Nilai</th>
-                <th style="width: 20%;">Rata - Rata Kelas</th>
+                <th style="width: 4%;">No</th>
+                <th style="width: 34%;">Mata Pelajaran</th>
+                <th style="width: 12%;">UH / Mid</th>
+                <th style="width: 13%;">UAS Tulis</th>
+                <th style="width: 12%;">UAS Lisan</th>
+                <th style="width: 12.5%;">Nilai Akhir</th>
+                <th style="width: 12.5%;">Rata Kelas</th>
               </tr>
             </thead>
             <tbody>
@@ -350,26 +358,34 @@ export function printRapor(
                 <tr>
                   <td class="text-center">${i + 1}</td>
                   <td>${n.subject}</td>
-                  <td class="text-center" style="font-weight: bold;">${n.score || '-'}</td>
+                  <td class="text-center">${n.midAvg || '-'}</td>
+                  <td class="text-center">${n.uasTulis || '-'}</td>
+                  <td class="text-center" style="font-weight: ${n.uasLisan ? 'bold' : 'normal'}; font-style: ${n.uasLisan ? 'normal' : 'italic'}; color: ${n.uasLisan ? '#000' : '#888'};">
+                    ${n.uasLisan ?? '-'}
+                  </td>
+                  <td class="text-center" style="font-weight: bold; background-color: #f8fafc;">${n.score || '-'}</td>
                   <td class="text-center">${n.classAvg || '-'}</td>
                 </tr>
               `).join('')}
               <tr>
-                <th colspan="2">JUMLAH</th>
-                <td class="text-center" style="font-weight: bold;">${totalScore || '-'}</td>
+                <th colspan="5" style="text-align: right; padding-right: 10px;">JUMLAH NILAI AKHIR</th>
+                <td class="text-center" style="font-weight: bold; background-color: #f1f5f9;">${totalScore || '-'}</td>
                 <td class="text-center">${totalClassAvg || '-'}</td>
               </tr>
               <tr>
-                <th colspan="2">RATA-RATA</th>
-                <td class="text-center" style="font-weight: bold;">${avgScore || '-'}</td>
+                <th colspan="5" style="text-align: right; padding-right: 10px;">RATA-RATA HARIAN & RAPOR</th>
+                <td class="text-center" style="font-weight: bold; background-color: #f1f5f9;">${avgScore || '-'}</td>
                 <td class="text-center">${avgClassAvg || '-'}</td>
               </tr>
               <tr>
-                <th colspan="2">RANGKING</th>
-                <td colspan="2" class="text-center" style="font-weight: bold;">${rankStr}</td>
+                <th colspan="5" style="text-align: right; padding-right: 10px;">PERINGKAT (RANKING)</th>
+                <td colspan="2" class="text-center" style="font-weight: bold; font-size: 11px; background-color: #f1f5f9;">${rankStr}</td>
               </tr>
             </tbody>
           </table>
+          <div style="font-size: 8px; font-style: italic; color: #555; margin-top: -4px; margin-bottom: 12px;">
+            * Pembobotan Nilai Akhir: 30% Akhlaq, 10% Kehadiran, 10% UH/Bulanan/Mid Semester, 60% Ujian Semester Tulis. Ujian Lisan dipisahkan sendiri pada kolom khusus.
+          </div>
 
           <!-- C. KETAHFIZHAN -->
           <div class="section-title">C. KETAHFIZHAN</div>

@@ -5,6 +5,8 @@ import { api } from '../api';
 import { printRapor } from '../utils/printRapor';
 import TanyaAdmin from './TanyaAdmin';
 
+import { computeRaporScore } from '../utils/nilaiWeights';
+
 interface WaliDashboardProps {
   user: User;
   academicYears: AcademicYear[];
@@ -54,9 +56,7 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
   }
 
   const getAverage = (n: Nilai): number => {
-    const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;
-    if (count === 0) return 0;
-    return Math.round((n.harian + n.bulanan + n.uts + n.uas + (n.uasLisan || 0)) / count);
+    return computeRaporScore(n).nilaiAkhirTulis;
   };
 
   const avg = nilaiList.length > 0 
@@ -221,9 +221,9 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
                     <th className="px-3 py-3.5 text-center">Harian</th>
                     <th className="px-3 py-3.5 text-center">Bulanan</th>
                     <th className="px-3 py-3.5 text-center">UTS</th>
-                    <th className="px-3 py-3.5 text-center">UAS Tulis</th>
-                    <th className="px-3 py-3.5 text-center">UAS Lisan</th>
-                    <th className="px-4 py-3.5 text-center">Rata²</th>
+                    <th className="px-3 py-3.5 text-center">UAS Tulis (60%)</th>
+                    <th className="px-3 py-3.5 text-center">UAS Lisan (Terpisah)</th>
+                    <th className="px-4 py-3.5 text-center">Nilai Akhir</th>
                     <th className="px-6 py-3.5">Catatan</th>
                   </tr>
                 </thead>
@@ -239,7 +239,13 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
                         <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.bulanan || '-'}</td>
                         <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.uts || '-'}</td>
                         <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.uas || '-'}</td>
-                        <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">{n.uasLisan || '-'}</td>
+                        <td className="px-3 py-4.5 text-center font-bold text-[#826f64] dark:text-[#bdaea4]">
+                          {n.uasLisan && n.uasLisan > 0 ? (
+                            <span className="px-2 py-1 rounded bg-[#dfc88f]/20 text-[#331c44] dark:text-[#dfc88f] font-black">{n.uasLisan}</span>
+                          ) : (
+                            <span className="italic opacity-50">-</span>
+                          )}
+                        </td>
                         <td className="px-4 py-4.5 text-center">
                           <span className={`inline-flex items-center justify-center w-8 h-8 rounded-xl font-black text-xs ${studentAvg < 75 ? 'bg-rose-100 dark:bg-rose-950/30 text-rose-700 dark:text-rose-450 border border-rose-200/50' : 'bg-[#e9dcc5] text-[#402654] dark:bg-[#2c2018] dark:text-[#dfc88f] border border-[#c7a86a]/20'}`}>
                             {studentAvg}

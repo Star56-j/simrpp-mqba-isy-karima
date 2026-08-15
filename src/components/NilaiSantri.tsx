@@ -1,20 +1,21 @@
 import React from 'react';
 import { 
-  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle, Download, Upload, X
+  FileSpreadsheet, FileText, CheckCircle, Search, Edit, Save, BookOpen, AlertCircle, Download, Upload, X, Printer
 } from 'lucide-react';
 import { Santri, Nilai, SchoolClass, AcademicYear, Semester, Subject, WaliKelas, TeachingSchedule } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
 import { parseExcelFile } from '../utils/importExcel';
-import { printRapor } from '../utils/printRapor';
+import { printGenericTable } from '../utils/printUtils';
+import { shareToWhatsApp } from '../utils/whatsappUtils';
+import ExportBar from './ExportBar';
 import RaporModal from './RaporModal';
-import { Printer } from 'lucide-react';
 
-// Helper: hitung rata-rata dari 5 kategori
+import { computeRaporScore } from '../utils/nilaiWeights';
+
+// Helper: hitung Nilai Akhir Rapor berdasarkan bobot resmi
 function nilaiAvg(n: Nilai): number {
-  const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;
-  if (count === 0) return 0;
-  return Math.round((n.harian + n.bulanan + n.uts + n.uas + (n.uasLisan || 0)) / count);
+  return computeRaporScore(n).nilaiAkhirTulis;
 }
 
 interface NilaiSantriProps {
@@ -121,7 +122,8 @@ export default function NilaiSantri({
     setSaving(true);
     setMsg({ type: '', text: '' });
     try {
-      await api.createNilai({
+      const existingN = nilaiList.find(x => x.santriId === santriId && x.subjectId === filterSubject);
+      const payload = {
         santriId,
         subjectId: filterSubject,
         academicYearId: filterAY,
@@ -133,7 +135,13 @@ export default function NilaiSantri({
         uasLisan: Number(editUasLisan) || 0,
         notes: editNotes,
         teacherId: currentUser.teacherId || currentUser.id
-      });
+      };
+      
+      if (existingN) {
+        await api.updateNilai(existingN.id, payload);
+      } else {
+        await api.createNilai(payload);
+      }
       setMsg({ type: 'success', text: 'Nilai berhasil disimpan.' });
       setEditingId(null);
       loadData();
@@ -192,6 +200,58 @@ export default function NilaiSantri({
       });
       exportToExcel(exportData, `Rapor_${cls}_TA${ay}_${sem}`);
     }
+  };
+
+  const handlePrint = () => {
+    const ay = academicYears.find(y => y.id === filterAY)?.name || '';
+    const sem = semesters.find(s => s.id === filterSem)?.name || '';
+    const cls = classes.find(c => c.id === filterClass)?.name || '';
+    const title = mode === 'input' ? 'Data Nilai Santri' : 'Rekap Rapor Santri';
+    const subtitle = `Kelas: ${cls} | TA: ${ay} | Semester: ${sem}`;
+    
+    if (mode === 'input') {
+      const headers = ['No', 'NIS', 'Nama Santri', 'Harian', 'Bulanan', 'UTS', 'UAS Tulis', 'UAS Lisan', 'Rata-rata', 'Catatan'];
+      const dataRows = santriList.map((santri, idx) => {
+        const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === filterSubject);
+        return [idx + 1, santri.nis, santri.name, n?.harian ?? '-', n?.bulanan ?? '-', n?.uts ?? '-', n?.uas ?? '-', n?.uasLisan ?? '-', n ? nilaiAvg(n) : '-', n?.notes ?? '-'];
+      });
+      printGenericTable(title, subtitle, headers, dataRows);
+    } else {
+      const headers = ['No', 'NIS', 'Nama Santri', 'Rata-rata Nilai'];
+      const dataRows = santriList.map((santri, idx) => {
+        const santriNilai = nilaiList.filter(x => x.santriId === santri.id);
+        const avg = santriNilai.length > 0 ? Math.round(santriNilai.reduce((a, b) => a + nilaiAvg(b), 0) / santriNilai.length) : 'Belum ada nilai';
+        return [idx + 1, santri.nis, santri.name, avg];
+      });
+      printGenericTable(title, subtitle, headers, dataRows);
+    }
+  };
+
+  const handleWhatsApp = () => {
+    const ay = academicYears.find(y => y.id === filterAY)?.name || '';
+    const sem = semesters.find(s => s.id === filterSem)?.name || '';
+    const cls = classes.find(c => c.id === filterClass)?.name || '';
+    const title = mode === 'input' ? 'Data Nilai Santri' : 'Rekap Rapor Santri';
+    const subtitle = `Kelas: ${cls} | TA: ${ay} | Semester: ${sem}`;
+    let text = `*${subtitle}*\n\n`;
+    
+    if (mode === 'input') {
+      const subj = subjects.find(s => s.id === filterSubject)?.name || '';
+      text += `Pelajaran: ${subj}\n\n`;
+      text += santriList.slice(0, 50).map(santri => {
+        const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === filterSubject);
+        return `- ${santri.name}: Rata-rata ${n ? nilaiAvg(n) : 'Belum dinilai'}`;
+      }).join('\n');
+    } else {
+      text += santriList.slice(0, 50).map(santri => {
+        const santriNilai = nilaiList.filter(x => x.santriId === santri.id);
+        const avg = santriNilai.length > 0 ? Math.round(santriNilai.reduce((a, b) => a + nilaiAvg(b), 0) / santriNilai.length) : '0';
+        return `- ${santri.name}: Rata-rata Umum ${avg}`;
+      }).join('\n');
+    }
+    
+    if (santriList.length > 50) text += `\n...dan ${santriList.length - 50} data lainnya.`;
+    shareToWhatsApp(title, text);
   };
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -286,11 +346,15 @@ export default function NilaiSantri({
           <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
             <Upload className="w-4 h-4" /><span>{mode === 'input' ? 'Import Nilai' : 'Import Rapor'}</span>
           </button>
-          <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-            <Download className="w-4 h-4" /><span>Export Excel</span>
-          </button>
         </div>
       </div>
+
+      <ExportBar 
+        onExportExcel={handleExport}
+        onPrint={handlePrint}
+        onWhatsApp={handleWhatsApp}
+        itemName={mode === 'input' ? 'Data Nilai' : 'Data Rapor'}
+      />
 
       {/* Filter */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

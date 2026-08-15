@@ -507,6 +507,7 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                 date: a.date,
                 classId: a.classId,
                 className: (a as any).class?.name || classes.find(c => c.id === a.classId)?.name || a.classId,
+                teacherName: (a as any).teacher?.name || a.recordedBy || currentUser.name || 'Pengajar',
                 hadir: 0, izin: 0, sakit: 0, alpha: 0, total: 0, notes: a.notes,
                 absentees: []
               };
@@ -556,6 +557,7 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                     <th className="px-4 py-3 w-10 text-center">No</th>
                     <th className="px-4 py-3">Tanggal</th>
                     <th className="px-4 py-3">Kelas</th>
+                    <th className="px-4 py-3">Pengabsen (Ust/Ustadzah)</th>
                     <th className="px-4 py-3 text-center">Hadir</th>
                     <th className="px-4 py-3 text-center">Izin</th>
                     <th className="px-4 py-3 text-center">Sakit</th>
@@ -566,15 +568,20 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-sm">
-                  {groupedAttendances.map((a: any, idx) => (
-                    <tr key={a.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                      <td className="px-4 py-3 text-center text-slate-400 font-semibold text-xs">{idx + 1}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-300">
-                        {new Date(a.date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
-                      </td>
-                      <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">
-                        Kelas {a.className}
-                      </td>
+                  {groupedAttendances.map((a: any, idx) => {
+                    const classDisplayName = String(a.className).startsWith('Kelas') ? a.className : `Kelas ${a.className}`;
+                    return (
+                      <tr key={a.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                        <td className="px-4 py-3 text-center text-slate-400 font-semibold text-xs">{idx + 1}</td>
+                        <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-300">
+                          {new Date(a.date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+                        </td>
+                        <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">
+                          {classDisplayName}
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-xs text-indigo-700 dark:text-indigo-300">
+                          {a.teacherName || 'Pengajar'}
+                        </td>
                       <td className="px-4 py-3 text-center font-mono font-bold text-indigo-600">{a.hadir}</td>
                       <td className="px-4 py-3 text-center font-mono font-bold text-blue-600">{a.izin}</td>
                       <td className="px-4 py-3 text-center font-mono font-bold text-amber-600">{a.sakit}</td>
@@ -628,7 +635,8 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                         </button>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

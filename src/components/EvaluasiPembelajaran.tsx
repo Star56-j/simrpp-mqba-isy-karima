@@ -679,7 +679,7 @@ export default function EvaluasiPembelajaranPage({
           <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700">
             <ClipboardCheck className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
             <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Belum ada evaluasi pembelajaran</p>
-            <p className="text-xs text-slate-400 mt-1">Klik tombol "Isi Evaluasi Bulan Ini" untuk mulai mengisi.</p>
+            <p className="text-xs text-slate-400 mt-1">{isAdmin ? 'Belum ada laporan evaluasi pembelajaran yang dikirimkan oleh para guru mata pelajaran.' : 'Klik tombol "Isi Evaluasi Bulan Ini" untuk mulai mengisi.'}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">

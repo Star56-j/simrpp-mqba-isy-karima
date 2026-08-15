@@ -419,7 +419,9 @@ export const EvaluasiWaliKelasComponent: React.FC<EvaluasiWaliKelasProps> = ({ c
           <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">
             {searchQuery || selectedClassId !== 'ALL' 
               ? 'Tidak ditemukan laporan yang sesuai dengan filter pencarian.' 
-              : 'Klik tombol "Buat Laporan Evaluasi" di atas untuk mengirimkan laporan evaluasi kelas ke Bagian Kurikulum.'}
+              : currentUser.role === 'Admin'
+                ? 'Belum ada laporan evaluasi yang dikirimkan oleh para Wali Kelas ke Bagian Kurikulum.'
+                : 'Klik tombol "Buat Laporan Evaluasi" di atas untuk mengirimkan laporan evaluasi kelas ke Bagian Kurikulum.'}
           </p>
         </div>
       ) : (

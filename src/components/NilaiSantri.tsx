@@ -72,10 +72,8 @@ export default function NilaiSantri({
   
   const isWaliKelas = currentUser.role === 'Admin' || myWaliClasses.length > 0;
   
-  // Available classes for dropdown
-  const availableClasses = mode === 'input' 
-    ? (currentUser.role === 'Admin' ? classes : classes.filter(c => myClassIds.includes(c.id) || myWaliClasses.includes(c.id)))
-    : (currentUser.role === 'Admin' ? classes : classes.filter(c => myWaliClasses.includes(c.id)));
+  // Available classes for dropdown — tampilkan seluruh kelas di sekolah
+  const availableClasses = classes;
 
   React.useEffect(() => {
     if (availableClasses.length > 0 && !availableClasses.find(c => c.id === filterClass)) {

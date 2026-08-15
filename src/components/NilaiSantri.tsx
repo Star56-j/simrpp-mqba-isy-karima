@@ -425,41 +425,58 @@ export default function NilaiSantri({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/30 dark:bg-slate-800/20">
-                <tr>
-                  <th className="px-4 py-3 w-12">No</th>
-                  <th className="px-4 py-3 w-24">NIS</th>
-                  <th className="px-4 py-3">Nama Santri</th>
-                  {mode === 'input' ? (
-                    <>
-                      <th className="px-3 py-3 text-center w-20">
-                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /><span>Harian</span></span>
+              <thead className="text-[10px] font-extrabold uppercase tracking-wider bg-slate-100/80 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300">
+                {mode === 'input' ? (
+                  <>
+                    {/* Tier 1 Header */}
+                    <tr className="border-b border-slate-200 dark:border-slate-700">
+                      <th colSpan={3} className="px-4 py-2 text-center bg-slate-200/50 dark:bg-slate-800/80 border-r border-slate-300 dark:border-slate-700">
+                        Identitas Santri
                       </th>
-                      <th className="px-3 py-3 text-center w-20">
-                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /><span>Bulanan</span></span>
+                      <th colSpan={3} className="px-3 py-2 text-center bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 border-r border-teal-200 dark:border-teal-800/60">
+                        1️⃣ Ujian Proses (10%)
                       </th>
-                      <th className="px-3 py-3 text-center w-20">
-                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-teal-500" /><span>UTS (Mid)</span></span>
+                      <th colSpan={1} className="px-3 py-2 text-center bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-r border-rose-200 dark:border-rose-800/60">
+                        2️⃣ Ujian Semester (60%)
                       </th>
-                      <th className="px-3 py-3 text-center w-20">
-                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /><span>UAS Tulis</span></span>
+                      <th colSpan={1} className="px-3 py-2 text-center bg-fuchsia-100/80 dark:bg-fuchsia-950/60 text-fuchsia-900 dark:text-fuchsia-200 border-x-2 border-fuchsia-300 dark:border-fuchsia-700 font-black">
+                        3️⃣ UAS Lisan (Terpisah)
                       </th>
-                      <th className="px-3 py-3 text-center w-20">
-                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" /><span>UAS Lisan</span></span>
-                      </th>
-                      <th className="px-3 py-3 text-center w-28 text-indigo-700 dark:text-indigo-300 font-black" title="Nilai Akhir Rapor (30% Akhlaq + 10% Absensi + 10% Mid + 60% UAS Tulis)">
+                      <th colSpan={1} className="px-3 py-2 text-center bg-indigo-100/80 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 border-r border-indigo-300 dark:border-indigo-700 font-black">
                         Nilai Akhir
                       </th>
-                      <th className="px-3 py-3">Catatan</th>
-                      <th className="px-3 py-3 text-center w-20">Aksi</th>
-                    </>
-                  ) : (
-                    <>
-                      <th className="px-4 py-3 text-center text-indigo-700 dark:text-indigo-300 font-black">Nilai Akhir Rapor</th>
-                      <th className="px-4 py-3 text-center w-64">Aksi Rapor</th>
-                    </>
-                  )}
-                </tr>
+                      <th colSpan={2} className="px-3 py-2 text-center bg-slate-200/50 dark:bg-slate-800/80">
+                        Lainnya
+                      </th>
+                    </tr>
+                    {/* Tier 2 Header */}
+                    <tr className="bg-slate-50 dark:bg-slate-900/80">
+                      <th className="px-4 py-2.5 w-12">No</th>
+                      <th className="px-4 py-2.5 w-24">NIS</th>
+                      <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-700">Nama Santri</th>
+                      <th className="px-3 py-2.5 text-center w-20">Harian</th>
+                      <th className="px-3 py-2.5 text-center w-20">Bulanan</th>
+                      <th className="px-3 py-2.5 text-center w-20 border-r border-slate-200 dark:border-slate-700">UTS (Mid)</th>
+                      <th className="px-3 py-2.5 text-center w-24 border-r border-slate-200 dark:border-slate-700">UAS Tulis</th>
+                      <th className="px-3 py-2.5 text-center w-28 bg-fuchsia-50 dark:bg-fuchsia-950/40 text-fuchsia-900 dark:text-fuchsia-200 border-x-2 border-fuchsia-300 dark:border-fuchsia-700 font-black">
+                        UAS Lisan
+                      </th>
+                      <th className="px-3 py-2.5 text-center w-28 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 border-r border-indigo-200 dark:border-indigo-800 font-black">
+                        Nilai Akhir
+                      </th>
+                      <th className="px-3 py-2.5">Catatan</th>
+                      <th className="px-3 py-2.5 text-center w-20">Aksi</th>
+                    </tr>
+                  </>
+                ) : (
+                  <tr>
+                    <th className="px-4 py-3 w-12">No</th>
+                    <th className="px-4 py-3 w-24">NIS</th>
+                    <th className="px-4 py-3">Nama Santri</th>
+                    <th className="px-4 py-3 text-center text-indigo-700 dark:text-indigo-300 font-black">Nilai Akhir Rapor</th>
+                    <th className="px-4 py-3 text-center w-64">Aksi Rapor</th>
+                  </tr>
+                )}
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {santriList.map((santri, idx) => {
@@ -472,7 +489,7 @@ export default function NilaiSantri({
                       <tr key={santri.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                         <td className="px-4 py-3 text-slate-500">{idx + 1}</td>
                         <td className="px-4 py-3 font-mono text-xs">{santri.nis}</td>
-                        <td className="px-4 py-3 font-bold">{santri.name}</td>
+                        <td className="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-800">{santri.name}</td>
                         
                         {/* Harian */}
                         <td className="px-3 py-3 text-center">
@@ -497,7 +514,7 @@ export default function NilaiSantri({
                           )}
                         </td>
                         {/* UTS */}
-                        <td className="px-3 py-3 text-center">
+                        <td className="px-3 py-3 text-center border-r border-slate-200 dark:border-slate-800">
                           {isEditing ? (
                             <input type="number" min="0" max="100" value={editUts} onChange={e => setEditUts(e.target.value)}
                               placeholder="0" className="w-14 px-1.5 py-1 text-center border border-teal-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-teal-500" />
@@ -508,7 +525,7 @@ export default function NilaiSantri({
                           )}
                         </td>
                         {/* UAS Tulis */}
-                        <td className="px-3 py-3 text-center">
+                        <td className="px-3 py-3 text-center border-r border-slate-200 dark:border-slate-800">
                           {isEditing ? (
                             <input type="number" min="0" max="100" value={editUas} onChange={e => setEditUas(e.target.value)}
                               placeholder="0" className="w-14 px-1.5 py-1 text-center border border-rose-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-rose-500" />
@@ -518,23 +535,23 @@ export default function NilaiSantri({
                             </span>
                           )}
                         </td>
-                        {/* UAS Lisan */}
-                        <td className="px-3 py-3 text-center">
+                        {/* UAS Lisan (TERPISAH) */}
+                        <td className="px-3 py-3 text-center bg-fuchsia-50/60 dark:bg-fuchsia-950/30 border-x-2 border-fuchsia-300 dark:border-fuchsia-700">
                           {isEditing ? (
                             <input type="number" min="0" max="100" value={editUasLisan} onChange={e => setEditUasLisan(e.target.value)}
-                              placeholder="0" className="w-14 px-1.5 py-1 text-center border border-fuchsia-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-fuchsia-500" />
+                              placeholder="0" className="w-16 px-1.5 py-1 text-center font-bold border border-fuchsia-400 bg-white dark:bg-slate-900 rounded text-xs focus:outline-none focus:ring-2 focus:ring-fuchsia-500" />
                           ) : (
-                            <span className={`font-bold text-xs ${n ? scoreColor(n.uasLisan || 0) : 'text-slate-300'}`}>
+                            <span className={`font-extrabold text-xs px-2 py-0.5 rounded ${n && n.uasLisan && n.uasLisan > 0 ? 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/50 dark:text-fuchsia-300 border border-fuchsia-200' : 'text-slate-300'}`}>
                               {n && n.uasLisan && n.uasLisan > 0 ? n.uasLisan : '-'}
                             </span>
                           )}
                         </td>
-                        {/* Rata-rata */}
-                        <td className="px-3 py-3 text-center">
+                        {/* Nilai Akhir Rapor */}
+                        <td className="px-3 py-3 text-center bg-indigo-50/60 dark:bg-indigo-950/30 border-r border-indigo-200 dark:border-indigo-800">
                           {!isEditing && n ? (
                             <span className={`font-black text-sm ${scoreColor(avg)}`}>{avg > 0 ? avg : '-'}</span>
                           ) : isEditing ? (
-                            <span className="text-[10px] text-slate-400 italic">Auto</span>
+                            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold italic">Auto</span>
                           ) : (
                             <span className="text-slate-300">-</span>
                           )}

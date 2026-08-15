@@ -175,7 +175,9 @@ export const api = {
   async createSantriAttendanceGuru(data: any): Promise<SantriAttendance> { return fetchJson<SantriAttendance>('/api/santri_attendances', { method: 'POST', body: JSON.stringify(data) }); },
   async updateSantriAttendance(id: string, data: Partial<SantriAttendance>): Promise<SantriAttendance> { return fetchJson<SantriAttendance>(`/api/santri_attendances/${id}`, { method: 'PUT', body: JSON.stringify(data) }); },
   async deleteSantriAttendance(id: string): Promise<void> { await fetchJson(`/api/santri_attendances/${id}`, { method: 'DELETE' }); },
-  async createSantriAttendanceBulk(data: { attendances: any[] }): Promise<void> { await Promise.all(data.attendances.map(a => this.createSantriAttendance(a))); },
+  async createSantriAttendanceBulk(data: { attendances: any[] }): Promise<void> {
+    await fetchJson('/api/santri_attendances/bulk', { method: 'POST', body: JSON.stringify(data) });
+  },
   
   async getSantriAttendanceSummary(params?: any): Promise<SantriAttendanceSummary[]> {
     const attendances = await this.getSantriAttendances(params);

@@ -1,9 +1,10 @@
 import React from 'react';
-import { ClipboardList, Plus, CheckCircle, AlertCircle, Download, Upload } from 'lucide-react';
+import { ClipboardList, Plus, CheckCircle, AlertCircle, Download, Upload, Calendar } from 'lucide-react';
 import { Santri, SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester, TeachingSchedule } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
 import { parseExcelFile } from '../utils/importExcel';
+import BulkMonthlySantriModal from './BulkMonthlySantriModal';
 
 interface AttendanceSantriGuruProps {
   academicYears: AcademicYear[];
@@ -73,6 +74,7 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
   const [formError,   setFormError]   = React.useState('');
   const [formSuccess, setFormSuccess] = React.useState('');
   const [editingId,   setEditingId]   = React.useState<string | null>(null);
+  const [showBulkSantriModal, setShowBulkSantriModal] = React.useState(false);
 
   const buildParams = React.useCallback(() => {
     const p: Record<string, string> = { academicYearId: filterAY, semesterId: filterSem, year: filterYear };
@@ -216,9 +218,15 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Absensi Santri</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Catat dan pantau kehadiran seluruh santri per kelas secara langsung.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Absensi Santri</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Catat dan pantau kehadiran seluruh santri per kelas secara langsung.</p>
+        </div>
+        <button onClick={() => setShowBulkSantriModal(true)}
+          className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition">
+          <Calendar className="w-4 h-4"/><span>⚡ Input Rekap Bulanan Santri Massal</span>
+        </button>
       </div>
 
       {/* Tab & Export */}
@@ -692,6 +700,18 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
           )}
         </div>
       )}
+
+      {/* BULK MONTHLY SANTRI MODAL */}
+      <BulkMonthlySantriModal
+        isOpen={showBulkSantriModal}
+        onClose={() => setShowBulkSantriModal(false)}
+        classes={availableClasses}
+        academicYears={academicYears}
+        semesters={semesters}
+        santriList={santriList}
+        onSuccess={() => loadData()}
+        defaultClassId={fClass}
+      />
     </div>
   );
 }

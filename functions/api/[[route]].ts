@@ -221,6 +221,39 @@ app.post('/attendances/bulk', async (c) => {
   }
 });
 
+// Bulk Insert Santri Attendances
+app.post('/santri_attendances/bulk', async (c) => {
+  try {
+    const { attendances } = await c.req.json();
+    if (!Array.isArray(attendances) || attendances.length === 0) {
+      return c.json({ success: true, count: 0 });
+    }
+    const stmt = c.env.DB.prepare(`
+      INSERT INTO santri_attendances (id, class_id, santri_id, date, status, notes, academic_year_id, semester_id, recorded_by, teacher_id, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const batch = attendances.map((a: any) => stmt.bind(
+      a.id || `sa-${crypto.randomUUID()}`,
+      a.classId || a.class_id,
+      a.santriId || a.santri_id,
+      a.date,
+      a.status || 'Hadir',
+      a.notes || '',
+      a.academicYearId || a.academic_year_id,
+      a.semesterId || a.semester_id,
+      a.recordedBy || 'admin',
+      a.teacherId || a.teacher_id || '',
+      new Date().toISOString()
+    ));
+
+    await c.env.DB.batch(batch);
+    return c.json({ success: true, count: attendances.length });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 const tables = [
   'teachers', 'subjects', 'classes', 'academic_years', 'semesters', 
   'rpps', 'activity_logs', 'attendances', 

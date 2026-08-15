@@ -3,15 +3,20 @@ import {
   ClipboardList, Plus, Edit, Trash2, X,
   CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download, Upload
 } from 'lucide-react';
-import { SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester } from '../types';
+import { Santri, SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
 import { parseExcelFile } from '../utils/importExcel';
+import { printGenericTable } from '../utils/printUtils';
+import { shareToWhatsApp } from '../utils/whatsappUtils';
+import ExportBar from './ExportBar';
+import BulkMonthlySantriModal from './BulkMonthlySantriModal';
 
 interface AttendanceSantriAdminProps {
   classes: SchoolClass[];
   academicYears: AcademicYear[];
   semesters: Semester[];
+  santriList: Santri[];
 }
 
 const MONTHS = [
@@ -19,7 +24,7 @@ const MONTHS = [
   'Juli','Agustus','September','Oktober','November','Desember'
 ];
 
-export default function AttendanceSantriAdmin({ classes, academicYears, semesters }: AttendanceSantriAdminProps) {
+export default function AttendanceSantriAdmin({ classes, academicYears, semesters, santriList }: AttendanceSantriAdminProps) {
   const currentYear = new Date().getFullYear().toString();
   const currentMonth = (new Date().getMonth() + 1).toString();
 
@@ -52,12 +57,24 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
   const [fSem, setFSem] = React.useState(semesters[0]?.id || '');
   const [formError, setFormError] = React.useState('');
   const [formSuccess, setFormSuccess] = React.useState('');
+  const [santriStatuses, setSantriStatuses] = React.useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = React.useState(false);
 
   // Delete
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [showBulkSantriModal, setShowBulkSantriModal] = React.useState(false);
 
-  const fTotal = fHadir + fIzin + fSakit + fAlpha;
+  // Initialize santri statuses when class changes
+  React.useEffect(() => {
+    if (fClass) {
+      const initial: Record<string, string> = {};
+      santriList.filter(s => s.classId === fClass).forEach(s => {
+        initial[s.id] = 'Hadir';
+      });
+      setSantriStatuses(initial);
+    }
+  }, [fClass, santriList]);
 
   const loadAttendances = React.useCallback(async () => {
     setLoading(true);
@@ -104,14 +121,46 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
       const dataToExport = summary.map((s, idx) => ({
         'No': idx + 1,
         'Kelas': classes.find(c => c.id === s.classId)?.name || s.classId,
-        'Total Pertemuan': s.totalSessions,
-        'Rata-rata Hadir': Math.round(s.avgHadir),
-        'Rata-rata Izin': Math.round(s.avgIzin),
-        'Rata-rata Sakit': Math.round(s.avgSakit),
-        'Rata-rata Alpha': Math.round(s.avgAlpha)
+        'Total Pertemuan': s.total,
+        'Rata-rata Hadir': Math.round(s.hadir / (s.total || 1)),
+        'Rata-rata Izin': Math.round(s.izin / (s.total || 1)),
+        'Rata-rata Sakit': Math.round(s.sakit / (s.total || 1)),
+        'Rata-rata Alpha': Math.round(s.alpha / (s.total || 1))
       }));
       exportToExcel(dataToExport, `Rekap_Absensi_Santri_${ayName}_${semName}`);
     }
+  };
+
+  const handlePrint = () => {
+    const title = activeTab === 'input' ? 'Data Absensi Santri' : 'Rekap Absensi Santri';
+    const subtitle = `Periode: ${rekapLabel}`;
+    if (activeTab === 'input') {
+      const headers = ['No', 'Tanggal', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Total', 'Keterangan'];
+      const dataRows = attendances.map((a, idx) => [
+        idx + 1, new Date(a.date).toLocaleDateString('id-ID'), classes.find(c => c.id === a.classId)?.name || a.classId, a.jumlahHadir, a.jumlahIzin, a.jumlahSakit, a.jumlahAlpha, a.jumlahTotal, a.notes || '-'
+      ]);
+      printGenericTable(title, subtitle, headers, dataRows);
+    } else {
+      const headers = ['No', 'Kelas', 'Total Pertemuan', 'Rata-rata Hadir', 'Rata-rata Izin', 'Rata-rata Sakit', 'Rata-rata Alpha'];
+      const dataRows = summary.map((s, idx) => [
+        idx + 1, classes.find(c => c.id === s.classId)?.name || s.classId, s.total, Math.round(s.hadir / (s.total || 1)), Math.round(s.izin / (s.total || 1)), Math.round(s.sakit / (s.total || 1)), Math.round(s.alpha / (s.total || 1))
+      ]);
+      printGenericTable(title, subtitle, headers, dataRows);
+    }
+  };
+
+  const handleWhatsApp = () => {
+    const title = activeTab === 'input' ? 'Data Absensi Santri' : 'Rekap Absensi Santri';
+    const subtitle = `Periode: ${rekapLabel}`;
+    let text = `*${subtitle}*\n\n`;
+    
+    if (activeTab === 'input') {
+      text += attendances.slice(0, 50).map(a => `- ${new Date(a.date).toLocaleDateString('id-ID')} | Kelas ${classes.find(c => c.id === a.classId)?.name || a.classId} | H:${a.jumlahHadir} I:${a.jumlahIzin} S:${a.jumlahSakit} A:${a.jumlahAlpha}`).join('\n');
+      if (attendances.length > 50) text += `\n...dan ${attendances.length - 50} data lainnya.`;
+    } else {
+      text += summary.map(s => `- Kelas ${classes.find(c => c.id === s.classId)?.name || s.classId}: Hadir rata-rata ${Math.round(s.hadir / (s.total || 1))}`).join('\n');
+    }
+    shareToWhatsApp(title, text);
   };
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -166,21 +215,38 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
     e.preventDefault();
     setFormError(''); setFormSuccess('');
     if (!fClass || !fDate || !fAY || !fSem) { setFormError('Semua field wajib diisi.'); return; }
+    
+    const classSantris = santriList.filter(s => s.classId === fClass);
+    if (classSantris.length === 0) { setFormError('Tidak ada santri di kelas ini.'); return; }
+    
+    setSubmitting(true);
     try {
-      const payload = {
-        classId: fClass, date: fDate,
-        jumlahHadir: fHadir, jumlahIzin: fIzin, jumlahSakit: fSakit, jumlahAlpha: fAlpha,
-        jumlahTotal: fTotal, notes: fNotes, academicYearId: fAY, semesterId: fSem
-      };
       if (editId) {
-        await api.updateSantriAttendance(editId, payload);
-        setFormSuccess('Absensi santri berhasil diperbarui.');
-      } else {
-        await api.createSantriAttendance(payload);
-        setFormSuccess('Absensi santri berhasil dicatat.');
+        setFormError('Edit riwayat absensi santri format lama tidak didukung. Silakan hapus & input baru.');
+        setSubmitting(false);
+        return;
       }
+
+      const attendancesToSave = classSantris.map(santri => ({
+        classId: fClass,
+        date: fDate,
+        santriId: santri.id,
+        status: santriStatuses[santri.id] || 'Hadir',
+        jumlahHadir: 0, jumlahIzin: 0, jumlahSakit: 0, jumlahAlpha: 0, jumlahTotal: 1,
+        notes: fNotes,
+        academicYearId: fAY,
+        semesterId: fSem
+      }));
+
+      await api.createSantriAttendanceBulk({ attendances: attendancesToSave });
+      setFormSuccess('Absensi santri berhasil dicatat.');
+      
       setTimeout(() => { setShowForm(false); resetForm(); loadAttendances(); loadSummary(); }, 900);
-    } catch (err: any) { setFormError(err.message || 'Gagal menyimpan.'); }
+    } catch (err: any) { 
+      setFormError(err.message || 'Gagal menyimpan.'); 
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -200,15 +266,21 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Absensi Santri</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Catat dan pantau kehadiran santri per kelas MQBA Isy Karima.</p>
         </div>
-        <button onClick={() => { resetForm(); setShowForm(true); }}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition">
-          <Plus className="w-4 h-4"/><span>Catat Absensi</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={() => { resetForm(); setShowForm(true); }}
+            className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition">
+            <Plus className="w-4 h-4"/><span>Catat Harian</span>
+          </button>
+          <button onClick={() => setShowBulkSantriModal(true)}
+            className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition">
+            <Calendar className="w-4 h-4"/><span>⚡ Input Rekap Bulanan Santri Massal</span>
+          </button>
+        </div>
       </div>
 
       {/* Toggle View & Export */}
@@ -230,17 +302,16 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
             <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
               <Upload className="w-4 h-4" /><span>Import</span>
             </button>
-            <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-              <Download className="w-4 h-4" /><span>Export</span>
-            </button>
           </div>
         )}
-        {activeTab === 'rekap' && (
-          <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-            <Download className="w-4 h-4" /><span>Export</span>
-          </button>
-        )}
       </div>
+
+      <ExportBar 
+        onExportExcel={handleExport}
+        onPrint={handlePrint}
+        onWhatsApp={handleWhatsApp}
+        itemName={activeTab === 'input' ? 'Data Absensi Santri' : 'Rekap Absensi Santri'}
+      />
 
       {/* Filter Bar */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs flex flex-wrap gap-3 items-end">
@@ -294,17 +365,50 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
       </div>
 
       {/* TAB: DATA ABSENSI */}
-      {activeTab === 'input' && (
+      {activeTab === 'input' && (() => {
+        // Group by date and class
+        const groupedAttendances = Object.values(
+          attendances.reduce((acc, a) => {
+            const key = `${a.date}-${a.classId}`;
+            if (!acc[key]) {
+              acc[key] = {
+                id: key,
+                date: a.date,
+                classId: a.classId,
+                className: (a as any).class?.name || classes.find(c => c.id === a.classId)?.name || a.classId,
+                hadir: 0, izin: 0, sakit: 0, alpha: 0, total: 0, notes: a.notes,
+                absentees: []
+              };
+            }
+            if (a.status) {
+              acc[key].total++;
+              if (a.status === 'Hadir') acc[key].hadir++;
+              else if (a.status === 'Izin') { acc[key].izin++; acc[key].absentees.push(`${a.santri?.name} (I)`); }
+              else if (a.status === 'Sakit') { acc[key].sakit++; acc[key].absentees.push(`${a.santri?.name} (S)`); }
+              else if (a.status === 'Alpha') { acc[key].alpha++; acc[key].absentees.push(`${a.santri?.name} (A)`); }
+            } else {
+              // Legacy format support
+              acc[key].hadir += (a.jumlahHadir || 0);
+              acc[key].izin += (a.jumlahIzin || 0);
+              acc[key].sakit += (a.jumlahSakit || 0);
+              acc[key].alpha += (a.jumlahAlpha || 0);
+              acc[key].total = acc[key].hadir + acc[key].izin + acc[key].sakit + acc[key].alpha;
+            }
+            return acc;
+          }, {} as Record<string, any>)
+        ).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        return (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs overflow-hidden">
           <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
               Daftar Absensi Santri — {rekapLabel}
             </span>
-            <span className="text-xs text-slate-400">{attendances.length} catatan</span>
+            <span className="text-xs text-slate-400">{groupedAttendances.length} sesi pertemuan</span>
           </div>
           {loading ? (
             <div className="p-12 text-center text-slate-400 text-sm">Memuat data...</div>
-          ) : attendances.length === 0 ? (
+          ) : groupedAttendances.length === 0 ? (
             <div className="p-12 text-center text-slate-400">
               <ClipboardList className="w-10 h-10 mx-auto mb-2 text-slate-200 dark:text-slate-800"/>
               <p className="text-sm font-medium">Belum ada data absensi santri untuk periode ini.</p>
@@ -326,27 +430,41 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-sm">
-                  {attendances.map(a => (
+                  {groupedAttendances.map((a: any) => (
                     <tr key={a.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                       <td className="px-4 py-3 font-mono text-xs text-slate-500">
                         {new Date(a.date).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}
                       </td>
                       <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">
-                        Kelas {(a as any).class?.name || classes.find(c=>c.id===a.classId)?.name || a.classId}
+                        Kelas {a.className}
                       </td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-indigo-600">{a.jumlahHadir}</td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-blue-600">{a.jumlahIzin}</td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-amber-600">{a.jumlahSakit}</td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-rose-600">{a.jumlahAlpha}</td>
-                      <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-300 font-semibold">{a.jumlahTotal}</td>
-                      <td className="px-4 py-3 text-xs text-slate-500 italic">{a.notes || '-'}</td>
+                      <td className="px-4 py-3 text-center font-mono font-bold text-indigo-600">{a.hadir}</td>
+                      <td className="px-4 py-3 text-center font-mono font-bold text-blue-600">{a.izin}</td>
+                      <td className="px-4 py-3 text-center font-mono font-bold text-amber-600">{a.sakit}</td>
+                      <td className="px-4 py-3 text-center font-mono font-bold text-rose-600">{a.alpha}</td>
+                      <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-300 font-semibold">{a.total}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 italic">
+                        {a.notes || '-'}
+                        {a.absentees.length > 0 && (
+                          <div className="mt-1 text-[10px] text-rose-500 font-semibold">{a.absentees.join(', ')}</div>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex justify-center space-x-1.5">
-                          <button onClick={() => openEdit(a)}
-                            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition" title="Edit">
+                          <button onClick={() => alert('Edit massal dinonaktifkan sementara. Silakan hapus & buat ulang.')}
+                            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition disabled:opacity-50" title="Edit">
                             <Edit className="w-3.5 h-3.5"/>
                           </button>
-                          <button onClick={() => setDeleteId(a.id)}
+                          <button onClick={async () => {
+                            if (window.confirm('Hapus seluruh absensi kelas ini pada tanggal tersebut?')) {
+                              setLoading(true);
+                              const recordsToDelete = attendances.filter(rec => rec.date === a.date && rec.classId === a.classId);
+                              try {
+                                for (const rec of recordsToDelete) await api.deleteSantriAttendance(rec.id);
+                                loadAttendances(); loadSummary();
+                              } catch(e){ alert('Gagal menghapus'); } finally { setLoading(false); }
+                            }
+                          }}
                             className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-500 transition" title="Hapus">
                             <Trash2 className="w-3.5 h-3.5"/>
                           </button>
@@ -359,7 +477,8 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
 
       {/* TAB: REKAP */}
       {activeTab === 'rekap' && (
@@ -468,26 +587,62 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
                   <input type="date" required value={fDate} onChange={e=>setFDate(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Total Santri</label>
-                  <input type="number" min={0} value={fTotal} readOnly
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-mono font-bold text-slate-600 focus:outline-none cursor-not-allowed"/>
-                </div>
               </div>
-              {/* Jumlah per status */}
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  {label:'Hadir', val:fHadir, setter:setFHadir, cls:'border-indigo-200 dark:border-indigo-800 focus:ring-indigo-500'},
-                  {label:'Izin', val:fIzin, setter:setFIzin, cls:'border-blue-200 dark:border-blue-800 focus:ring-blue-500'},
-                  {label:'Sakit', val:fSakit, setter:setFSakit, cls:'border-amber-200 dark:border-amber-800 focus:ring-amber-500'},
-                  {label:'Alpha', val:fAlpha, setter:setFAlpha, cls:'border-rose-200 dark:border-rose-800 focus:ring-rose-500'},
-                ].map(({label, val, setter, cls}) => (
-                  <div key={label} className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block text-center">{label}</label>
-                    <input type="number" min={0} value={val} onChange={e=>setter(Number(e.target.value))}
-                      className={`w-full px-2 py-2 rounded-xl border ${cls} bg-white dark:bg-slate-900 text-xs font-mono font-bold text-center focus:outline-none focus:ring-2`}/>
+              
+              {/* Daftar Santri */}
+              <div className="space-y-2 mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Daftar Santri Kelas {classes.find(c => c.id === fClass)?.name}</label>
+                  <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded font-bold">Total: {santriList.filter(s => s.classId === fClass).length} Santri</span>
+                </div>
+                
+                {!fClass ? (
+                  <div className="text-center py-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                    <p className="text-xs text-slate-500">Pilih kelas terlebih dahulu.</p>
                   </div>
-                ))}
+                ) : santriList.filter(s => s.classId === fClass).length === 0 ? (
+                  <div className="text-center py-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                    <p className="text-xs text-slate-500">Tidak ada santri di kelas ini.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 max-h-60 overflow-y-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 sticky top-0 z-10">
+                        <tr>
+                          <th className="px-3 py-2 font-bold uppercase tracking-wider">No</th>
+                          <th className="px-3 py-2 font-bold uppercase tracking-wider">Nama Santri</th>
+                          <th className="px-3 py-2 font-bold uppercase tracking-wider text-center">Hadir</th>
+                          <th className="px-3 py-2 font-bold uppercase tracking-wider text-center">Izin</th>
+                          <th className="px-3 py-2 font-bold uppercase tracking-wider text-center">Sakit</th>
+                          <th className="px-3 py-2 font-bold uppercase tracking-wider text-center">Alpha</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                        {santriList.filter(s => s.classId === fClass).map((santri, idx) => (
+                          <tr key={santri.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                            <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                            <td className="px-3 py-2 font-semibold text-slate-700 dark:text-slate-300">{santri.name}</td>
+                            {['Hadir', 'Izin', 'Sakit', 'Alpha'].map(status => (
+                              <td key={status} className="px-3 py-2 text-center">
+                                <input 
+                                  type="radio" 
+                                  name={`status-${santri.id}`}
+                                  checked={santriStatuses[santri.id] === status || (!santriStatuses[santri.id] && status === 'Hadir')}
+                                  onChange={() => setSantriStatuses(p => ({...p, [santri.id]: status}))}
+                                  className={`w-4 h-4 cursor-pointer ${
+                                    status === 'Hadir' ? 'accent-indigo-600' :
+                                    status === 'Izin' ? 'accent-blue-500' :
+                                    status === 'Sakit' ? 'accent-amber-500' : 'accent-rose-500'
+                                  }`}
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -540,6 +695,18 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
           </div>
         </div>
       )}
+
+      {/* BULK MONTHLY SANTRI MODAL */}
+      <BulkMonthlySantriModal
+        isOpen={showBulkSantriModal}
+        onClose={() => setShowBulkSantriModal(false)}
+        classes={classes}
+        academicYears={academicYears}
+        semesters={semesters}
+        santriList={santriList}
+        onSuccess={() => { loadAttendances(); loadSummary(); }}
+        defaultClassId={filterClass || classes[0]?.id}
+      />
     </div>
   );
 }

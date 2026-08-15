@@ -216,6 +216,26 @@ CREATE TABLE IF NOT EXISTS password_reset_requests (
   resolved_at TEXT
 );
 
+CREATE TABLE IF NOT EXISTS evaluasi_wali_kelas (
+  id TEXT PRIMARY KEY,
+  guru_id TEXT,
+  guru_nama TEXT,
+  kelas_id TEXT,
+  kelas_nama TEXT,
+  tipe_periode TEXT DEFAULT 'bulanan',
+  bulan TEXT,
+  tahun TEXT,
+  semester TEXT,
+  tahun_ajaran TEXT,
+  laporan_kbm TEXT,
+  masalah_kelas TEXT,
+  perkembangan_santri TEXT,
+  rekomendasi_kurikulum TEXT,
+  tanggapan_admin TEXT,
+  created_at TEXT,
+  updated_at TEXT
+);
+
 -- ================================================================
 -- SEED DATA
 -- ================================================================

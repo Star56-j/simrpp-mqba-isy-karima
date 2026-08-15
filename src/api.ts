@@ -1,7 +1,7 @@
 import {
   User, Teacher, Subject, SchoolClass, AcademicYear, Semester, TeachingSchedule, RPP, ActivityLog,
   Attendance, AttendanceSummary, SantriAttendance, SantriAttendanceSummary, WaliKelas, Santri, Nilai,
-  AdminStats, GuruStats, RaporDetail, Pengumuman, EvaluasiPembelajaran, PasswordResetRequest
+  AdminStats, GuruStats, RaporDetail, Pengumuman, EvaluasiPembelajaran, PasswordResetRequest, TanyaAdmin, EvaluasiWaliKelas
 } from './types';
 
 const getHeaders = () => {
@@ -280,6 +280,37 @@ export const api = {
   },
   async deleteTanyaAdmin(id: string): Promise<void> {
     await fetchJson(`/api/tanya_admin/${id}`, { method: 'DELETE' });
+  },
+  async getEvaluasiWaliKelas(): Promise<EvaluasiWaliKelas[]> {
+    const raw = await fetchJson<any[]>('/api/evaluasi_wali_kelas').catch(() => []);
+    return raw.map(r => ({
+      id: r.id,
+      guruId: r.guru_id || r.guruId,
+      guruNama: r.guru_nama || r.guruNama,
+      kelasId: r.kelas_id || r.kelasId,
+      kelasNama: r.kelas_nama || r.kelasNama,
+      tipePeriode: r.tipe_periode || r.tipePeriode || 'bulanan',
+      bulan: r.bulan,
+      tahun: r.tahun,
+      semester: r.semester,
+      tahunAjaran: r.tahun_ajaran || r.tahunAjaran,
+      laporanKbm: r.laporan_kbm || r.laporanKbm || '',
+      masalahKelas: r.masalah_kelas || r.masalahKelas || '',
+      perkembanganSantri: r.perkembangan_santri || r.perkembanganSantri || '',
+      rekomendasiKurikulum: r.rekomendasi_kurikulum || r.rekomendasiKurikulum || '',
+      tanggapanAdmin: r.tanggapan_admin || r.tanggapanAdmin || '',
+      createdAt: r.created_at || r.createdAt || new Date().toISOString(),
+      updatedAt: r.updated_at || r.updatedAt
+    }));
+  },
+  async createEvaluasiWaliKelas(data: any): Promise<EvaluasiWaliKelas> {
+    return fetchJson<EvaluasiWaliKelas>('/api/evaluasi_wali_kelas', { method: 'POST', body: JSON.stringify(data) });
+  },
+  async updateEvaluasiWaliKelas(id: string, data: Partial<EvaluasiWaliKelas>): Promise<EvaluasiWaliKelas> {
+    return fetchJson<EvaluasiWaliKelas>(`/api/evaluasi_wali_kelas/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  async deleteEvaluasiWaliKelas(id: string): Promise<void> {
+    await fetchJson(`/api/evaluasi_wali_kelas/${id}`, { method: 'DELETE' });
   },
   async setSecurityQuestion(question: string, answer: string): Promise<{ message: string }> { return { message: 'Success' }; },
 };

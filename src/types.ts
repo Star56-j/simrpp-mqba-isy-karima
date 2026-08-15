@@ -406,3 +406,23 @@ export interface EvaluasiPembelajaran {
   semester?: Semester;
 }
 
+export interface EvaluasiWaliKelas {
+  id: string;
+  guruId: string;
+  guruNama: string;
+  kelasId: string;
+  kelasNama: string;
+  tipePeriode: 'bulanan' | 'semester';
+  bulan?: string;
+  tahun?: string;
+  semester?: string;
+  tahunAjaran?: string;
+  laporanKbm: string;
+  masalahKelas: string;
+  perkembanganSantri: string;
+  rekomendasiKurikulum: string;
+  tanggapanAdmin?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+

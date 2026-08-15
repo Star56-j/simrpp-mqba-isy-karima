@@ -45,6 +45,7 @@ import EvaluasiPembelajaranPage from './components/EvaluasiPembelajaran';
 import RekapRaporWaliKelas from './components/RekapRaporWaliKelas';
 import ResetRequests from './components/ResetRequests';
 import TanyaAdmin from './components/TanyaAdmin';
+import { EvaluasiWaliKelasComponent } from './components/EvaluasiWaliKelas';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -461,6 +462,11 @@ export default function App() {
           <TanyaAdmin currentUser={user} />
         );
 
+      case 'evaluasi-wali-kelas':
+        return (
+          <EvaluasiWaliKelasComponent currentUser={user} />
+        );
+
       default:
         return (
           <div className="p-8 text-center text-slate-400">
@@ -491,6 +497,7 @@ export default function App() {
       case 'profile-settings': return 'Pengaturan Profil';
       case 'pengumuman': return 'Pengumuman Akademik';
       case 'evaluasi-pembelajaran': return 'Evaluasi Pembelajaran Bulanan';
+      case 'evaluasi-wali-kelas': return 'Evaluasi Wali Kelas ke Kurikulum';
       default: return 'Akademik MQBA Isy Karima';
     }
   };

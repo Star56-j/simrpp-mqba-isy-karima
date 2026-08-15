@@ -679,7 +679,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                   <span>Input Rekap Absensi Guru Bulanan (Massal)</span>
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Isi rekapitulasi jumlah hari Hadir, Izin, Sakit, dan Alpha untuk seluruh pengajar ({teachers.length} orang) secara sekaligus dalam 1 bulan.
+                  Isi rekapitulasi frekuensi mengajar & masuk kelas (Hadir, Izin, Sakit, dan Alpha) untuk seluruh pengajar ({teachers.length} orang) secara sekaligus dalam 1 bulan.
                 </p>
               </div>
               <button onClick={() => setShowBulkModal(false)} className="p-2 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 transition">
@@ -702,18 +702,18 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                   className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Hari Kerja Efektif</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Target Masuk Kelas / Jam</label>
                 <input type="number" value={bulkEffDays} onChange={e=>{
                   const d = Math.max(1, Number(e.target.value)||22);
                   setBulkEffDays(d);
-                }} min={1} max={31}
+                }} min={1} max={100}
                   className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
               </div>
               <div className="col-span-2 sm:col-span-1 md:col-span-2">
                 <button type="button" onClick={() => handleSetAllHadir(bulkEffDays)}
                   className="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-xs transition flex items-center justify-center gap-1.5">
                   <CheckCircle className="w-4 h-4"/>
-                  <span>Set Semua {bulkEffDays} Hadir</span>
+                  <span>Set Semua {bulkEffDays} Kali Masuk</span>
                 </button>
               </div>
             </div>
@@ -730,11 +730,11 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                     <tr>
                       <th className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">No</th>
                       <th className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">Nama Pengajar</th>
-                      <th className="px-3 py-3 text-center border-b border-slate-100 dark:border-slate-800 text-indigo-600">Hadir</th>
+                      <th className="px-3 py-3 text-center border-b border-slate-100 dark:border-slate-800 text-indigo-600">Hadir (Masuk)</th>
                       <th className="px-3 py-3 text-center border-b border-slate-100 dark:border-slate-800 text-blue-600">Izin</th>
                       <th className="px-3 py-3 text-center border-b border-slate-100 dark:border-slate-800 text-amber-600">Sakit</th>
                       <th className="px-3 py-3 text-center border-b border-slate-100 dark:border-slate-800 text-rose-600">Alpha</th>
-                      <th className="px-3 py-3 text-center border-b border-slate-100 dark:border-slate-800">Total</th>
+                      <th className="px-3 py-3 text-center border-b border-slate-100 dark:border-slate-800">Total Masuk</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-xs">
@@ -748,31 +748,31 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                             {t.name}
                           </td>
                           <td className="px-3 py-2.5 text-center">
-                            <input type="number" min={0} max={31}
+                            <input type="number" min={0} max={100}
                               value={item.hadir}
                               onChange={e => handleBulkChange(t.id, 'hadir', Number(e.target.value))}
                               className="w-16 px-2 py-1 text-center font-mono font-bold text-indigo-600 border border-indigo-200 dark:border-indigo-900 rounded-lg bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"/>
                           </td>
                           <td className="px-3 py-2.5 text-center">
-                            <input type="number" min={0} max={31}
+                            <input type="number" min={0} max={100}
                               value={item.izin}
                               onChange={e => handleBulkChange(t.id, 'izin', Number(e.target.value))}
                               className="w-16 px-2 py-1 text-center font-mono font-bold text-blue-600 border border-blue-200 dark:border-blue-900 rounded-lg bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"/>
                           </td>
                           <td className="px-3 py-2.5 text-center">
-                            <input type="number" min={0} max={31}
+                            <input type="number" min={0} max={100}
                               value={item.sakit}
                               onChange={e => handleBulkChange(t.id, 'sakit', Number(e.target.value))}
                               className="w-16 px-2 py-1 text-center font-mono font-bold text-amber-600 border border-amber-200 dark:border-amber-900 rounded-lg bg-white dark:bg-slate-900 focus:ring-2 focus:ring-amber-500 focus:outline-none"/>
                           </td>
                           <td className="px-3 py-2.5 text-center">
-                            <input type="number" min={0} max={31}
+                            <input type="number" min={0} max={100}
                               value={item.alpha}
                               onChange={e => handleBulkChange(t.id, 'alpha', Number(e.target.value))}
                               className="w-16 px-2 py-1 text-center font-mono font-bold text-rose-600 border border-rose-200 dark:border-rose-900 rounded-lg bg-white dark:bg-slate-900 focus:ring-2 focus:ring-rose-500 focus:outline-none"/>
                           </td>
                           <td className="px-3 py-2.5 text-center font-mono font-bold text-slate-600 dark:text-slate-300">
-                            {tot} Hari
+                            {tot} Kali
                           </td>
                         </tr>
                       );

@@ -167,21 +167,17 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
           </div>
 
-          {/* Illustration - User Uploaded Classroom Scene */}
+          {/* Illustration - Classroom Scene without background */}
           <div className="relative z-10 flex items-center justify-center my-3 flex-1">
-            <div className="relative w-full">
-              <div className="rounded-2xl p-1.5 bg-gradient-to-b from-sky-50 to-amber-50/50 border border-sky-100/80 shadow-md overflow-hidden group">
-                <img
-                  src="/islamic_user_classroom.jpg"
-                  alt="Suasana KBM Kelas Ustadz dan Santri MQBA Isy Karima"
-                  className="w-full h-auto max-h-56 object-cover rounded-xl transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-              </div>
-              {/* Floating Islamic star badges */}
-              <div className="absolute -top-2 -right-2 bg-white/90 backdrop-blur-xs text-sky-600 text-xs px-2 py-0.5 rounded-full font-bold shadow-xs border border-sky-100 flex items-center gap-1">
-                <span>✦</span>
-                <span className="text-[10px]">Pendidikan Qur'ani</span>
-              </div>
+            <div className="relative w-full flex items-center justify-center">
+              <img
+                src="/islamic_login_simple.png"
+                alt="Ilustrasi Ustadz dan Santri Belajar di Kelas"
+                className="w-full max-w-[280px] sm:max-w-[320px] h-auto object-contain drop-shadow-sm hover:scale-[1.02] transition-transform duration-500"
+              />
+              {/* Floating Islamic stars */}
+              <div className="absolute -top-1 right-2 text-sky-400/40 text-2xl animate-float">✦</div>
+              <div className="absolute bottom-2 left-2 text-sky-500/30 text-xl" style={{animationDelay: '1s'}}>✦</div>
             </div>
           </div>
 

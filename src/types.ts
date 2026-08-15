@@ -358,6 +358,8 @@ export interface TanyaAdmin {
   replyAt?: string;
   reply_at?: string;
   status: 'Pending' | 'Dijawab';
+  imageUrl?: string;
+  image_url?: string;
   createdAt?: string;
   created_at?: string;
   updatedAt?: string;

@@ -1,8 +1,9 @@
-import React from 'react';
-import { BookOpen, LogOut, GraduationCap, Calendar, Printer } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, LogOut, GraduationCap, Calendar, Printer, HelpCircle } from 'lucide-react';
 import { User, Santri, Nilai, AcademicYear, Semester } from '../types';
 import { api } from '../api';
 import { printRapor } from '../utils/printRapor';
+import TanyaAdmin from './TanyaAdmin';
 
 interface WaliDashboardProps {
   user: User;
@@ -12,14 +13,17 @@ interface WaliDashboardProps {
 }
 
 export default function WaliDashboard({ user, academicYears, semesters, onLogout }: WaliDashboardProps) {
-  const [santri, setSantri] = React.useState<Santri | null>(null);
-  const [nilaiList, setNilaiList] = React.useState<Nilai[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [printing, setPrinting] = React.useState(false);
+  const [santri, setSantri] = useState<Santri | null>(null);
+  const [nilaiList, setNilaiList] = useState<Nilai[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [printing, setPrinting] = useState(false);
+
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'rapor' | 'tanyaAdmin'>('rapor');
 
   // Filter
-  const [filterAY, setFilterAY] = React.useState(academicYears[0]?.id || '');
-  const [filterSem, setFilterSem] = React.useState(semesters[0]?.id || '');
+  const [filterAY, setFilterAY] = useState(academicYears[0]?.id || '');
+  const [filterSem, setFilterSem] = useState(semesters[0]?.id || '');
 
   React.useEffect(() => {
     // Current user for WaliSantri has santriId set.
@@ -63,7 +67,7 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
     <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0f0b09] font-sans selection:bg-[#6f2f22] selection:text-white pb-16 transition-colors duration-300">
       {/* Navbar */}
       <nav className="bg-[#331c44] text-[#fff8e8] shadow-md sticky top-0 z-50 border-b border-[#dfc88f]/20 backdrop-blur-md bg-opacity-95">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
           <div className="flex items-center space-x-3">
             <img src="/logo-mqba.png" alt="Logo" className="h-9 w-9 bg-white/10 rounded-xl p-1.5 shadow-inner border border-white/5" />
             <div>
@@ -71,16 +75,45 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
               <p className="text-[9px] text-[#efe2c5]/75 font-bold uppercase tracking-wider mt-0.5">Akademik MQBA Isy Karima</p>
             </div>
           </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-1.5 bg-black/20 p-1 rounded-xl border border-white/10">
+            <button
+              onClick={() => setActiveTab('rapor')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'rapor' ? 'bg-[#dfc88f] text-[#331c44] shadow-xs' : 'text-[#efe2c5]/80 hover:text-white'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Rapor Santri</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('tanyaAdmin')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'tanyaAdmin' ? 'bg-[#dfc88f] text-[#331c44] shadow-xs' : 'text-[#efe2c5]/80 hover:text-white'
+              }`}
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Tanya Admin</span>
+            </button>
+          </div>
+
           <button onClick={onLogout}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/25 text-rose-200 transition text-[10px] font-black uppercase tracking-wider cursor-pointer active:scale-95 border border-rose-500/10">
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/25 text-rose-200 transition text-[10px] font-black uppercase tracking-wider cursor-pointer active:scale-95 border border-rose-500/10 shrink-0">
             <LogOut className="w-3.5 h-3.5" /><span>Keluar</span>
           </button>
         </div>
       </nav>
 
       <main className="max-w-5xl mx-auto px-4 mt-8 space-y-6">
-        {/* Profile Card */}
-        <div className="bg-[#fffdf8] dark:bg-[#1a1310] border border-[#c7a86a]/20 dark:border-[#c7a86a]/10 rounded-[2rem] p-6 shadow-lg shadow-[#79462e]/5 dark:shadow-black/40 relative overflow-hidden premium-card">
+        {activeTab === 'tanyaAdmin' ? (
+          <div className="bg-[#fffdf8] dark:bg-[#1a1310] border border-[#c7a86a]/20 dark:border-[#c7a86a]/10 rounded-[2rem] p-6 shadow-lg">
+            <TanyaAdmin currentUser={user} />
+          </div>
+        ) : (
+          <>
+            {/* Profile Card */}
+            <div className="bg-[#fffdf8] dark:bg-[#1a1310] border border-[#c7a86a]/20 dark:border-[#c7a86a]/10 rounded-[2rem] p-6 shadow-lg shadow-[#79462e]/5 dark:shadow-black/40 relative overflow-hidden premium-card">
           <div className="absolute right-0 top-0 w-36 h-36 bg-[#331c44]/5 dark:bg-[#dfc88f]/5 rounded-bl-full" />
           <div className="flex items-start space-x-4 relative z-10">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c7a86a] to-[#8f6b39] flex items-center justify-center shadow-lg shadow-[#8f6b39]/20 text-white animate-float">
@@ -223,6 +256,8 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
             </div>
           )}
         </div>
+          </>
+        )}
       </main>
     </div>
   );

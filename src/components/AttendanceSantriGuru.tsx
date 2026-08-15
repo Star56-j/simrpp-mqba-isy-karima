@@ -588,10 +588,19 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button onClick={() => {
-                          alert('Edit data massal per santri melalui Riwayat saat ini tidak tersedia.');
+                          setFClass(a.classId);
+                          setFDate(a.date);
+                          const sessionRecords = attendances.filter(rec => rec.date === a.date && rec.classId === a.classId);
+                          const existingStatuses: Record<string, string> = {};
+                          sessionRecords.forEach(rec => {
+                            existingStatuses[rec.santriId] = rec.status;
+                          });
+                          setSantriStatuses(existingStatuses);
+                          if (a.notes) setFNotes(a.notes);
+                          setActiveTab('isi');
                         }}
-                          className="px-2 py-1 text-xs font-bold text-slate-400 hover:text-indigo-600 transition disabled:opacity-50"
-                          title="Edit"
+                          className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition mr-1"
+                          title="Edit Absensi Sesi Ini"
                         >
                           Edit
                         </button>

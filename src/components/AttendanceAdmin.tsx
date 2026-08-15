@@ -191,7 +191,12 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
       });
 
       if (recordsToCreate.length > 0) {
-        await api.createAttendanceBulk(recordsToCreate);
+        await api.createAttendanceBulk({
+          attendances: recordsToCreate,
+          overwriteMonth: true,
+          year: bulkYear,
+          month: bulkMonth
+        });
       }
 
       setBulkSuccessMsg(`Berhasil menyimpan rekap absensi bulanan untuk ${teachers.length} guru (${recordsToCreate.length} catatan).`);

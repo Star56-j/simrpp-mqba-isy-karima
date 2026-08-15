@@ -189,7 +189,13 @@ export default function BulkMonthlySantriModal({
       });
 
       if (recordsToCreate.length > 0) {
-        await api.createSantriAttendanceBulk({ attendances: recordsToCreate });
+        await api.createSantriAttendanceBulk({
+          attendances: recordsToCreate,
+          overwriteMonth: true,
+          classId: selectedClass,
+          year: bulkYear,
+          month: bulkMonth
+        });
       }
 
       const targetClassName = classes.find(c => c.id === selectedClass)?.name || 'Kelas';

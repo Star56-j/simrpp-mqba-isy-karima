@@ -134,8 +134,8 @@ export const api = {
     return res;
   },
   async createAttendance(data: Omit<Attendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>): Promise<Attendance> { return fetchJson<Attendance>('/api/attendances', { method: 'POST', body: JSON.stringify(data) }); },
-  async createAttendanceBulk(attendances: Omit<Attendance, 'id' | 'recordedBy' | 'createdAt' | 'updatedAt'>[]): Promise<void> {
-    await fetchJson('/api/attendances/bulk', { method: 'POST', body: JSON.stringify({ attendances }) });
+  async createAttendanceBulk(data: { attendances: any[]; overwriteMonth?: boolean; year?: string; month?: string }): Promise<void> {
+    await fetchJson('/api/attendances/bulk', { method: 'POST', body: JSON.stringify(data) });
   },
   async selfAttendance(data: any): Promise<Attendance> { 
     const u = this.getCurrentUser();
@@ -175,7 +175,7 @@ export const api = {
   async createSantriAttendanceGuru(data: any): Promise<SantriAttendance> { return fetchJson<SantriAttendance>('/api/santri_attendances', { method: 'POST', body: JSON.stringify(data) }); },
   async updateSantriAttendance(id: string, data: Partial<SantriAttendance>): Promise<SantriAttendance> { return fetchJson<SantriAttendance>(`/api/santri_attendances/${id}`, { method: 'PUT', body: JSON.stringify(data) }); },
   async deleteSantriAttendance(id: string): Promise<void> { await fetchJson(`/api/santri_attendances/${id}`, { method: 'DELETE' }); },
-  async createSantriAttendanceBulk(data: { attendances: any[] }): Promise<void> {
+  async createSantriAttendanceBulk(data: { attendances: any[]; overwriteMonth?: boolean; classId?: string; year?: string; month?: string }): Promise<void> {
     await fetchJson('/api/santri_attendances/bulk', { method: 'POST', body: JSON.stringify(data) });
   },
   

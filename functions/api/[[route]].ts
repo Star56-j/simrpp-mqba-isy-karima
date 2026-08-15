@@ -193,10 +193,17 @@ app.get('/santri_attendances', async (c) => {
 // Bulk Insert Attendances
 app.post('/attendances/bulk', async (c) => {
   try {
-    const { attendances } = await c.req.json();
+    const { attendances, overwriteMonth, year, month } = await c.req.json();
     if (!Array.isArray(attendances) || attendances.length === 0) {
       return c.json({ success: true, count: 0 });
     }
+
+    if (overwriteMonth && year && month) {
+      const mStr = String(month).padStart(2, '0');
+      const datePrefix = `${year}-${mStr}-%`;
+      await c.env.DB.prepare(`DELETE FROM attendances WHERE date LIKE ?`).bind(datePrefix).run();
+    }
+
     const stmt = c.env.DB.prepare(`
       INSERT INTO attendances (id, teacher_id, date, status, notes, academic_year_id, semester_id, recorded_by, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -224,10 +231,17 @@ app.post('/attendances/bulk', async (c) => {
 // Bulk Insert Santri Attendances
 app.post('/santri_attendances/bulk', async (c) => {
   try {
-    const { attendances } = await c.req.json();
+    const { attendances, overwriteMonth, classId, year, month } = await c.req.json();
     if (!Array.isArray(attendances) || attendances.length === 0) {
       return c.json({ success: true, count: 0 });
     }
+
+    if (overwriteMonth && classId && year && month) {
+      const mStr = String(month).padStart(2, '0');
+      const datePrefix = `${year}-${mStr}-%`;
+      await c.env.DB.prepare(`DELETE FROM santri_attendances WHERE class_id = ? AND date LIKE ?`).bind(classId, datePrefix).run();
+    }
+
     const stmt = c.env.DB.prepare(`
       INSERT INTO santri_attendances (id, class_id, santri_id, date, status, notes, academic_year_id, semester_id, recorded_by, teacher_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

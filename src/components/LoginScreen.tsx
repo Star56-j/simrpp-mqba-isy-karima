@@ -144,66 +144,65 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-20" style={{background: 'radial-gradient(circle, #0284c7 0%, transparent 70%)', transform: 'translate(-40%, -40%)'}} />
       <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-15" style={{background: 'radial-gradient(circle, #0ea5e9 0%, transparent 70%)', transform: 'translate(40%, 40%)'}} />
       
-      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row rounded-3xl overflow-hidden animate-fade-in shadow-2xl" style={{boxShadow: '0 25px 80px rgba(3,105,161,0.25)'}}>
+      <div className="relative z-10 w-full max-w-3xl mx-auto flex flex-col md:flex-row rounded-3xl overflow-hidden animate-fade-in shadow-2xl" style={{boxShadow: '0 20px 60px rgba(3,105,161,0.22)'}}>
         
         {/* Left Side - Illustration Panel */}
-        <div className="hidden md:flex flex-col justify-between w-5/12 bg-white  p-7 relative overflow-hidden">
+        <div className="hidden md:flex flex-col justify-between w-5/12 bg-white p-5 sm:p-6 relative overflow-hidden">
           {/* Islamic Geometric Overlay (light) */}
           <div className="absolute inset-0 opacity-5" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%230284c7' stroke-width='1.5'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%230284c7' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: '60px 60px'}} />
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10" style={{background: 'radial-gradient(circle, #0284c7 0%, transparent 70%)', transform: 'translate(30%, -30%)'}} />
 
           {/* Logo & Title */}
           <div className="relative z-10">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50  border border-sky-100  p-2 shadow-md mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 border border-sky-100 p-1.5 shadow-sm mb-3">
               <img src="/logo-mqba.png" alt="Logo MQBA Isy Karima" className="h-full w-full object-contain" />
             </div>
-            <h1 className="text-2xl font-black leading-tight tracking-tight mb-2 text-slate-800 ">
+            <h1 className="text-xl font-black leading-tight tracking-tight mb-1 text-slate-800">
               Akademik MQBA<br/>
-              <span className="text-sky-600 ">Isy Karima</span>
+              <span className="text-sky-600">Isy Karima</span>
             </h1>
-            <p className="text-slate-500  text-sm leading-relaxed font-medium">
-              Platform terpadu untuk mengelola pembelajaran dengan semangat pendidikan Qur'ani.
+            <p className="text-slate-500 text-xs leading-relaxed font-medium">
+              Platform terpadu mengelola pembelajaran dengan semangat pendidikan Qur'ani.
             </p>
 
           </div>
 
           {/* Illustration - Simple Islamic Flat */}
-          <div className="relative z-10 flex items-center justify-center my-4 flex-1">
+          <div className="relative z-10 flex items-center justify-center my-2 flex-1">
             <div className="relative">
-              {/* No circle background, image directly on white panel to hide its white bg */}
               <div className="flex items-center justify-center">
                 <img
                   src="/islamic_login_simple.png"
                   alt="Ilustrasi Ustadz dan Santri Belajar Qur'an"
-                  className="w-64 h-64 sm:w-72 sm:h-72 object-contain mix-blend-multiply drop-shadow-md"
+                  className="w-44 h-44 sm:w-48 sm:h-48 object-contain mix-blend-multiply"
                 />
               </div>
               {/* Floating Islamic stars */}
-              <div className="absolute top-2 -right-6 text-sky-400/40 text-3xl animate-float">✦</div>
-              <div className="absolute bottom-6 -left-6 text-sky-500/30 text-2xl" style={{animationDelay: '1s'}}>✦</div>
+              <div className="absolute top-1 -right-4 text-sky-400/40 text-2xl animate-float">✦</div>
+              <div className="absolute bottom-4 -left-4 text-sky-500/30 text-xl" style={{animationDelay: '1s'}}>✦</div>
             </div>
           </div>
 
         </div>
 
         {/* Right Side - Form */}
-        <div className="relative w-full md:w-7/12 p-6 sm:p-8 flex flex-col justify-center text-white overflow-hidden" style={{background: 'linear-gradient(160deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%)'}}>
+        <div className="relative w-full md:w-7/12 p-5 sm:p-6 flex flex-col justify-center text-white overflow-hidden" style={{background: 'linear-gradient(160deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%)'}}>
           {/* Form Islamic Ornament Background */}
           <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E")`, 
             backgroundSize: '60px 60px'
           }} />
           
-          <div className="relative z-10 mb-5">
-            <div className="md:hidden flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 p-2 shadow-lg mb-6">
+          <div className="relative z-10 mb-4">
+            <div className="md:hidden flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-2 shadow-lg mb-4">
               <img src="/logo-mqba.png" alt="Logo MQBA" className="h-full w-full object-contain brightness-0 invert" />
             </div>
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 text-sky-100 text-xs font-bold mb-4">
+            <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-2.5 py-0.5 text-sky-100 text-[10px] font-bold mb-3">
               <span className="w-1.5 h-1.5 bg-sky-300 rounded-full animate-pulse"></span>
               SISTEM AKADEMIK ONLINE
             </div>
-            <h2 className="text-2xl font-black tracking-tight text-white">Ahlan wa Sahlan</h2>
-            <p className="mt-1.5 text-sm text-sky-200/80">Masukkan kredensial Anda untuk mengakses sistem.</p>
+            <h2 className="text-xl font-black tracking-tight text-white">Ahlan wa Sahlan</h2>
+            <p className="mt-0.5 text-xs text-sky-200/80">Masukkan kredensial Anda untuk mengakses sistem.</p>
           </div>
 
           {error && (

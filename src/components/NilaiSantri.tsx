@@ -57,8 +57,9 @@ export default function NilaiSantri({
   const [saving, setSaving] = React.useState(false);
   const [msg, setMsg] = React.useState({ type: '', text: '' });
 
-  // Rapor modal state
+  // Rapor modal & ref state
   const [raporModalSantri, setRaporModalSantri] = React.useState<Santri | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Filter schedules yang diajar oleh guru saat ini
   const teacherIds = [currentUser.teacherId, currentUser.id, (currentUser as any).teacher_id].filter(Boolean);

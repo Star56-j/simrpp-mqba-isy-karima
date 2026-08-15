@@ -146,38 +146,33 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       
       <div className="relative z-10 w-full max-w-3xl mx-auto flex flex-col md:flex-row rounded-3xl overflow-hidden animate-fade-in shadow-2xl" style={{boxShadow: '0 20px 60px rgba(3,105,161,0.22)'}}>
         
-        {/* Left Side - Illustration Panel */}
-        <div className="hidden md:flex flex-col justify-between w-5/12 bg-white p-5 sm:p-6 relative overflow-hidden">
+        {/* Left Side - Centered Info Panel */}
+        <div className="hidden md:flex flex-col items-center justify-center text-center w-5/12 bg-white p-6 sm:p-8 relative overflow-hidden">
           {/* Islamic Geometric Overlay (light) */}
           <div className="absolute inset-0 opacity-5" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%230284c7' stroke-width='1.5'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%230284c7' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: '60px 60px'}} />
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10" style={{background: 'radial-gradient(circle, #0284c7 0%, transparent 70%)', transform: 'translate(30%, -30%)'}} />
+          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-10" style={{background: 'radial-gradient(circle, #0ea5e9 0%, transparent 70%)', transform: 'translate(-30%, 30%)'}} />
 
-          {/* Logo & Title */}
-          <div className="relative z-10">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 border border-sky-100 p-1.5 shadow-sm mb-3">
+          {/* Centered Logo & Title */}
+          <div className="relative z-10 flex flex-col items-center justify-center my-auto">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-50 border border-sky-100 p-2.5 shadow-md mb-4 hover:scale-105 transition-transform duration-300">
               <img src="/logo-mqba.png" alt="Logo MQBA Isy Karima" className="h-full w-full object-contain" />
             </div>
-            <h1 className="text-xl font-black leading-tight tracking-tight mb-1 text-slate-800">
+            <h1 className="text-2xl font-black leading-tight tracking-tight mb-2 text-slate-800">
               Akademik MQBA<br/>
               <span className="text-sky-600">Isy Karima</span>
             </h1>
-            <p className="text-slate-500 text-xs leading-relaxed font-medium">
+            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-medium max-w-xs mx-auto">
               Platform terpadu mengelola pembelajaran dengan semangat pendidikan Qur'ani.
             </p>
 
-          </div>
-
-          {/* Illustration - Classroom Scene without background */}
-          <div className="relative z-10 flex items-center justify-center my-3 flex-1">
-            <div className="relative w-full flex items-center justify-center">
-              <img
-                src="/islamic_login_simple.png"
-                alt="Ilustrasi Ustadz dan Santri Belajar di Kelas"
-                className="w-full max-w-[320px] sm:max-w-[380px] h-auto object-contain drop-shadow-md hover:scale-[1.02] transition-transform duration-500"
-              />
-              {/* Floating Islamic stars */}
-              <div className="absolute -top-1 right-2 text-sky-400/40 text-2xl animate-float">✦</div>
-              <div className="absolute bottom-2 left-2 text-sky-500/30 text-xl" style={{animationDelay: '1s'}}>✦</div>
+            {/* Decorative Islamic stars accent */}
+            <div className="flex items-center gap-2 mt-6 text-sky-400/60 text-sm font-bold">
+              <span>✦</span>
+              <span className="w-8 h-0.5 bg-sky-200/60 rounded-full"></span>
+              <span className="text-[11px] uppercase tracking-wider text-sky-600/80 font-semibold">Pendidikan Qur'ani</span>
+              <span className="w-8 h-0.5 bg-sky-200/60 rounded-full"></span>
+              <span>✦</span>
             </div>
           </div>
 

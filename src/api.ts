@@ -42,6 +42,7 @@ export const api = {
   },
 
   async getActivityLogs(): Promise<ActivityLog[]> { return fetchJson<ActivityLog[]>('/api/activity_logs').catch(() => []); },
+  async clearActivityLogs(): Promise<void> { await fetchJson('/api/activity_logs/clear_all', { method: 'DELETE' }); },
   
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
     const res = await fetchJson<{ token: string; user: User }>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: email.trim().toLowerCase(), password }) });

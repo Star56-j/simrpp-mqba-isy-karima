@@ -6,9 +6,11 @@ import {
   CalendarDays,
   ShieldAlert,
   User,
-  Filter
+  Filter,
+  Trash2
 } from 'lucide-react';
 import { ActivityLog } from '../types';
+import { api } from '../api';
 
 interface ActivityLogsProps {
   logs: ActivityLog[];
@@ -18,6 +20,21 @@ interface ActivityLogsProps {
 export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [roleFilter, setRoleFilter] = React.useState<string>('Semua');
+  const [clearing, setClearing] = React.useState(false);
+
+  const handleClearAll = async () => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus seluruh log aktivitas sistem? Tindakan ini tidak dapat dibatalkan.')) {
+      setClearing(true);
+      try {
+        await api.clearActivityLogs();
+        onRefresh();
+      } catch (e: any) {
+        alert(e.message || 'Gagal menghapus log aktivitas.');
+      } finally {
+        setClearing(false);
+      }
+    }
+  };
 
   const filteredLogs = (logs || []).filter(log => {
     if (!log) return false;
@@ -44,13 +61,23 @@ export default function ActivityLogs({ logs, onRefresh }: ActivityLogsProps) {
             Audit keamanan dan pelacakan aktivitas kurikulum pengajar MQBA Isy Karima.
           </p>
         </div>
-        <button
-          onClick={onRefresh}
-          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition self-start sm:self-auto"
-        >
-          <RefreshCw className="w-4 h-4 text-indigo-600" />
-          <span>Segarkan Log</span>
-        </button>
+        <div className="flex items-center space-x-2 self-start sm:self-auto">
+          <button
+            onClick={onRefresh}
+            className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition cursor-pointer"
+          >
+            <RefreshCw className="w-4 h-4 text-indigo-600" />
+            <span>Segarkan Log</span>
+          </button>
+          <button
+            onClick={handleClearAll}
+            disabled={clearing || (logs || []).length === 0}
+            className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition cursor-pointer"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>{clearing ? 'Memproses...' : 'Hapus Semua Log'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}

@@ -217,6 +217,34 @@ app.get('/santri_attendances', async (c) => {
       santri: r.santriName ? { id: r.santri_id, name: r.santriName } : undefined,
       teacher: r.teacherName ? { id: r.teacher_id, name: r.teacherName } : undefined
     }));
+// Clear all activity logs
+app.delete('/activity_logs/clear_all', async (c) => {
+  try {
+    await c.env.DB.prepare('DELETE FROM activity_logs').run();
+    return c.json({ success: true, message: 'Semua log aktivitas berhasil dihapus.' });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// Special GET for nilai with field mapping
+app.get('/nilai', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`SELECT * FROM nilai ORDER BY id DESC`).all();
+    const mapped = results.map((r: any) => ({
+      id: r.id,
+      santriId: r.santri_id,
+      subjectId: r.subject_id,
+      classId: r.class_id,
+      academicYearId: r.academic_year_id,
+      semesterId: r.semester_id,
+      harian: r.harian || 0,
+      bulanan: r.bulanan || 0,
+      uts: r.uts || 0,
+      uas: r.uas || 0,
+      uasLisan: r.uas_lisan || 0,
+      notes: r.notes || ''
+    }));
     return c.json(mapped);
   } catch (e: any) {
     return c.json({ error: e.message }, 500);

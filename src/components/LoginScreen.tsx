@@ -321,9 +321,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             </button>
           </form>
 
-          <div className="relative z-10 mt-5 pt-4 border-t border-white/10 text-center">
-            <p className="text-xs font-medium text-white">
-              © {new Date().getFullYear()} Akademik MQBA Isy Karima · Powered by <span className="text-white font-bold">Active Node</span>
+          <div className="relative z-10 mt-4 pt-3 border-t border-white/10 text-center">
+            <p className="text-[10px] font-normal text-sky-200/70 tracking-wide">
+              © {new Date().getFullYear()} Akademik MQBA Isy Karima · Powered by <span className="text-sky-100 font-semibold">Active Node</span>
             </p>
           </div>
         </div>

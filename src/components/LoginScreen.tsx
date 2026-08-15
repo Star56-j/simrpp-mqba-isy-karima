@@ -155,31 +155,28 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
           {/* Centered Logo & Title */}
           <div className="relative z-10 flex flex-col items-center justify-center my-auto">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-50 border border-sky-100 p-2.5 shadow-md mb-4 hover:scale-105 transition-transform duration-300">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white border border-sky-100 p-2 shadow-sm shadow-sky-100/50 mb-3 hover:scale-105 transition-transform duration-300 ring-4 ring-sky-50/50">
               <img src="/logo-mqba.png" alt="Logo MQBA Isy Karima" className="h-full w-full object-contain" />
             </div>
-            <h1 className="text-2xl font-black leading-tight tracking-tight mb-2 text-slate-800">
+            <h1 className="text-xl sm:text-2xl font-black leading-tight tracking-tight mb-2 text-slate-800">
               Akademik MQBA<br/>
-              <span className="text-sky-600">Isy Karima</span>
+              <span className="bg-gradient-to-r from-sky-600 to-sky-500 bg-clip-text text-transparent">Isy Karima</span>
             </h1>
-            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-medium max-w-xs mx-auto">
+            <p className="text-slate-400 text-[11px] sm:text-xs leading-relaxed font-normal max-w-[220px] sm:max-w-[240px] mx-auto text-center tracking-tight">
               Platform terpadu mengelola pembelajaran dengan semangat pendidikan Qur'ani.
             </p>
 
-            {/* Decorative Islamic stars accent */}
-            <div className="flex items-center gap-2 mt-6 text-sky-400/60 text-sm font-bold">
-              <span>✦</span>
-              <span className="w-8 h-0.5 bg-sky-200/60 rounded-full"></span>
-              <span className="text-[11px] uppercase tracking-wider text-sky-600/80 font-semibold">Pendidikan Qur'ani</span>
-              <span className="w-8 h-0.5 bg-sky-200/60 rounded-full"></span>
-              <span>✦</span>
+            {/* Decorative Islamic badge accent */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50/80 border border-sky-100 text-sky-700 text-[10px] font-bold tracking-wider uppercase mt-5 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+              Pendidikan Qur'ani
             </div>
           </div>
 
         </div>
 
         {/* Right Side - Form */}
-        <div className="relative w-full md:w-7/12 p-5 sm:p-6 flex flex-col justify-center text-white overflow-hidden" style={{background: 'linear-gradient(160deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%)'}}>
+        <div className="relative w-full md:w-7/12 p-6 sm:p-7 flex flex-col justify-center text-white overflow-hidden" style={{background: 'linear-gradient(160deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%)'}}>
           {/* Form Islamic Ornament Background */}
           <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E")`, 
@@ -187,56 +184,56 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           }} />
           
           <div className="relative z-10 mb-4">
-            <div className="md:hidden flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-2 shadow-lg mb-4">
+            <div className="md:hidden flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-2 shadow-lg mb-3">
               <img src="/logo-mqba.png" alt="Logo MQBA" className="h-full w-full object-contain brightness-0 invert" />
             </div>
-            <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-2.5 py-0.5 text-sky-100 text-[10px] font-bold mb-3">
+            <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-3 py-0.5 text-sky-100 text-[10px] font-bold tracking-wider uppercase mb-2">
               <span className="w-1.5 h-1.5 bg-sky-300 rounded-full animate-pulse"></span>
-              SISTEM AKADEMIK ONLINE
+              Sistem Akademik Online
             </div>
-            <h2 className="text-xl font-black tracking-tight text-white">Ahlan wa Sahlan</h2>
-            <p className="mt-0.5 text-xs text-sky-200/80">Masukkan kredensial Anda untuk mengakses sistem.</p>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">Ahlan wa Sahlan</h2>
+            <p className="mt-0.5 text-xs text-sky-100/70 font-normal">Masukkan kredensial Anda untuk mengakses sistem.</p>
           </div>
 
           {error && (
-            <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700   ">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span className="font-medium">{error}</span>
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-200/40 bg-rose-500/20 backdrop-blur-md p-3 text-xs text-rose-100 shadow-sm">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" />
+              <span className="font-medium leading-relaxed">{error}</span>
             </div>
           )}
 
           {/* Login Type Toggle */}
-          <div className="flex rounded-xl bg-sky-900/40 p-1 mb-5 border border-white/10 relative z-10 backdrop-blur-sm overflow-x-auto whitespace-nowrap">
+          <div className="flex rounded-2xl bg-slate-900/30 backdrop-blur-md p-1 mb-4 border border-white/10 relative z-10 overflow-x-auto whitespace-nowrap shadow-inner">
             <button
               type="button"
               onClick={() => { setLoginType('guru'); setError(''); }}
-              className={`flex-1 min-w-[100px] rounded-lg py-2.5 px-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 ${loginType === 'guru' ? 'bg-white text-sky-800 shadow-sm' : 'text-sky-200 hover:text-white'}`}
+              className={`flex-1 min-w-[95px] rounded-xl py-2 px-2 text-[11px] font-bold tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none ${loginType === 'guru' ? 'bg-white text-sky-900 shadow-md scale-[1.02]' : 'text-sky-200/80 hover:text-white'}`}
             >
-              <Users className="h-4 w-4 shrink-0" />Pengajar
+              <Users className="h-3.5 w-3.5 shrink-0" />Pengajar
             </button>
             <button
               type="button"
               onClick={() => { setLoginType('walikelas'); setError(''); }}
-              className={`flex-1 min-w-[100px] rounded-lg py-2.5 px-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 ${loginType === 'walikelas' ? 'bg-white text-sky-800 shadow-sm' : 'text-sky-200 hover:text-white'}`}
+              className={`flex-1 min-w-[95px] rounded-xl py-2 px-2 text-[11px] font-bold tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none ${loginType === 'walikelas' ? 'bg-white text-sky-900 shadow-md scale-[1.02]' : 'text-sky-200/80 hover:text-white'}`}
             >
-              <GraduationCap className="h-4 w-4 shrink-0" />Wali Kelas
+              <GraduationCap className="h-3.5 w-3.5 shrink-0" />Wali Kelas
             </button>
             <button
               type="button"
               onClick={() => { setLoginType('walisantri'); setError(''); }}
-              className={`flex-1 min-w-[100px] rounded-lg py-2.5 px-2 text-xs font-bold uppercase tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 ${loginType === 'walisantri' ? 'bg-white text-sky-800 shadow-sm' : 'text-sky-200 hover:text-white'}`}
+              className={`flex-1 min-w-[95px] rounded-xl py-2 px-2 text-[11px] font-bold tracking-wide transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none ${loginType === 'walisantri' ? 'bg-white text-sky-900 shadow-md scale-[1.02]' : 'text-sky-200/80 hover:text-white'}`}
             >
-              <Users className="h-4 w-4 shrink-0" />Wali Santri
+              <Users className="h-3.5 w-3.5 shrink-0" />Wali Santri
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {loginType === 'guru' || loginType === 'walikelas' ? (
               <>
-                <div className="space-y-2 relative z-10">
-                  <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wide text-sky-200">Username / Email</label>
+                <div className="space-y-1.5 relative z-10">
+                  <label htmlFor="email" className="block text-[11px] font-bold uppercase tracking-wider text-sky-200/90">Username / Email</label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-sky-300/70" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-sky-200/70" />
                     <input
                       id="email"
                       name="email"
@@ -246,22 +243,22 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                       placeholder={loginType === 'walikelas' ? "contoh: wali.hasri" : "contoh: ustadz.aidil"}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-black/10 backdrop-blur-sm py-3 pl-11 pr-4 text-sm text-white focus:border-white focus:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-1 focus-visible:ring-offset-sky-900 transition placeholder:text-sky-200/50"
+                      className="w-full rounded-xl border border-white/15 bg-white/10 backdrop-blur-md py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white focus:border-white/40 focus:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 transition-all duration-200 placeholder:text-sky-200/40"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2 relative z-10">
+                <div className="space-y-1.5 relative z-10">
                   <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wide text-sky-200">Kata Sandi</label>
+                    <label htmlFor="password" className="block text-[11px] font-bold uppercase tracking-wider text-sky-200/90">Kata Sandi</label>
                     <button
                       type="button"
                       onClick={() => { setShowForgotModal(true); setForgotEmail(''); setForgotError(''); setForgotSuccess(''); setForgotAnswer(''); setForgotNewPass(''); setForgotConfirmPass(''); setResetStep(1); }}
-                      className="text-xs font-bold text-sky-300 hover:text-white cursor-pointer transition hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900 rounded-sm"
+                      className="text-[11px] font-bold text-sky-200/90 hover:text-white cursor-pointer transition hover:underline focus:outline-none rounded-sm"
                     >Lupa Sandi?</button>
                   </div>
                   <div className="relative">
-                    <KeyRound className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-sky-300/70" />
+                    <KeyRound className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-sky-200/70" />
                     <input
                       id="password"
                       name="password"
@@ -271,23 +268,23 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-black/10 backdrop-blur-sm py-3 pl-11 pr-10 text-sm text-white focus:border-white focus:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-1 focus-visible:ring-offset-sky-900 transition placeholder:text-sky-200/50"
+                      className="w-full rounded-xl border border-white/15 bg-white/10 backdrop-blur-md py-2.5 pl-10 pr-10 text-xs sm:text-sm text-white focus:border-white/40 focus:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 transition-all duration-200 placeholder:text-sky-200/40"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-300/70 hover:text-white transition cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-200/70 hover:text-white transition cursor-pointer"
                     >
-                      {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="space-y-2 relative z-10">
-                <label htmlFor="nis" className="block text-xs font-bold uppercase tracking-wide text-sky-200">Nama Lengkap Santri</label>
+              <div className="space-y-1.5 relative z-10">
+                <label htmlFor="nis" className="block text-[11px] font-bold uppercase tracking-wider text-sky-200/90">Nama Lengkap Santri</label>
                 <div className="relative">
-                  <GraduationCap className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-sky-300/70" />
+                  <GraduationCap className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-sky-200/70" />
                   <input
                     id="nis"
                     name="nis"
@@ -296,27 +293,26 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     placeholder="Contoh: Ahmad Abdullah"
                     value={nis}
                     onChange={(e) => setNis(e.target.value)}
-                    className="w-full rounded-xl border border-white/20 bg-black/10 backdrop-blur-sm py-3 pl-11 pr-4 text-sm text-white focus:border-white focus:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-1 focus-visible:ring-offset-sky-900 transition placeholder:text-sky-200/50"
+                    className="w-full rounded-xl border border-white/15 bg-white/10 backdrop-blur-md py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white focus:border-white/40 focus:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 transition-all duration-200 placeholder:text-sky-200/40"
                   />
                 </div>
-                <p className="text-xs text-sky-200/60 pt-1">Masukkan nama lengkap santri untuk mengakses portal wali.</p>
+                <p className="text-[11px] text-sky-200/70 pt-0.5">Masukkan nama lengkap santri untuk mengakses portal wali.</p>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold tracking-wide text-white transition-all disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer active:scale-95 shadow-md shadow-sky-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-sky-900"
-              style={{background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)'}}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-xs sm:text-sm font-bold tracking-wide text-white transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer active:scale-95 bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 shadow-lg shadow-sky-600/30 hover:shadow-sky-500/40 border border-sky-400/30"
             >
               <span>{loading ? 'Menghubungkan...' : 'Masuk ke Sistem'}</span>
               {!loading && <ArrowRight className="h-4 w-4" />}
             </button>
           </form>
 
-          <div className="relative z-10 mt-4 pt-3 border-t border-white/10 text-center">
+          <div className="relative z-10 mt-5 pt-3 border-t border-white/10 text-center">
             <p className="text-[10px] font-normal text-sky-200/70 tracking-wide">
-              © {new Date().getFullYear()} Akademik MQBA Isy Karima · Powered by <span className="text-sky-100 font-semibold">Active Node</span>
+              © {new Date().getFullYear()} Akademik MQBA Isy Karima · Powered by <span className="text-white font-semibold">Active Node</span>
             </p>
           </div>
         </div>

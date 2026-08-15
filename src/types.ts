@@ -6,6 +6,21 @@ export interface User {
   teacherId?: string;
   santriId?: string; // Khusus untuk wali santri
   teacher?: Teacher;
+  securityQuestion?: string;
+}
+
+export interface PasswordResetRequest {
+  id: string;
+  teacherId: string;
+  teacherName: string;
+  teacherEmail: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  createdAt: string;
+  resolvedAt?: string;
+  updatedAt?: string;
 }
 
 export interface Teacher {
@@ -154,6 +169,8 @@ export interface SantriAttendance {
   id: string;
   classId: string;
   date: string;
+  santriId?: string;
+  status?: string;
   jumlahHadir: number;
   jumlahIzin: number;
   jumlahSakit: number;
@@ -170,6 +187,7 @@ export interface SantriAttendance {
   class?: SchoolClass;
   academicYear?: AcademicYear;
   semester?: Semester;
+  santri?: Santri;
 }
 
 export interface SantriAttendanceSummary {
@@ -226,6 +244,7 @@ export interface Nilai {
   id: string;
   santriId: string;
   subjectId: string;
+  classId?: string;
   academicYearId: string;
   semesterId: string;
   teacherId: string;
@@ -320,6 +339,29 @@ export interface RaporDetail {
   nisn?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TanyaAdmin {
+  id: string;
+  senderId?: string;
+  sender_id?: string;
+  senderName?: string;
+  sender_name?: string;
+  senderEmail?: string;
+  sender_email?: string;
+  senderRole?: string;
+  sender_role?: string;
+  subject: string;
+  message: string;
+  adminReply?: string;
+  admin_reply?: string;
+  replyAt?: string;
+  reply_at?: string;
+  status: 'Pending' | 'Dijawab';
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
 }
 
 export type PredikatKetercapaian = 'Sangat Baik' | 'Baik' | 'Cukup' | 'Perlu Perbaikan';

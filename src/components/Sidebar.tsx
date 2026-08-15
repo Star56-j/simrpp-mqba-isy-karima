@@ -18,7 +18,8 @@ import {
   FileSpreadsheet,
   Users2,
   Crown,
-  Megaphone
+  Megaphone,
+  HelpCircle
 } from 'lucide-react';
 import { User as UserType } from '../types';
 
@@ -60,6 +61,7 @@ export default function Sidebar({
     { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
     { id: 'rekap-rapor-wali-kelas', label: 'Rekap Rapor Kelas', icon: FileSpreadsheet },
     { id: 'evaluasi-pembelajaran', label: 'Evaluasi Bulanan', icon: Activity },
+    { id: 'tanya-admin', label: 'Tanya Admin', icon: HelpCircle },
     { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
     { id: 'activity-logs', label: 'Activity Log', icon: Activity },
     { id: 'reset-requests', label: 'Reset Sandi Guru', icon: Lock },
@@ -70,6 +72,7 @@ export default function Sidebar({
     { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
     { id: 'rekap-rapor-wali-kelas', label: 'Rekap Rapor Kelas', icon: FileSpreadsheet },
     { id: 'evaluasi-pembelajaran', label: 'Evaluasi Bulanan', icon: Activity },
+    { id: 'tanya-admin', label: 'Tanya Admin', icon: HelpCircle },
     { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ] : [
@@ -78,8 +81,8 @@ export default function Sidebar({
     { id: 'my-attendance', label: 'Absensi Saya', icon: FileSpreadsheet },
     { id: 'my-santri-attendance', label: 'Absensi Santri', icon: Users2 },
     { id: 'nilai-santri', label: 'Nilai & Rapor', icon: BookOpen },
-    { id: 'rekap-rapor-wali-kelas', label: 'Rekap Rapor Kelas', icon: FileSpreadsheet },
     { id: 'evaluasi-pembelajaran', label: 'Evaluasi Bulanan', icon: Activity },
+    { id: 'tanya-admin', label: 'Tanya Admin', icon: HelpCircle },
     { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
     { id: 'profile-settings', label: 'Profil Saya', icon: User },
   ];

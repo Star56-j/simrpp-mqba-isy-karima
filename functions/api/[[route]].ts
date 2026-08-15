@@ -271,7 +271,7 @@ app.post('/santri_attendances/bulk', async (c) => {
 const tables = [
   'teachers', 'subjects', 'classes', 'academic_years', 'semesters', 
   'rpps', 'activity_logs', 'attendances', 
-  'santri_attendances', 'nilai', 'rapor_detail', 'pengumuman'
+  'santri_attendances', 'nilai', 'rapor_detail', 'pengumuman', 'tanya_admin'
 ];
 
 tables.forEach(table => {

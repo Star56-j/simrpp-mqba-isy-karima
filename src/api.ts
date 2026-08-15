@@ -268,5 +268,18 @@ export const api = {
   async resetSelf(email: string, answer: string, newPass: string): Promise<{ message: string }> { return { message: 'Success' }; },
   async requestAdminReset(email: string): Promise<{ message: string }> { return { message: 'Success' }; },
   async submitResetAnswer(answer: string): Promise<{ message: string }> { return { message: 'Success' }; },
+
+  async getTanyaAdmin(): Promise<TanyaAdmin[]> {
+    return fetchJson<TanyaAdmin[]>('/api/tanya_admin').catch(() => []);
+  },
+  async createTanyaAdmin(data: any): Promise<TanyaAdmin> {
+    return fetchJson<TanyaAdmin>('/api/tanya_admin', { method: 'POST', body: JSON.stringify(data) });
+  },
+  async updateTanyaAdmin(id: string, data: Partial<TanyaAdmin>): Promise<TanyaAdmin> {
+    return fetchJson<TanyaAdmin>(`/api/tanya_admin/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  async deleteTanyaAdmin(id: string): Promise<void> {
+    await fetchJson(`/api/tanya_admin/${id}`, { method: 'DELETE' });
+  },
   async setSecurityQuestion(question: string, answer: string): Promise<{ message: string }> { return { message: 'Success' }; },
 };

@@ -44,6 +44,7 @@ import WaliDashboard from './components/WaliDashboard';
 import EvaluasiPembelajaranPage from './components/EvaluasiPembelajaran';
 import RekapRaporWaliKelas from './components/RekapRaporWaliKelas';
 import ResetRequests from './components/ResetRequests';
+import TanyaAdmin from './components/TanyaAdmin';
 
 export default function App() {
   const [user, setUser] = React.useState<User | null>(null);
@@ -423,6 +424,13 @@ export default function App() {
         );
 
       case 'rekap-rapor-wali-kelas':
+        if (user.role !== 'Admin' && user.role !== 'WaliKelas') {
+          return (
+            <div className="p-8 text-center text-slate-500 font-medium">
+              Akses terbatas. Fitur Rekap Rapor Kelas hanya dapat diakses oleh Admin dan Wali Kelas.
+            </div>
+          );
+        }
         return (
           <RekapRaporWaliKelas
             classes={classes}
@@ -446,6 +454,11 @@ export default function App() {
             schedules={schedules}
             currentUser={user}
           />
+        );
+
+      case 'tanya-admin':
+        return (
+          <TanyaAdmin currentUser={user} />
         );
 
       default:
@@ -474,6 +487,7 @@ export default function App() {
       case 'my-santri-attendance': return 'Absensi Santri';
       case 'wali-kelas': return 'Wali Kelas';
       case 'rekap-rapor-wali-kelas': return 'Rekap Rapor Kelas Binaan';
+      case 'tanya-admin': return user?.role === 'Admin' ? 'Pesan & Pertanyaan Guru (Tanya Admin)' : 'Tanya Admin';
       case 'profile-settings': return 'Pengaturan Profil';
       case 'pengumuman': return 'Pengumuman Akademik';
       case 'evaluasi-pembelajaran': return 'Evaluasi Pembelajaran Bulanan';

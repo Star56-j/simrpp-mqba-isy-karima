@@ -217,6 +217,12 @@ app.get('/santri_attendances', async (c) => {
       santri: r.santriName ? { id: r.santri_id, name: r.santriName } : undefined,
       teacher: r.teacherName ? { id: r.teacher_id, name: r.teacherName } : undefined
     }));
+    return c.json(mapped);
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 // Clear all activity logs
 app.delete('/activity_logs/clear_all', async (c) => {
   try {

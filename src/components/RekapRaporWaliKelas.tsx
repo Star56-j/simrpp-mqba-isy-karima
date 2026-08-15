@@ -5,6 +5,7 @@ import { api } from '../api';
 import RaporModal from './RaporModal';
 import { printRapor } from '../utils/printRapor';
 import { printPerkembangan } from '../utils/printPerkembangan';
+import { computeRaporScore } from '../utils/nilaiWeights';
 import * as XLSX from 'xlsx';
 
 interface RekapRaporWaliKelasProps {
@@ -207,7 +208,7 @@ export default function RekapRaporWaliKelas({
     const selectedClassName = classes.find(c => c.id === selectedClass)?.name || '';
 
     // build structured rows
-    const rows = [
+    const rows: any[][] = [
       ["LAPORAN PERKEMBANGAN HASIL BELAJAR SANTRI"],
       ["Markaz Qur'an dan Bahasa Arab Isy Karima"],
       [],
@@ -220,13 +221,11 @@ export default function RekapRaporWaliKelas({
     ];
 
     const getAverage = (n: Nilai): number => {
-      const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;
-      if (count === 0) return 0;
-      return Math.round((n.harian + n.bulanan + n.uts + n.uas + (n.uasLisan || 0)) / count);
+      return computeRaporScore(n).nilaiAkhirTulis;
     };
 
     if (timeframe === 'bulanan') {
-      rows.push(["No", "Mata Pelajaran", "Nilai Harian (Avg)", "Nilai Ujian Bulanan"]);
+      rows.push(["No", "Mata Pelajaran", "Nilai Harian", "Nilai Bulanan"]);
       subjects.forEach((subj, idx) => {
         const activeNilai = selectedSem === 'sem-1' ? nilaiList.filter(n => n.semesterId === 'sem-1') : nilaiList.filter(n => n.semesterId === 'sem-2');
         const n = activeNilai.find(x => x.santriId === santri.id && x.subjectId === subj.id);
@@ -235,7 +234,7 @@ export default function RekapRaporWaliKelas({
         rows.push([idx + 1, subj.name, daily, monthly]);
       });
     } else if (timeframe === 'semester') {
-      rows.push(["No", "Mata Pelajaran", "Harian", "Bulanan", "UTS", "UAS", "Rata-rata"]);
+      rows.push(["No", "Mata Pelajaran", "Harian", "Bulanan", "UTS (Mid)", "UAS Tulis (60%)", "UAS Lisan", "Nilai Akhir Rapor"]);
       subjects.forEach((subj, idx) => {
         const semId = timeframeDetail === 'Ganjil' ? 'sem-1' : 'sem-2';
         const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === subj.id && x.semesterId === semId);
@@ -243,11 +242,12 @@ export default function RekapRaporWaliKelas({
         const monthly = n && n.bulanan ? n.bulanan : "-";
         const uts = n && n.uts ? n.uts : "-";
         const uas = n && n.uas ? n.uas : "-";
-        const avg = n ? getAverage(n) : "-";
-        rows.push([idx + 1, subj.name, daily, monthly, uts, uas, avg]);
+        const uasLisan = n && n.uasLisan ? n.uasLisan : "-";
+        const finalRapor = n ? getAverage(n) : "-";
+        rows.push([idx + 1, subj.name, daily, monthly, uts, uas, uasLisan, finalRapor]);
       });
     } else {
-      rows.push(["No", "Mata Pelajaran", "Rata-rata Ganjil (S1)", "Rata-rata Genap (S2)", "Nilai Akhir", "Perkembangan"]);
+      rows.push(["No", "Mata Pelajaran", "Nilai Rapor S1", "Nilai Rapor S2", "Nilai Akhir Tahun", "Perkembangan"]);
       subjects.forEach((subj, idx) => {
         const nGanjil = nilaiList.find(x => x.santriId === santri.id && x.subjectId === subj.id && x.semesterId === 'sem-1');
         const nGenap = nilaiList.find(x => x.santriId === santri.id && x.subjectId === subj.id && x.semesterId === 'sem-2');

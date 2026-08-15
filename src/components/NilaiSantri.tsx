@@ -179,8 +179,8 @@ export default function NilaiSantri({
           'Bulanan': n ? n.bulanan : '-',
           'UTS': n ? n.uts : '-',
           'UAS Tulis': n ? n.uas : '-',
-          'UAS Lisan': n ? n.uasLisan : '-',
-          'Rata-rata': n ? nilaiAvg(n) : '-',
+          'UAS Lisan': n ? (n.uasLisan || '-') : '-',
+          'Nilai Akhir Rapor': n ? nilaiAvg(n) : '-',
           'Catatan': n ? n.notes : '-'
         };
       });
@@ -195,7 +195,7 @@ export default function NilaiSantri({
           'No': idx + 1,
           'NIS': santri.nis,
           'Nama Santri': santri.name,
-          'Rata-rata Nilai': santriNilai.length > 0 ? avg : 'Belum ada nilai'
+          'Nilai Akhir Rapor': santriNilai.length > 0 ? avg : 'Belum ada nilai'
         };
       });
       exportToExcel(exportData, `Rapor_${cls}_TA${ay}_${sem}`);
@@ -210,14 +210,14 @@ export default function NilaiSantri({
     const subtitle = `Kelas: ${cls} | TA: ${ay} | Semester: ${sem}`;
     
     if (mode === 'input') {
-      const headers = ['No', 'NIS', 'Nama Santri', 'Harian', 'Bulanan', 'UTS', 'UAS Tulis', 'UAS Lisan', 'Rata-rata', 'Catatan'];
+      const headers = ['No', 'NIS', 'Nama Santri', 'Harian', 'Bulanan', 'UTS (Mid)', 'UAS Tulis (60%)', 'UAS Lisan', 'Nilai Akhir Rapor', 'Catatan'];
       const dataRows = santriList.map((santri, idx) => {
         const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === filterSubject);
         return [idx + 1, santri.nis, santri.name, n?.harian ?? '-', n?.bulanan ?? '-', n?.uts ?? '-', n?.uas ?? '-', n?.uasLisan ?? '-', n ? nilaiAvg(n) : '-', n?.notes ?? '-'];
       });
       printGenericTable(title, subtitle, headers, dataRows);
     } else {
-      const headers = ['No', 'NIS', 'Nama Santri', 'Rata-rata Nilai'];
+      const headers = ['No', 'NIS', 'Nama Santri', 'Nilai Akhir Rapor'];
       const dataRows = santriList.map((santri, idx) => {
         const santriNilai = nilaiList.filter(x => x.santriId === santri.id);
         const avg = santriNilai.length > 0 ? Math.round(santriNilai.reduce((a, b) => a + nilaiAvg(b), 0) / santriNilai.length) : 'Belum ada nilai';
@@ -240,13 +240,13 @@ export default function NilaiSantri({
       text += `Pelajaran: ${subj}\n\n`;
       text += santriList.slice(0, 50).map(santri => {
         const n = nilaiList.find(x => x.santriId === santri.id && x.subjectId === filterSubject);
-        return `- ${santri.name}: Rata-rata ${n ? nilaiAvg(n) : 'Belum dinilai'}`;
+        return `- ${santri.name}: Nilai Akhir Rapor ${n ? nilaiAvg(n) : 'Belum dinilai'}`;
       }).join('\n');
     } else {
       text += santriList.slice(0, 50).map(santri => {
         const santriNilai = nilaiList.filter(x => x.santriId === santri.id);
         const avg = santriNilai.length > 0 ? Math.round(santriNilai.reduce((a, b) => a + nilaiAvg(b), 0) / santriNilai.length) : '0';
-        return `- ${santri.name}: Rata-rata Umum ${avg}`;
+        return `- ${santri.name}: Nilai Akhir Rapor ${avg}`;
       }).join('\n');
     }
     
@@ -399,14 +399,19 @@ export default function NilaiSantri({
         </div>
       )}
 
-      {/* Legend — kategori penilaian */}
+      {/* Legend — kategori penilaian & bobot resmi */}
       {mode === 'input' && (
-        <div className="flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500" /><span>Harian</span></span>
-          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span>Bulanan</span></span>
-          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-teal-500" /><span>UTS</span></span>
-          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /><span>UAS Tulis</span></span>
-          <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-fuchsia-500" /><span>UAS Lisan</span></span>
+        <div className="bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500" /><span>Harian</span></span>
+            <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span>Bulanan</span></span>
+            <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-teal-500" /><span>UTS (Mid)</span></span>
+            <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /><span>UAS Tulis (60%)</span></span>
+            <span className="flex items-center space-x-1.5"><span className="w-2 h-2 rounded-full bg-fuchsia-500" /><span>UAS Lisan (Terpisah)</span></span>
+          </div>
+          <div className="text-[10px] text-indigo-700 dark:text-indigo-300 font-extrabold normal-case bg-white dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-indigo-200 dark:border-indigo-800 shadow-2xs">
+            📌 Rumus Rapor: 30% Akhlaq + 10% Absensi + 10% Mid/Harian + 60% UAS Tulis
+          </div>
         </div>
       )}
 
@@ -433,7 +438,7 @@ export default function NilaiSantri({
                         <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /><span>Bulanan</span></span>
                       </th>
                       <th className="px-3 py-3 text-center w-20">
-                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-teal-500" /><span>UTS</span></span>
+                        <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-teal-500" /><span>UTS (Mid)</span></span>
                       </th>
                       <th className="px-3 py-3 text-center w-20">
                         <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /><span>UAS Tulis</span></span>
@@ -441,13 +446,15 @@ export default function NilaiSantri({
                       <th className="px-3 py-3 text-center w-20">
                         <span className="inline-flex items-center space-x-1"><span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" /><span>UAS Lisan</span></span>
                       </th>
-                      <th className="px-3 py-3 text-center w-20">Rata²</th>
+                      <th className="px-3 py-3 text-center w-28 text-indigo-700 dark:text-indigo-300 font-black" title="Nilai Akhir Rapor (30% Akhlaq + 10% Absensi + 10% Mid + 60% UAS Tulis)">
+                        Nilai Akhir
+                      </th>
                       <th className="px-3 py-3">Catatan</th>
                       <th className="px-3 py-3 text-center w-20">Aksi</th>
                     </>
                   ) : (
                     <>
-                      <th className="px-4 py-3 text-center">Rata-rata Nilai</th>
+                      <th className="px-4 py-3 text-center text-indigo-700 dark:text-indigo-300 font-black">Nilai Akhir Rapor</th>
                       <th className="px-4 py-3 text-center w-64">Aksi Rapor</th>
                     </>
                   )}

@@ -166,7 +166,7 @@ export default function WaliDashboard({ user, academicYears, semesters, onLogout
             {nilaiList.length > 0 && (
               <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <p className="text-[9px] font-black uppercase tracking-wider text-[#826f64] dark:text-[#bdaea4] leading-none">Rata-rata</p>
+                  <p className="text-[9px] font-black uppercase tracking-wider text-[#826f64] dark:text-[#bdaea4] leading-none">Nilai Akhir Rapor</p>
                   <p className="text-2xl font-black text-[#6f2f22] dark:text-[#dfc88f] mt-1 tracking-tight">{avg}</p>
                 </div>
                 <button

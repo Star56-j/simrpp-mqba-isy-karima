@@ -45,6 +45,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
   const [submitting,   setSubmitting]   = React.useState(false);
   const [formError,    setFormError]    = React.useState('');
   const [formSuccess,  setFormSuccess]  = React.useState('');
+  const [editingId,    setEditingId]    = React.useState<string | null>(null);
 
   const buildParams = React.useCallback(() => {
     const p: Record<string, string> = { academicYearId: filterAY, semesterId: filterSem, year: filterYear };
@@ -78,12 +79,12 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
       exportToExcel(dataToExport, `Riwayat_Absensi_Saya`);
     } else if (activeTab === 'rekap' && summary) {
       const dataToExport = [{
-        'Tahun Ajaran': academicYears.find(y => y.id === summary.academicYearId)?.name || summary.academicYearId,
-        'Semester': semesters.find(sem => sem.id === summary.semesterId)?.name || summary.semesterId,
-        'Hadir': summary.totalHadir,
-        'Izin': summary.totalIzin,
-        'Sakit': summary.totalSakit,
-        'Alpha': summary.totalAlpha
+        'Tahun Ajaran': filterAY ? (academicYears.find(y => y.id === filterAY)?.name || filterAY) : 'Semua',
+        'Semester': filterSem ? (semesters.find(sem => sem.id === filterSem)?.name || filterSem) : 'Semua',
+        'Hadir': summary.hadir,
+        'Izin': summary.izin,
+        'Sakit': summary.sakit,
+        'Alpha': summary.alpha
       }];
       exportToExcel(dataToExport, `Rekap_Absensi_Saya`);
     }
@@ -95,8 +96,14 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
     if (!fDate || !fAY || !fSem) { setFormError('Semua field wajib diisi.'); return; }
     setSubmitting(true);
     try {
-      await api.selfAttendance({ date: fDate, status: fStatus, notes: fNotes, academicYearId: fAY, semesterId: fSem });
-      setFormSuccess(`Absensi ${fDate} berhasil dicatat sebagai "${fStatus}".`);
+      if (editingId) {
+        await api.updateAttendance(editingId, { date: fDate, status: fStatus, notes: fNotes, academicYearId: fAY, semesterId: fSem });
+        setFormSuccess(`Absensi berhasil diperbarui.`);
+        setEditingId(null);
+      } else {
+        await api.selfAttendance({ date: fDate, status: fStatus, notes: fNotes, academicYearId: fAY, semesterId: fSem });
+        setFormSuccess(`Absensi ${fDate} berhasil dicatat sebagai "${fStatus}".`);
+      }
       setFNotes('');
       // refresh data riwayat
       loadData();
@@ -314,6 +321,7 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                     <th className="px-4 py-3 text-center">Status</th>
                     <th className="px-4 py-3">Keterangan</th>
                     <th className="px-4 py-3">Semester</th>
+                    <th className="px-4 py-3 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-sm">
@@ -331,6 +339,15 @@ export default function AttendanceGuru({ academicYears, semesters }: AttendanceG
                       <td className="px-4 py-3 text-xs text-slate-500 italic">{a.notes || '-'}</td>
                       <td className="px-4 py-3 text-xs text-slate-500">
                         {(a as any).semester?.name || semesters.find(s => s.id === a.semesterId)?.name || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button onClick={() => {
+                          setFDate(a.date); setFStatus(a.status as any); setFNotes(a.notes || ''); 
+                          setFAY(a.academicYearId); setFSem(a.semesterId); setEditingId(a.id);
+                          setFormError(''); setFormSuccess(''); setActiveTab('isi');
+                        }} className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition text-[10px] font-bold uppercase tracking-wider">
+                          Edit
+                        </button>
                       </td>
                     </tr>
                   ))}

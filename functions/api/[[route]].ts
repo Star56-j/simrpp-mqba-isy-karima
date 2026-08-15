@@ -152,15 +152,46 @@ app.get('/wali_kelas', async (c) => {
   }
 });
 
+// Special GET for attendances with teacher name join
+app.get('/attendances', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT a.*, t.name as teacherName
+      FROM attendances a
+      LEFT JOIN teachers t ON a.teacher_id = t.id
+      ORDER BY a.date DESC, a.id DESC
+    `).all();
+
+    const mapped = results.map((r: any) => ({
+      id: r.id,
+      teacherId: r.teacher_id,
+      date: r.date,
+      status: r.status,
+      notes: r.notes,
+      academicYearId: r.academic_year_id,
+      semesterId: r.semester_id,
+      recordedBy: r.recorded_by || r.teacherName || 'Pengajar',
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+      teacherName: r.teacherName || r.recorded_by || 'Pengajar',
+      teacher: r.teacherName ? { id: r.teacher_id, name: r.teacherName } : undefined
+    }));
+    return c.json(mapped);
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 // Special GET for santri_attendances
 app.get('/santri_attendances', async (c) => {
   try {
     const { results } = await c.env.DB.prepare(`
-      SELECT sa.*, c.name as className, s.name as santriName
+      SELECT sa.*, c.name as className, s.name as santriName, t.name as teacherName
       FROM santri_attendances sa
       LEFT JOIN classes c ON sa.class_id = c.id
       LEFT JOIN santri s ON sa.santri_id = s.id
-      ORDER BY sa.id DESC
+      LEFT JOIN teachers t ON sa.teacher_id = t.id
+      ORDER BY sa.date DESC, sa.id DESC
     `).all();
     
     const mapped = results.map((r: any) => ({
@@ -177,12 +208,14 @@ app.get('/santri_attendances', async (c) => {
       notes: r.notes,
       academicYearId: r.academic_year_id,
       semesterId: r.semester_id,
-      recordedBy: r.recorded_by,
+      recordedBy: r.recorded_by || r.teacherName || 'Pengajar',
       teacherId: r.teacher_id,
+      teacherName: r.teacherName || r.recorded_by || 'Pengajar',
       createdAt: r.created_at,
       updatedAt: r.updated_at,
       class: r.className ? { id: r.class_id, name: r.className } : undefined,
-      santri: r.santriName ? { id: r.santri_id, name: r.santriName } : undefined
+      santri: r.santriName ? { id: r.santri_id, name: r.santriName } : undefined,
+      teacher: r.teacherName ? { id: r.teacher_id, name: r.teacherName } : undefined
     }));
     return c.json(mapped);
   } catch (e: any) {

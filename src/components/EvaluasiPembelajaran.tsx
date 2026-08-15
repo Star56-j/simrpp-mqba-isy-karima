@@ -23,6 +23,10 @@ import {
 import { api } from '../api';
 import { EvaluasiPembelajaran, Teacher, Subject, SchoolClass, AcademicYear, Semester, TeachingSchedule } from '../types';
 import { printEvaluasi } from '../utils/printEvaluasi';
+import { exportToExcel } from '../utils/exportExcel';
+import { printGenericTable } from '../utils/printUtils';
+import { shareToWhatsApp } from '../utils/whatsappUtils';
+import ExportBar from './ExportBar';
 
 const BULAN_NAMES = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
@@ -231,16 +235,48 @@ export default function EvaluasiPembelajaranPage({
     };
   }, [filtered]);
 
+  const handleExport = () => {
+    const dataToExport = filtered.map((e, idx) => ({
+      'No': idx + 1,
+      'Bulan': BULAN_NAMES[e.bulan],
+      'Tahun': e.tahun,
+      'Guru': teachers.find(t => t.id === e.teacherId)?.name || e.teacherId,
+      'Kelas': classes.find(c => c.id === e.classId)?.name || e.classId,
+      'Predikat': e.predikatKetercapaian,
+      '% Terlaksana': `${e.persentaseTerlaksana}%`,
+      'Catatan': e.catatanKepalaKurikulum || '-'
+    }));
+    exportToExcel(dataToExport, `Data_Evaluasi_Pembelajaran`);
+  };
+
+  const handlePrint = () => {
+    const title = 'Rekap Evaluasi Pembelajaran Bulanan';
+    const subtitle = 'Semua Data';
+    const headers = ['No', 'Bulan', 'Guru', 'Kelas', 'Predikat', 'Terlaksana (%)'];
+    const dataRows = filtered.map((e, idx) => [
+      idx + 1, `${BULAN_NAMES[e.bulan]} ${e.tahun}`, teachers.find(t => t.id === e.teacherId)?.name || e.teacherId, classes.find(c => c.id === e.classId)?.name || e.classId, e.predikatKetercapaian, `${e.persentaseTerlaksana}%`
+    ]);
+    printGenericTable(title, subtitle, headers, dataRows);
+  };
+
+  const handleWhatsApp = () => {
+    const title = 'Laporan Evaluasi Pembelajaran';
+    let text = ``;
+    text += filtered.slice(0, 50).map(e => `- ${teachers.find(t => t.id === e.teacherId)?.name || e.teacherId} (Kls ${classes.find(c => c.id === e.classId)?.name || e.classId}): ${e.predikatKetercapaian} (${e.persentaseTerlaksana}%)`).join('\n');
+    if (filtered.length > 50) text += `\n...dan ${filtered.length - 50} data lainnya.`;
+    shareToWhatsApp(title, text);
+  };
+
   // ── FORM MODAL ──────────────────────────────────────────────
   const renderForm = () => (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto py-6 px-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto py-6 px-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 mb-6">
         <div className="bg-gradient-to-r from-indigo-700 to-indigo-900 rounded-t-3xl px-6 py-5 flex items-center justify-between">
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest text-indigo-200 mb-0.5">Kurikulum Merdeka</p>
-            <h2 className="text-lg font-black text-white">{editTarget ? 'Edit Evaluasi Pembelajaran' : 'Isi Evaluasi Pembelajaran Bulanan'}</h2>
+            <h2 id="modal-title" className="text-lg font-black text-white">{editTarget ? 'Edit Evaluasi Pembelajaran' : 'Isi Evaluasi Pembelajaran Bulanan'}</h2>
           </div>
-          <button onClick={() => setShowForm(false)} className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"><X className="w-5 h-5" /></button>
+          <button aria-label="Tutup" onClick={() => setShowForm(false)} className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-800"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="p-6 space-y-6">
@@ -456,7 +492,7 @@ export default function EvaluasiPembelajaranPage({
                 {detailItem.predikatKetercapaian}
               </span>
             </div>
-            <button onClick={() => setDetailItem(null)} className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer mt-1">
+            <button aria-label="Tutup detail" onClick={() => setDetailItem(null)} className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-800">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -548,12 +584,21 @@ export default function EvaluasiPembelajaranPage({
               <p className="text-slate-400 text-xs mt-0.5">8 dimensi penilaian berbasis Kurikulum Merdeka</p>
             </div>
           </div>
-          <button onClick={handleOpenCreate}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-800 text-white text-sm font-black shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all cursor-pointer flex-shrink-0">
-            <Plus className="w-4 h-4" />
-            {isAdmin ? 'Tambah Evaluasi' : 'Isi Evaluasi Bulan Ini'}
-          </button>
+          {!isAdmin && (
+            <button onClick={handleOpenCreate}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-800 text-white text-sm font-black shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all cursor-pointer flex-shrink-0">
+              <Plus className="w-4 h-4" />
+              <span>Isi Evaluasi Bulan Ini</span>
+            </button>
+          )}
         </div>
+
+        <ExportBar 
+          onExportExcel={handleExport}
+          onPrint={handlePrint}
+          onWhatsApp={handleWhatsApp}
+          itemName="Evaluasi Pembelajaran"
+        />
 
         {/* Alerts */}
         {success && (

@@ -457,7 +457,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters }: 
                         {new Date(a.date).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}
                       </td>
                       <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">
-                        {(a as any).teacher?.name || teachers.find(t=>t.id===a.teacherId)?.name || a.teacherId}
+                        {(a as any).teacherName || (a as any).teacher?.name || teachers.find(t => t.id === a.teacherId || t.id === (a as any).teacher_id)?.name || a.recordedBy || 'Pengajar'}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${STATUS_COLORS[a.status]}`}>

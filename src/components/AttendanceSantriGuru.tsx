@@ -177,9 +177,11 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
       const cls = availableClasses.find(c => c.id === fClass);
       
       if (editingId) {
-        setFormError('Edit riwayat absensi santri format lama tidak didukung. Silakan input baru.');
-        setSubmitting(false);
-        return;
+        // Hapus catatan absensi lama untuk kelas & tanggal ini agar di-overwrite
+        const recordsToDelete = attendances.filter(rec => rec.date === fDate && rec.classId === fClass);
+        for (const rec of recordsToDelete) {
+          await api.deleteSantriAttendance(rec.id).catch(() => {});
+        }
       }
       
       const attendancesToSave = classSantris.map(santri => ({
@@ -190,11 +192,14 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
         jumlahHadir: 0, jumlahIzin: 0, jumlahSakit: 0, jumlahAlpha: 0, jumlahTotal: 1,
         notes: fNotes,
         academicYearId: fAY,
-        semesterId: fSem
+        semesterId: fSem,
+        teacherId: currentUser.teacherId || currentUser.id,
+        recordedBy: currentUser.name || 'Pengajar'
       }));
 
       await api.createSantriAttendanceBulk({ attendances: attendancesToSave });
-      setFormSuccess(`Absensi detail santri Kelas ${cls?.name} tanggal ${fDate} berhasil dicatat.`);
+      setFormSuccess(`Absensi santri Kelas ${cls?.name} tanggal ${fDate} berhasil ${editingId ? 'diperbarui' : 'dicatat'}.`);
+      setEditingId(null);
       
       // Reset
       const initialStatuses: Record<string, string> = {};

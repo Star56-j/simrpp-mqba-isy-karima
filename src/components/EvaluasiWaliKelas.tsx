@@ -324,13 +324,15 @@ export const EvaluasiWaliKelasComponent: React.FC<EvaluasiWaliKelasProps> = ({ c
             </p>
           </div>
           
-          <button
-            onClick={handleOpenNewModal}
-            className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white text-sky-900 hover:bg-sky-50 font-bold text-xs sm:text-sm shadow-md transition transform active:scale-95 shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Buat Laporan Evaluasi</span>
-          </button>
+          {currentUser.role !== 'Admin' && (
+            <button
+              onClick={handleOpenNewModal}
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white text-sky-900 hover:bg-sky-50 font-bold text-xs sm:text-sm shadow-md transition transform active:scale-95 shrink-0 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Buat Laporan Evaluasi</span>
+            </button>
+          )}
         </div>
       </div>
 

@@ -173,8 +173,8 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               <div className="flex items-center justify-center">
                 <img
                   src="/islamic_login_simple.png"
-                  alt="Ilustrasi Ustadz dan Santri Belajar Qur'an"
-                  className="w-48 h-48 sm:w-52 sm:h-52 object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
+                  alt="Ilustrasi Ustadz Mengajar di Kelas bersama Santri"
+                  className="w-52 h-52 sm:w-56 sm:h-56 object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
                 />
               </div>
               {/* Floating Islamic stars */}

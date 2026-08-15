@@ -440,7 +440,7 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                     </div>
                   </div>
 
-                  <button type="submit" disabled={submitting || myClasses.length === 0}
+                  <button type="submit" disabled={submitting || availableClasses.length === 0}
                     className="w-full py-3 rounded-xl text-sm font-extrabold uppercase tracking-wider text-white bg-indigo-700 hover:bg-indigo-800 shadow-sm transition flex items-center justify-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed">
                     <Plus className="w-4 h-4" />
                     <span>{submitting ? 'Menyimpan...' : 'Simpan Absensi Santri'}</span>

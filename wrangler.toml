@@ -1,7 +1,11 @@
 name = "akademikmqbaisykarima"
-pages_build_output_dir = "./dist"
+main = "src/worker.ts"
 compatibility_date = "2026-07-29"
 compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"

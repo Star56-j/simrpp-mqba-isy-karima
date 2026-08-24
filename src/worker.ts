@@ -1,19 +1,41 @@
 import { Hono } from 'hono';
-import { handle } from 'hono/cloudflare-pages';
 
 type Env = {
   DB: D1Database;
+  ASSETS: Fetcher;
 };
 
-const app = new Hono<{ Bindings: Env }>().basePath('/api');
+const app = new Hono<{ Bindings: Env }>();
+const api = new Hono<{ Bindings: Env }>();
 
-app.get('/health', (c) => {
+api.onError((err, c) => {
+  console.error('API Error:', err);
+  return c.json({ error: err.message || 'Internal Server Error' }, 500);
+});
+
+api.notFound((c) => {
+  return c.json({ error: `API route not found: ${c.req.method} ${c.req.path}` }, 404);
+});
+
+api.use('*', async (c, next) => {
+  if (c.req.path === '/health' || c.req.path === '/health/') {
+    return next();
+  }
+  if (!c.env?.DB) {
+    return c.json({
+      error: 'Database D1 (DB) belum terhubung di Cloudflare Pages Dashboard. Buka Cloudflare Dashboard > Settings > Bindings > D1 Database, lalu hubungkan simrpp_db ke variabel DB.'
+    }, 500);
+  }
+  return next();
+});
+
+api.get('/health', (c) => {
   return c.json({ ok: true, hasDb: !!c.env?.DB, timestamp: new Date().toISOString() });
 });
 
 
 // --- AUTH ---
-app.post('/auth/login', async (c) => {
+api.post('/auth/login', async (c) => {
   const { email, password } = await c.req.json().catch(() => ({ email: '', password: '' }));
   try {
     const cleanEmail = (email || '').trim().toLowerCase();
@@ -78,7 +100,7 @@ app.post('/auth/login', async (c) => {
   }
 });
 
-app.post('/auth/wali-login', async (c) => {
+api.post('/auth/wali-login', async (c) => {
   try {
     const { name } = await c.req.json();
     const cleanInput = (name || '').trim();
@@ -163,7 +185,7 @@ app.post('/auth/wali-login', async (c) => {
 
 // --- GENERIC CRUD ---
 
-app.get('/santri', async (c) => {
+api.get('/santri', async (c) => {
   try {
     const { results } = await c.env.DB.prepare(`
       SELECT s.*, c.name as className
@@ -190,7 +212,7 @@ app.get('/santri', async (c) => {
   }
 });
 
-app.post('/santri', async (c) => {
+api.post('/santri', async (c) => {
   try {
     const body = await c.req.json();
     const id = body.id || `s-${crypto.randomUUID()}`;
@@ -215,7 +237,7 @@ app.post('/santri', async (c) => {
   }
 });
 
-app.put('/santri/:id', async (c) => {
+api.put('/santri/:id', async (c) => {
   try {
     const id = c.req.param('id');
     const body = await c.req.json();
@@ -241,7 +263,7 @@ app.put('/santri/:id', async (c) => {
   }
 });
 
-app.delete('/santri/:id', async (c) => {
+api.delete('/santri/:id', async (c) => {
   try {
     const id = c.req.param('id');
     await c.env.DB.prepare(`DELETE FROM santri WHERE id = ?`).bind(id).run();
@@ -256,7 +278,7 @@ app.delete('/santri/:id', async (c) => {
 });
 
 
-app.get('/wali_kelas', async (c) => {
+api.get('/wali_kelas', async (c) => {
   try {
     const { results } = await c.env.DB.prepare(`
       SELECT w.*, t.name as teacherName, cl.name as className,
@@ -287,7 +309,7 @@ app.get('/wali_kelas', async (c) => {
 });
 
 // Special GET for attendances with teacher name join
-app.get('/attendances', async (c) => {
+api.get('/attendances', async (c) => {
   try {
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_id TEXT').run().catch(() => {});
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_name TEXT').run().catch(() => {});
@@ -342,7 +364,7 @@ app.get('/attendances', async (c) => {
 });
 
 // Special GET for santri_attendances
-app.get('/santri_attendances', async (c) => {
+api.get('/santri_attendances', async (c) => {
   try {
     await c.env.DB.prepare('ALTER TABLE santri_attendances ADD COLUMN subject_id TEXT').run().catch(() => {});
     await c.env.DB.prepare('ALTER TABLE santri_attendances ADD COLUMN subject_name TEXT').run().catch(() => {});
@@ -390,7 +412,7 @@ app.get('/santri_attendances', async (c) => {
 });
 
 // Clear all activity logs
-app.delete('/activity_logs/clear_all', async (c) => {
+api.delete('/activity_logs/clear_all', async (c) => {
   try {
     await c.env.DB.prepare('DELETE FROM activity_logs').run();
     return c.json({ success: true, message: 'Semua log aktivitas berhasil dihapus.' });
@@ -400,7 +422,7 @@ app.delete('/activity_logs/clear_all', async (c) => {
 });
 
 // Special GET for nilai with field mapping
-app.get('/nilai', async (c) => {
+api.get('/nilai', async (c) => {
   try {
     const { results } = await c.env.DB.prepare(`SELECT * FROM nilai ORDER BY id DESC`).all();
     const mapped = results.map((r: any) => ({
@@ -424,7 +446,7 @@ app.get('/nilai', async (c) => {
 });
 
 // Single Insert Attendance
-app.post('/attendances', async (c) => {
+api.post('/attendances', async (c) => {
   try {
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_id TEXT').run().catch(() => {});
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_name TEXT').run().catch(() => {});
@@ -456,7 +478,7 @@ app.post('/attendances', async (c) => {
 });
 
 // Update Single Attendance
-app.put('/attendances/:id', async (c) => {
+api.put('/attendances/:id', async (c) => {
   try {
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_id TEXT').run().catch(() => {});
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_name TEXT').run().catch(() => {});
@@ -486,7 +508,7 @@ app.put('/attendances/:id', async (c) => {
 });
 
 // Bulk Insert Attendances
-app.post('/attendances/bulk', async (c) => {
+api.post('/attendances/bulk', async (c) => {
   try {
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_id TEXT').run().catch(() => {});
     await c.env.DB.prepare('ALTER TABLE attendances ADD COLUMN subject_name TEXT').run().catch(() => {});
@@ -528,7 +550,7 @@ app.post('/attendances/bulk', async (c) => {
 });
 
 // Bulk Insert Santri Attendances
-app.post('/santri_attendances/bulk', async (c) => {
+api.post('/santri_attendances/bulk', async (c) => {
   try {
     const { attendances, overwriteMonth, classId, year, month } = await c.req.json();
     if (!Array.isArray(attendances) || attendances.length === 0) {
@@ -572,7 +594,7 @@ app.post('/santri_attendances/bulk', async (c) => {
   }
 });
 
-app.get('/teachers', async (c) => {
+api.get('/teachers', async (c) => {
   try {
     const { results } = await c.env.DB.prepare(`SELECT * FROM teachers ORDER BY LOWER(name) ASC`).all();
     return c.json(results);
@@ -589,7 +611,7 @@ const tables = [
 
 tables.forEach(table => {
   // GET all
-  app.get(`/${table}`, async (c) => {
+  api.get(`/${table}`, async (c) => {
     try {
       if (table === 'rpps') {
         await c.env.DB.prepare("UPDATE rpps SET teacher_id = 't-12' WHERE teacher_id IS NULL OR teacher_id = '' OR teacher_id = 'undefined'").run().catch(() => {});
@@ -602,7 +624,7 @@ tables.forEach(table => {
   });
 
   // POST create
-  app.post(`/${table}`, async (c) => {
+  api.post(`/${table}`, async (c) => {
     try {
       const body = await c.req.json();
       const id = body.id || `${table}-${crypto.randomUUID()}`;
@@ -654,7 +676,7 @@ tables.forEach(table => {
   });
 
   // PUT update
-  app.put(`/${table}/:id`, async (c) => {
+  api.put(`/${table}/:id`, async (c) => {
     try {
       const id = c.req.param('id');
       const body = await c.req.json();
@@ -706,7 +728,7 @@ tables.forEach(table => {
   });
 
   // DELETE
-  app.delete(`/${table}/:id`, async (c) => {
+  api.delete(`/${table}/:id`, async (c) => {
     try {
       const id = c.req.param('id');
       await c.env.DB.prepare(`DELETE FROM ${table} WHERE id = ?`).bind(id).run();
@@ -720,7 +742,7 @@ tables.forEach(table => {
 // --- SPECIAL ROUTES WITH JOINS ---
 
 // Schedules
-app.get('/schedules', async (c) => {
+api.get('/schedules', async (c) => {
   try {
     const { results } = await c.env.DB.prepare(`
       SELECT ts.*, c.name as className, t.name as teacherName, s.name as subjectName
@@ -749,7 +771,7 @@ app.get('/schedules', async (c) => {
   }
 });
 
-app.post('/schedules', async (c) => {
+api.post('/schedules', async (c) => {
   try {
     const body = await c.req.json();
     const id = body.id || `sch-${crypto.randomUUID()}`;
@@ -763,7 +785,7 @@ app.post('/schedules', async (c) => {
   }
 });
 
-app.put('/schedules/:id', async (c) => {
+api.put('/schedules/:id', async (c) => {
   try {
     const id = c.req.param('id');
     const body = await c.req.json();
@@ -778,7 +800,7 @@ app.put('/schedules/:id', async (c) => {
   }
 });
 
-app.delete('/schedules/:id', async (c) => {
+api.delete('/schedules/:id', async (c) => {
   try {
     await c.env.DB.prepare(`DELETE FROM teaching_schedules WHERE id = ?`).bind(c.req.param('id')).run();
     return c.json({ success: true });
@@ -788,7 +810,7 @@ app.delete('/schedules/:id', async (c) => {
 });
 
 // --- DASHBOARD STATS ---
-app.get('/dashboard/stats', async (c) => {
+api.get('/dashboard/stats', async (c) => {
   try {
     const teachersCount = (await c.env.DB.prepare('SELECT COUNT(*) as count FROM teachers').first() as any)?.count || 0;
     const subjectsCount = (await c.env.DB.prepare('SELECT COUNT(*) as count FROM subjects').first() as any)?.count || 0;
@@ -886,7 +908,7 @@ app.get('/dashboard/stats', async (c) => {
 });
 
 // --- ACTIVITY LOGS ---
-app.get('/activity_logs', async (c) => {
+api.get('/activity_logs', async (c) => {
   try {
     await c.env.DB.prepare(`
       CREATE TABLE IF NOT EXISTS activity_logs (
@@ -952,7 +974,7 @@ app.get('/activity_logs', async (c) => {
   }
 });
 
-app.post('/activity_logs', async (c) => {
+api.post('/activity_logs', async (c) => {
   try {
     await c.env.DB.prepare(`
       CREATE TABLE IF NOT EXISTS activity_logs (
@@ -991,7 +1013,7 @@ app.post('/activity_logs', async (c) => {
   }
 });
 
-app.delete('/activity_logs/clear_all', async (c) => {
+api.delete('/activity_logs/clear_all', async (c) => {
   try {
     await c.env.DB.prepare('DELETE FROM activity_logs').run().catch(() => {});
     return c.json({ message: 'Log berhasil dibersihkan.' });
@@ -1001,7 +1023,7 @@ app.delete('/activity_logs/clear_all', async (c) => {
 });
 
 // --- PENGUMUMAN & BROADCAST ---
-app.get('/pengumuman', async (c) => {
+api.get('/pengumuman', async (c) => {
   try {
     await c.env.DB.prepare(`
       CREATE TABLE IF NOT EXISTS pengumuman (
@@ -1053,7 +1075,7 @@ app.get('/pengumuman', async (c) => {
   }
 });
 
-app.post('/pengumuman', async (c) => {
+api.post('/pengumuman', async (c) => {
   try {
     await c.env.DB.prepare(`
       CREATE TABLE IF NOT EXISTS pengumuman (
@@ -1175,7 +1197,7 @@ async function ensureEvaluasiTable(db: D1Database) {
   }
 }
 
-app.get('/evaluasi_pembelajaran', async (c) => {
+api.get('/evaluasi_pembelajaran', async (c) => {
   try {
     await ensureEvaluasiTable(c.env.DB);
     const { results } = await c.env.DB.prepare(`
@@ -1240,7 +1262,7 @@ app.get('/evaluasi_pembelajaran', async (c) => {
   }
 });
 
-app.post('/evaluasi_pembelajaran', async (c) => {
+api.post('/evaluasi_pembelajaran', async (c) => {
   try {
     await ensureEvaluasiTable(c.env.DB);
     const body = await c.req.json();
@@ -1298,7 +1320,7 @@ app.post('/evaluasi_pembelajaran', async (c) => {
   }
 });
 
-app.put('/evaluasi_pembelajaran/:id', async (c) => {
+api.put('/evaluasi_pembelajaran/:id', async (c) => {
   try {
     await ensureEvaluasiTable(c.env.DB);
     const id = c.req.param('id');
@@ -1370,7 +1392,7 @@ app.put('/evaluasi_pembelajaran/:id', async (c) => {
   }
 });
 
-app.delete('/evaluasi_pembelajaran/:id', async (c) => {
+api.delete('/evaluasi_pembelajaran/:id', async (c) => {
   try {
     const id = c.req.param('id');
     await c.env.DB.prepare('DELETE FROM evaluasi_pembelajaran WHERE id = ?').bind(id).run();
@@ -1422,7 +1444,7 @@ async function ensureAkhlaqTable(db: D1Database) {
   }
 }
 
-app.get('/akhlaq_santri', async (c) => {
+api.get('/akhlaq_santri', async (c) => {
   try {
     await ensureAkhlaqTable(c.env.DB);
     const { results } = await c.env.DB.prepare(`
@@ -1468,7 +1490,7 @@ app.get('/akhlaq_santri', async (c) => {
   }
 });
 
-app.post('/akhlaq_santri', async (c) => {
+api.post('/akhlaq_santri', async (c) => {
   try {
     await ensureAkhlaqTable(c.env.DB);
     const body = await c.req.json();
@@ -1536,7 +1558,7 @@ app.post('/akhlaq_santri', async (c) => {
   }
 });
 
-app.post('/akhlaq_santri/bulk', async (c) => {
+api.post('/akhlaq_santri/bulk', async (c) => {
   try {
     await ensureAkhlaqTable(c.env.DB);
     const { items } = await c.req.json();
@@ -1608,7 +1630,7 @@ app.post('/akhlaq_santri/bulk', async (c) => {
   }
 });
 
-app.delete('/akhlaq_santri/:id', async (c) => {
+api.delete('/akhlaq_santri/:id', async (c) => {
   try {
     const id = c.req.param('id');
     await c.env.DB.prepare('DELETE FROM akhlaq_santri WHERE id = ?').bind(id).run();
@@ -1666,7 +1688,7 @@ async function ensureEvaluasiWaliKelasTable(db: D1Database) {
   }
 }
 
-app.get('/evaluasi_wali_kelas', async (c) => {
+api.get('/evaluasi_wali_kelas', async (c) => {
   try {
     await ensureEvaluasiWaliKelasTable(c.env.DB);
     const { results } = await c.env.DB.prepare(`
@@ -1702,7 +1724,7 @@ app.get('/evaluasi_wali_kelas', async (c) => {
   }
 });
 
-app.post('/evaluasi_wali_kelas', async (c) => {
+api.post('/evaluasi_wali_kelas', async (c) => {
   try {
     await ensureEvaluasiWaliKelasTable(c.env.DB);
     const body = await c.req.json();
@@ -1741,7 +1763,7 @@ app.post('/evaluasi_wali_kelas', async (c) => {
   }
 });
 
-app.put('/evaluasi_wali_kelas/:id', async (c) => {
+api.put('/evaluasi_wali_kelas/:id', async (c) => {
   try {
     await ensureEvaluasiWaliKelasTable(c.env.DB);
     const id = c.req.param('id');
@@ -1796,7 +1818,7 @@ app.put('/evaluasi_wali_kelas/:id', async (c) => {
   }
 });
 
-app.delete('/evaluasi_wali_kelas/:id', async (c) => {
+api.delete('/evaluasi_wali_kelas/:id', async (c) => {
   try {
     const id = c.req.param('id');
     await c.env.DB.prepare('DELETE FROM evaluasi_wali_kelas WHERE id = ?').bind(id).run();
@@ -1807,8 +1829,10 @@ app.delete('/evaluasi_wali_kelas/:id', async (c) => {
 });
 
 
-app.notFound((c) => {
-  return c.json({ error: 'Endpoint not found: ' + c.req.method + ' ' + c.req.path }, 404);
+app.route('/api', api);
+
+app.all('/api/*', (c) => {
+  return c.json({ error: `API route not found: ${c.req.method} ${c.req.path}` }, 404);
 });
 
 app.onError((err, c) => {
@@ -1816,4 +1840,11 @@ app.onError((err, c) => {
   return c.json({ error: err.message || 'Internal Server Error' }, 500);
 });
 
-export const onRequest = handle(app);
+app.get('*', async (c) => {
+  if (c.env.ASSETS) {
+    return c.env.ASSETS.fetch(c.req.raw);
+  }
+  return c.text('Not Found', 404);
+});
+
+export default app;

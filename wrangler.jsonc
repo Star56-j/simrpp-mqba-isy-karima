@@ -1,18 +1,23 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "akademikmqbaisykarima",
-  "pages_build_output_dir": "./dist",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-07-29",
-  "observability": {
-    "enabled": true
-  },
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "simrpp_db",
       "database_id": "43116587-6602-4f6e-b912-6aac5273e8e0"
     }
-  ]
+  ],
+  "observability": {
+    "enabled": true
+  }
 }

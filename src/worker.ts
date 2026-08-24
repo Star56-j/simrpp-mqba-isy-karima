@@ -1830,6 +1830,7 @@ api.delete('/evaluasi_wali_kelas/:id', async (c) => {
 
 
 app.route('/api', api);
+app.route('/', api);
 
 app.all('/api/*', (c) => {
   return c.json({ error: `API route not found: ${c.req.method} ${c.req.path}` }, 404);
@@ -1841,7 +1842,7 @@ app.onError((err, c) => {
 });
 
 app.get('*', async (c) => {
-  if (c.env.ASSETS) {
+  if (c.env?.ASSETS) {
     return c.env.ASSETS.fetch(c.req.raw);
   }
   return c.text('Not Found', 404);

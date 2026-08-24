@@ -252,15 +252,15 @@ export function printEvaluasi(
         <tr>
           <td>
             Mengetahui,<br/>
-            <strong>Kepala Unit/Kurikulum</strong>
+            <strong>Kepala Kurikulum MQBA</strong>
             <div class="signature-space"></div>
-            <span class="signature-name">Ust. Umar Alamuddin, Lc.</span>
+            <span class="signature-name">Ust. Aidil Aqli, S.Ag.</span>
           </td>
           <td>
             Karanganyar, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>
             <strong>Guru Pengajar</strong>
             <div class="signature-space"></div>
-            <span class="signature-name">${ev.teacher?.name || '—'}</span>
+            <span class="signature-name">${ev.teacher?.name || 'Guru'}</span>
           </td>
         </tr>
       </table>
@@ -272,5 +272,87 @@ export function printEvaluasi(
   if (printWindow) {
     printWindow.document.write(html);
     printWindow.document.close();
+  }
+}
+
+export function printEvaluasiWaliKelas(ev: any) {
+  const periodeStr = ev.tipePeriode === 'bulanan'
+    ? `Bulan ${ev.bulan || ''} ${ev.tahun || ''}`
+    : `Semester ${ev.semester || ''} TA ${ev.tahunAjaran || ''}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+      <meta charset="UTF-8">
+      <title>Laporan Evaluasi Wali Kelas - ${ev.kelasNama || 'Kelas'}</title>
+      <style>
+        body { font-family: 'Times New Roman', serif; font-size: 13px; margin: 0; padding: 40px; color: #111; line-height: 1.6; }
+        .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 20px; }
+        .header h1 { font-size: 17px; margin: 0; font-weight: bold; text-transform: uppercase; }
+        .header h2 { font-size: 14px; margin: 4px 0 0; font-weight: normal; }
+        .header p { font-size: 11px; margin: 2px 0 0; color: #555; }
+        .title { text-align: center; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-bottom: 20px; text-decoration: underline; }
+        table.info { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+        table.info td { padding: 4px 0; vertical-align: top; }
+        table.info td.lbl { width: 180px; font-weight: bold; }
+        table.info td.col { width: 16px; text-align: center; }
+        .sec { font-weight: bold; font-size: 12px; text-transform: uppercase; margin-top: 18px; margin-bottom: 6px; border-bottom: 1px solid #000; padding-bottom: 2px; }
+        .cnt { font-size: 13px; margin-left: 12px; white-space: pre-wrap; text-align: justify; margin-bottom: 14px; }
+        .sigs { width: 100%; border-collapse: collapse; margin-top: 48px; }
+        .sigs td { text-align: center; font-size: 13px; width: 50%; }
+        .sig-space { height: 70px; }
+        @media print { .no-print { display: none; } }
+      </style>
+    </head>
+    <body>
+      <div class="no-print" style="margin-bottom: 20px; text-align: right;">
+        <button onclick="window.print()" style="padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Cetak PDF</button>
+      </div>
+      <div class="header">
+        <h1>Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima</h1>
+        <h2>Yayasan Sosial dan Pendidikan Isy Karima</h2>
+        <p>Karanganyar, Jawa Tengah, Indonesia &nbsp;|&nbsp; info@isykarima.id</p>
+      </div>
+      <div class="title">LAPORAN EVALUASI WALI KELAS</div>
+      <table class="info">
+        <tr><td class="lbl">Kelas Bimbingan</td><td class="col">:</td><td><strong>${ev.kelasNama || '-'}</strong></td></tr>
+        <tr><td class="lbl">Nama Wali Kelas</td><td class="col">:</td><td><strong>${ev.guruNama || '-'}</strong></td></tr>
+        <tr><td class="lbl">Periode Evaluasi</td><td class="col">:</td><td>${periodeStr}</td></tr>
+        <tr><td class="lbl">Tanggal Laporan</td><td class="col">:</td><td>${ev.createdAt ? new Date(ev.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</td></tr>
+      </table>
+
+      <div class="sec">I. Laporan KBM & Kedisiplinan Pembelajaran Kelas</div>
+      <div class="cnt">${ev.laporanKbm || '-'}</div>
+
+      <div class="sec">II. Permasalahan & Kendala Khusus Kelas</div>
+      <div class="cnt">${ev.masalahKelas || '-'}</div>
+
+      <div class="sec">III. Catatan Perkembangan Santri & Karakter</div>
+      <div class="cnt">${ev.perkembanganSantri || '-'}</div>
+
+      <div class="sec">IV. Usulan & Rekomendasi kepada Kurikulum</div>
+      <div class="cnt">${ev.rekomendasiKurikulum || '-'}</div>
+
+      ${ev.tanggapanAdmin ? `
+      <div class="sec">V. Tanggapan / Solusi dari Kurikulum</div>
+      <div class="cnt">${ev.tanggapanAdmin}</div>
+      ` : ''}
+
+      <table class="sigs">
+        <tr>
+          <td>Menyetujui,<br/><strong>Kepala Kurikulum MQBA</strong><div class="sig-space"></div><strong>( Ust. Aidil Aqli, S.Ag. )</strong></td>
+          <td>Karanganyar, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/><strong>Wali Kelas</strong><div class="sig-space"></div><strong>( ${ev.guruNama || 'Wali Kelas'} )</strong></td>
+        </tr>
+      </table>
+      <script>window.onload = function() { window.print(); };</script>
+    </body>
+    </html>
+  `;
+
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
   }
 }

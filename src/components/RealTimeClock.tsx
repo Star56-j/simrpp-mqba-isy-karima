@@ -65,9 +65,9 @@ export default function RealTimeClock() {
   const hijri = getHijriDate(time);
 
   return (
-    <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-md border border-amber-400/20 px-4 py-3 rounded-xl shadow-lg shadow-indigo-950/20">
-      <div className="p-2 bg-amber-500/20 rounded-lg">
-        <Clock className="w-5 h-5 text-amber-300" />
+    <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-3 rounded-xl shadow-lg shadow-indigo-950/20">
+      <div className="p-2 bg-white/20 rounded-lg">
+        <Clock className="w-5 h-5 text-white" />
       </div>
       <div>
         <div className="text-xl font-black text-white tracking-wider leading-none">
@@ -76,7 +76,7 @@ export default function RealTimeClock() {
         <div className="text-[10px] font-semibold text-indigo-200 uppercase tracking-widest mt-1">
           {formatterDate.format(time)}
         </div>
-        <div className="text-[9px] font-bold text-amber-400/80 tracking-wider mt-0.5">
+        <div className="text-[9px] font-bold text-white/80 tracking-wider mt-0.5">
           {hijri.day} {hijri.month} {hijri.year} H
         </div>
       </div>

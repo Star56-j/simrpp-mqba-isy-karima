@@ -1,0 +1,33 @@
+-- Script untuk membuat akun pengguna (Users) bagi para Pengajar
+-- Jalankan ini di D1 Cloudflare dengan: npx wrangler d1 execute simrpp_db --remote --file=generate_accounts.sql
+
+INSERT OR IGNORE INTO users (id, name, email, passwordHash, role, teacher_id) VALUES
+('user-t-0', 'Ust. Abdul Malik', 'ustadz.abdul.malik', 'guru123', 'Guru', 't-0'),
+('user-t-1', 'Ust. Umar', 'ustadz.umar', 'guru123', 'Guru', 't-1'),
+('user-t-2', 'Ust. Dzulfikar', 'ustadz.dzulfikar', 'guru123', 'Guru', 't-2'),
+('user-t-3', 'Ust. Karim', 'ustadz.karim', 'guru123', 'Guru', 't-3'),
+('user-t-4', 'Ust. Fredy', 'ustadz.fredy', 'guru123', 'Guru', 't-4'),
+('user-t-5', 'Ust. Abdullah', 'ustadz.abdullah', 'guru123', 'Guru', 't-5'),
+('user-t-6', 'Usth. Anim', 'ustadzah.anim', 'guru123', 'Guru', 't-6'),
+('user-t-7', 'Ust. Agib', 'ustadz.agib', 'guru123', 'Guru', 't-7'),
+('user-t-8', 'Usth. Iffah', 'ustadzah.iffah', 'guru123', 'Guru', 't-8'),
+('user-t-9', 'Ust. Yunan', 'ustadz.yunan', 'guru123', 'Guru', 't-9'),
+('user-t-10', 'Ust. Faqih', 'ustadz.faqih', 'guru123', 'Guru', 't-10'),
+('user-t-11', 'Usth. Indri', 'ustadzah.indri', 'guru123', 'Guru', 't-11'),
+('user-t-12', 'Ust. Aidil', 'ustadz.aidil', 'guru123', 'Guru', 't-12'),
+('user-t-13', 'Usth. Saiba Musyaiya', 'ustadzah.saiba.musyaiya', 'guru123', 'Guru', 't-13'),
+('user-t-14', 'Ust. Arya', 'ustadz.arya', 'guru123', 'Guru', 't-14'),
+('user-t-15', 'Ust. Kholif', 'ustadz.kholif', 'guru123', 'Guru', 't-15'),
+('user-t-16', 'Usth. Bela', 'ustadzah.bela', 'guru123', 'Guru', 't-16'),
+('user-t-17', 'Ust. Farhan', 'ustadz.farhan', 'guru123', 'Guru', 't-17'),
+('user-t-18', 'Ust. Tubagus', 'ustadz.tubagus', 'guru123', 'Guru', 't-18'),
+('user-t-19', 'Ust. Hafizh', 'ustadz.hafizh', 'guru123', 'Guru', 't-19'),
+('user-t-20', 'Usth. Fani', 'ustadzah.fani', 'guru123', 'Guru', 't-20'),
+('user-t-21', 'Ust. Azri', 'ustadz.azri', 'guru123', 'Guru', 't-21'),
+('user-t-22', 'Usth. Dila', 'ustadzah.dila', 'guru123', 'Guru', 't-22'),
+('user-t-23', 'Usth. Azizah', 'ustadzah.azizah', 'guru123', 'Guru', 't-23'),
+('user-t-24', 'Usth. Hasri', 'ustadzah.hasri', 'guru123', 'Guru', 't-24'),
+('user-t-25', 'Ust. Latief', 'ustadz.latief', 'guru123', 'Guru', 't-25'),
+('user-t-26', 'Ust. Akmal', 'ustadz.akmal', 'guru123', 'Guru', 't-26'),
+('user-t-27', 'Usth. Lina', 'ustadzah.lina', 'guru123', 'Guru', 't-27'),
+('user-t-28', 'Ust. Rezkidar', 'ustadz.rezkidar', 'guru123', 'Guru', 't-28');

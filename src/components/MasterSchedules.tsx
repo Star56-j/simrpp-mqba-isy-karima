@@ -10,10 +10,13 @@ import {
   Copy,
   Printer,
   FileSpreadsheet,
+  Download,
   Search,
   ChevronDown,
   Filter
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { TeachingSchedule, Teacher, Subject, SchoolClass, AcademicYear, Semester } from '../types';
 import { api } from '../api';
 
@@ -202,6 +205,49 @@ export default function MasterSchedules({
     }
   };
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    doc.setFont('times', 'bold');
+    doc.setFontSize(13);
+    doc.text("MARKAZ QUR'AN DAN BAHASA ARAB (MQBA) ISY KARIMA", 105, 14, { align: 'center' });
+    doc.setFont('times', 'normal');
+    doc.setFontSize(10.5);
+    doc.text('YAYASAN SOSIAL DAN PENDIDIKAN ISY KARIMA', 105, 19.5, { align: 'center' });
+    doc.setLineWidth(0.5);
+    doc.line(15, 23, 195, 23);
+
+    doc.setFont('times', 'bold');
+    doc.setFontSize(12);
+    doc.text('JADWAL PELAJARAN / KBM MQBA ISY KARIMA', 105, 30, { align: 'center' });
+
+    autoTable(doc, {
+      startY: 35,
+      theme: 'grid',
+      styles: { font: 'times', fontSize: 8.5, cellPadding: 1.8 },
+      headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+      head: [['No', 'Hari', 'Jam KBM', 'Kelas', 'Guru Pengajar', 'Mata Pelajaran']],
+      body: filteredSchedules.map((s, idx) => [
+        idx + 1,
+        s.day,
+        s.time,
+        s.class?.name || '-',
+        s.teacher?.name || '-',
+        s.subject?.name || '-'
+      ])
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY + 8;
+    const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    doc.setFont('times', 'normal');
+    doc.setFontSize(9.5);
+    doc.text(`Karanganyar, ${todayStr}`, 155, finalY, { align: 'center' });
+    doc.text('Kepala Kurikulum MQBA', 155, finalY + 4.5, { align: 'center' });
+    doc.setFont('times', 'bold');
+    doc.text('( Ust. Aidil Aqli, S.Ag. )', 155, finalY + 24, { align: 'center' });
+
+    doc.save('Jadwal_Pelajaran_MQBA.pdf');
+  };
+
   const openAddModal = () => {
     setSelectedSchedule(null);
     setDay('Senin');
@@ -387,7 +433,7 @@ export default function MasterSchedules({
           <div className="flex items-center space-x-2">
             <button
               onClick={exportToExcel}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[11px] font-extrabold uppercase tracking-wider transition"
+              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer"
               title="Download Excel"
             >
               <FileSpreadsheet className="w-4 h-4" />
@@ -395,11 +441,19 @@ export default function MasterSchedules({
             </button>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-extrabold uppercase tracking-wider transition"
-              title="Print PDF"
+              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer"
+              title="Print Cetak Fisik"
             >
               <Printer className="w-4 h-4" />
-              <span className="hidden sm:inline">Cetak PDF</span>
+              <span className="hidden sm:inline">Print</span>
+            </button>
+            <button
+              onClick={handleDownloadPDF}
+              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer"
+              title="Download File PDF"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Download PDF</span>
             </button>
           </div>
         </div>
@@ -426,7 +480,7 @@ export default function MasterSchedules({
                   <tr key={sch.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                     <td className="p-4 text-center text-slate-400 font-semibold">{index + 1}</td>
                     <td className="p-4">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-850 dark:text-slate-300">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                         {sch.day}
                       </span>
                     </td>

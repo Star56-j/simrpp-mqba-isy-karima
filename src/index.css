@@ -1,268 +1,213 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Amiri:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-arabic: "Amiri", serif;
   
-  --color-indigo-50: var(--islamic-indigo-50);
-  --color-indigo-100: var(--islamic-indigo-100);
-  --color-indigo-200: var(--islamic-indigo-200);
-  --color-indigo-300: var(--islamic-indigo-300);
-  --color-indigo-400: var(--islamic-indigo-400);
-  --color-indigo-500: var(--islamic-indigo-500);
-  --color-indigo-600: var(--islamic-indigo-600);
-  --color-indigo-700: var(--islamic-indigo-700);
-  --color-indigo-800: var(--islamic-indigo-800);
-  --color-indigo-900: var(--islamic-indigo-900);
-  --color-indigo-950: var(--islamic-indigo-950);
+  /* Ocean Blue / Sky Blue Islamic Palette */
+  --color-indigo-50: #f0f9ff;
+  --color-indigo-100: #e0f2fe;
+  --color-indigo-200: #bae6fd;
+  --color-indigo-300: #7dd3fc;
+  --color-indigo-400: #38bdf8;
+  --color-indigo-500: #0ea5e9;
+  --color-indigo-600: #0284c7;
+  --color-indigo-700: #0369a1;
+  --color-indigo-800: #075985;
+  --color-indigo-900: #0c4a6e;
+  --color-indigo-950: #082f49;
+
+  --shadow-sm: 0 1px 3px rgba(3,105,161,0.08);
+  --shadow-md: 0 4px 12px rgba(3,105,161,0.10);
+  --shadow-lg: 0 8px 24px rgba(3,105,161,0.12);
+  --shadow-xl: 0 16px 40px rgba(3,105,161,0.14);
 }
 
 :root {
-  --islamic-indigo-50: #eef2ff;
-  --islamic-indigo-100: #e0e7ff;
-  --islamic-indigo-200: #c7d2fe;
-  --islamic-indigo-300: #a5b4fc;
-  --islamic-indigo-400: #818cf8;
-  --islamic-indigo-500: #6366f1;
-  --islamic-indigo-600: #4f46e5;
-  --islamic-indigo-700: #4338ca;
-  --islamic-indigo-800: #3730a3;
-  --islamic-indigo-900: #312e81;
-  --islamic-indigo-950: #1e1b4b;
+  --ocean-50: #f0f9ff;
+  --ocean-100: #e0f2fe;
+  --ocean-200: #bae6fd;
+  --ocean-300: #7dd3fc;
+  --ocean-400: #38bdf8;
+  --ocean-500: #0ea5e9;
+  --ocean-600: #0284c7;
+  --ocean-700: #0369a1;
+  --ocean-800: #075985;
+  --ocean-900: #0c4a6e;
 }
 
-/* Tailwind v4: gunakan class strategy untuk dark mode agar toggle manual berfungsi */
 @variant dark (&:where(.dark, .dark *));
 
 @layer base {
   body {
-    @apply font-sans antialiased bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 selection:bg-indigo-700 selection:text-white transition-colors duration-200;
+    @apply font-sans antialiased bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 selection:bg-sky-500 selection:text-white transition-colors duration-200;
   }
 }
 
-/* Motif kawung bergaya batik Solo untuk halaman login */
-.login-batik-pattern {
-  background-color: transparent;
-  background-image:
-    radial-gradient(ellipse at 50% 0%, transparent 38%, rgba(111, 47, 34, 0.2) 40%, rgba(111, 47, 34, 0.2) 43%, transparent 45%),
-    radial-gradient(ellipse at 50% 100%, transparent 38%, rgba(111, 47, 34, 0.2) 40%, rgba(111, 47, 34, 0.2) 43%, transparent 45%),
-    radial-gradient(ellipse at 0% 50%, transparent 38%, rgba(53, 32, 79, 0.16) 40%, rgba(53, 32, 79, 0.16) 43%, transparent 45%),
-    radial-gradient(ellipse at 100% 50%, transparent 38%, rgba(53, 32, 79, 0.16) 40%, rgba(53, 32, 79, 0.16) 43%, transparent 45%),
-    radial-gradient(circle at 50% 50%, rgba(184, 138, 68, 0.35) 0 3%, transparent 4%);
-  background-size: 72px 72px;
+/* ─── Global Dark Mode Contrast Safeguards ─── */
+.dark option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   DINASTI ABBASIYAH — Islamic Geometric Ornaments
-   Terinspirasi dari pola geometris era kejayaan Islam (750–1258 M)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Pola bintang octagonal — khas ornamen Abbasiyah */
-.abbasid-geometric {
-  background-color: transparent;
-  background-image:
-    /* Octagonal star pattern */
-    linear-gradient(45deg, rgba(245, 158, 11, 0.06) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(245, 158, 11, 0.06) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(245, 158, 11, 0.06) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(245, 158, 11, 0.06) 75%),
-    /* Inner diamond */
-    linear-gradient(45deg, rgba(245, 158, 11, 0.03) 50%, transparent 50%),
-    linear-gradient(-45deg, rgba(245, 158, 11, 0.03) 50%, transparent 50%);
-  background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 20px 20px, 20px 20px;
-  background-position: 0 0, 0 0, 20px 20px, 20px 20px, 0 0, 20px 0;
+.dark input, .dark select, .dark textarea {
+  color-scheme: dark;
 }
 
-/* Pola interlacing lines — arabesque */
-.abbasid-arabesque {
-  background-color: transparent;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 28px,
-      rgba(245, 158, 11, 0.04) 28px,
-      rgba(245, 158, 11, 0.04) 30px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 28px,
-      rgba(245, 158, 11, 0.04) 28px,
-      rgba(245, 158, 11, 0.04) 30px
-    ),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 39px,
-      rgba(245, 158, 11, 0.03) 39px,
-      rgba(245, 158, 11, 0.03) 40px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 39px,
-      rgba(245, 158, 11, 0.03) 39px,
-      rgba(245, 158, 11, 0.03) 40px
-    );
+/* Fallback contrast safety for pill badges & day tags in dark mode */
+.dark table span.bg-slate-100,
+.dark table span.bg-slate-50,
+.dark table span.bg-white {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
 }
 
-/* Border ornamen emas khas Abbasiyah */
-.abbasid-border-top {
-  position: relative;
+/* ─── Islamic Pattern Decorations ─── */
+.islamic-pattern-bg {
+  background-color: #f0f9ff;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%230ea5e915' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%230ea5e920' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
 }
-.abbasid-border-top::before {
+
+.dark .islamic-pattern-bg {
+  background-color: #0a1628;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%230ea5e925' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%230ea5e918' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+.islamic-star-pattern {
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpolygon points='20,2 24,14 37,14 27,22 31,34 20,26 9,34 13,22 3,14 16,14' fill='none' stroke='%230ea5e912' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* ─── Sidebar Ocean Blue ─── */
+.sidebar-ocean {
+  background: linear-gradient(180deg, #0c4a6e 0%, #0369a1 40%, #0284c7 100%);
+}
+
+.sidebar-ocean-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100/80 text-sm font-medium cursor-pointer transition-all duration-200;
+}
+
+.sidebar-ocean-item:hover {
+  @apply bg-white/10 text-white;
+}
+
+.sidebar-ocean-item.active {
+  @apply bg-white/20 text-white font-semibold shadow-sm;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
+}
+
+/* ─── Glassmorphism Ocean Cards ─── */
+.glass-panel {
+  @apply bg-white border border-sky-100 shadow-sm;
+}
+.dark .glass-panel {
+  @apply bg-slate-900 border-slate-800;
+}
+
+.glass-nav {
+  @apply bg-white/90 border-b border-sky-100 backdrop-blur-sm;
+}
+.dark .glass-nav {
+  @apply bg-slate-900/90 border-slate-800;
+}
+
+/* ─── Ocean Stat Cards ─── */
+.stat-card-ocean {
+  @apply relative overflow-hidden bg-white rounded-2xl border border-sky-100 p-5 shadow-sm;
+}
+.stat-card-ocean::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(245, 158, 11, 0.1) 10%,
-    rgba(245, 158, 11, 0.5) 30%,
-    rgba(217, 169, 62, 0.8) 50%,
-    rgba(245, 158, 11, 0.5) 70%,
-    rgba(245, 158, 11, 0.1) 90%,
-    transparent 100%
-  );
-  border-radius: 0 0 4px 4px;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%);
 }
 
-/* Animasi shimmer emas */
-@keyframes goldShimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-.gold-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(245, 158, 11, 0) 0%,
-    rgba(245, 158, 11, 0.15) 25%,
-    rgba(217, 169, 62, 0.3) 50%,
-    rgba(245, 158, 11, 0.15) 75%,
-    rgba(245, 158, 11, 0) 100%
-  );
-  background-size: 200% 100%;
-  animation: goldShimmer 4s ease-in-out infinite;
-}
-
-/* Animasi twinkle bintang */
-@keyframes starTwinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-
-.animate-twinkle {
-  animation: starTwinkle 3s ease-in-out infinite;
-}
-
-.animate-twinkle-delay {
-  animation: starTwinkle 3s ease-in-out 1.5s infinite;
-}
-
-.animate-twinkle-slow {
-  animation: starTwinkle 5s ease-in-out 0.8s infinite;
-}
-
-/* Sidebar scrollbar — sesuaikan warna dengan background indigo-900 */
-aside ::-webkit-scrollbar {
-  width: 4px;
-}
-aside ::-webkit-scrollbar-track {
-  background: transparent;
-}
-aside ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 99px;
-}
-aside ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
-}
-/* Firefox */
-aside nav {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.12) transparent;
-}
-
-/* Animations */
+/* ─── Animations ─── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
-
-/* Floating animation for decorative elements */
-@keyframes floatSlow {
+@keyframes pulseOcean {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(14,165,233,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(14,165,233,0); }
+}
+@keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-6px); }
 }
-
-.animate-float {
-  animation: floatSlow 6s ease-in-out infinite;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   PREMIUM UI UTILITIES (Glassmorphism, Glows, Focus States)
-   ═══════════════════════════════════════════════════════════════ */
+.animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slide-left { animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-ocean { animation: pulseOcean 2s ease-in-out infinite; }
 
-/* Panel Kaca (Glassmorphism) */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+/* ─── Card Hover Effect ─── */
+.card-hover {
+  @apply transition-all duration-200 hover:-translate-y-1 hover:border-sky-300 hover:shadow-md dark:hover:border-sky-700;
 }
 
-.dark .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+/* ─── Status Badges Ocean ─── */
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border;
+}
+.status-badge.success { @apply bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400; }
+.status-badge.warning { @apply bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400; }
+.status-badge.danger  { @apply bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400; }
+.status-badge.info    { @apply bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/30 dark:text-sky-400; }
+.status-badge.neutral { @apply bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300; }
+
+/* ─── Scrollbar Ocean ─── */
+aside ::-webkit-scrollbar { width: 4px; }
+aside ::-webkit-scrollbar-track { background: transparent; }
+aside ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 99px; }
+aside ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
+
+/* ─── Input Focus Ocean ─── */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  ring: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.15);
 }
 
-/* Kartu Premium Hover */
-.premium-card {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.premium-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -10px rgba(79, 70, 229, 0.15);
-  border-color: rgba(79, 70, 229, 0.25);
-}
-.dark .premium-card:hover {
-  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
-  border-color: rgba(129, 140, 248, 0.2);
+/* ─── Ocean Button Primary ─── */
+.btn-ocean {
+  @apply inline-flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-xl text-sm transition-all duration-200 active:scale-95;
 }
 
-/* Input Form Premium */
-.input-premium {
-  transition: all 0.2s ease-in-out;
-}
-.input-premium:focus {
-  border-color: var(--islamic-indigo-500, #6366f1);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-  background-color: #fff;
-}
-.dark .input-premium:focus {
-  background-color: rgba(15, 23, 42, 0.6);
-}
+/* ─── Legacy Compat ─── */
+.login-batik-pattern { background: none; }
+.abbasid-geometric { background: none; }
+.abbasid-arabesque { background: none; }
+.abbasid-border-top::before { display: none; }
+.gold-shimmer { background: none; animation: none; }
 
-/* Glow Accent */
-.glow-accent-indigo {
-  box-shadow: 0 0 15px -3px rgba(99, 102, 241, 0.3);
-}
-.glow-accent-amber {
-  box-shadow: 0 0 15px -3px rgba(245, 158, 11, 0.3);
-}
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.2s; }
+input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+.dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 
+@media print {
+  body { background: white !important; color: black !important; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .print-break-inside-avoid { page-break-inside: avoid; }
+  .print-break-before { page-break-before: always; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}

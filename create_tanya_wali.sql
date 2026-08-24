@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS tanya_wali_kelas (
+  id TEXT PRIMARY KEY,
+  santri_id TEXT,
+  santri_name TEXT,
+  class_id TEXT,
+  class_name TEXT,
+  wali_santri_id TEXT,
+  wali_santri_name TEXT,
+  wali_kelas_id TEXT,
+  wali_kelas_name TEXT,
+  subject TEXT,
+  message TEXT,
+  image_url TEXT,
+  file_url TEXT,
+  file_name TEXT,
+  wali_reply TEXT,
+  reply_at TEXT,
+  status TEXT DEFAULT 'Pending',
+  created_at TEXT,
+  updated_at TEXT
+);

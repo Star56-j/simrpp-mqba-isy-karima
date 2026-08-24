@@ -1,5 +1,5 @@
 import { Santri, Nilai, Subject, RaporDetail, SchoolClass, AcademicYear, Semester } from '../types';
-import { computeRaporScore } from './nilaiWeights';
+import { computeRaporScore, getPredikat } from './nilaiWeights';
 
 export function printRapor(
   santri: Santri,
@@ -10,7 +10,7 @@ export function printRapor(
   allSubjects: Subject[],
   raporDetail: RaporDetail | null,
   waliKelasName: string,
-  ketuaUnitName: string = "Ust. Umar Alamuddin, Lc."
+  ketuaUnitName: string = "Ust. Aidil Aqli, S.Ag."
 ) {
   const getAverage = (n: Nilai): number => {
     return computeRaporScore(n).nilaiAkhirTulis;
@@ -345,12 +345,13 @@ export function printRapor(
             <thead>
               <tr>
                 <th style="width: 4%;">No</th>
-                <th style="width: 34%;">Mata Pelajaran</th>
-                <th style="width: 12%;">UH / Mid</th>
-                <th style="width: 13%;">UAS Tulis</th>
-                <th style="width: 12%;">UAS Lisan</th>
-                <th style="width: 12.5%;">Nilai Akhir</th>
-                <th style="width: 12.5%;">Rata Kelas</th>
+                <th style="width: 30%;">Mata Pelajaran</th>
+                <th style="width: 10%;">UH / Mid</th>
+                <th style="width: 11%;">UAS Tulis</th>
+                <th style="width: 11%;">UAS Lisan</th>
+                <th style="width: 11%;">Nilai Akhir</th>
+                <th style="width: 11%;">Predikat</th>
+                <th style="width: 12%;">Rata Kelas</th>
               </tr>
             </thead>
             <tbody>
@@ -364,27 +365,30 @@ export function printRapor(
                     ${n.uasLisan ?? '-'}
                   </td>
                   <td class="text-center" style="font-weight: bold; background-color: #f8fafc;">${n.score || '-'}</td>
+                  <td class="text-center" style="font-weight: bold;">${n.score ? getPredikat(n.score) : '-'}</td>
                   <td class="text-center">${n.classAvg || '-'}</td>
                 </tr>
               `).join('')}
               <tr>
                 <th colspan="5" style="text-align: right; padding-right: 10px;">JUMLAH NILAI AKHIR</th>
                 <td class="text-center" style="font-weight: bold; background-color: #f1f5f9;">${totalScore || '-'}</td>
+                <td class="text-center" style="font-weight: bold; background-color: #f1f5f9;">${getPredikat(avgScore)}</td>
                 <td class="text-center">${totalClassAvg || '-'}</td>
               </tr>
               <tr>
                 <th colspan="5" style="text-align: right; padding-right: 10px;">RATA-RATA HARIAN & RAPOR</th>
                 <td class="text-center" style="font-weight: bold; background-color: #f1f5f9;">${avgScore || '-'}</td>
+                <td class="text-center" style="font-weight: bold; background-color: #f1f5f9;">${getPredikat(avgScore)}</td>
                 <td class="text-center">${avgClassAvg || '-'}</td>
               </tr>
               <tr>
                 <th colspan="5" style="text-align: right; padding-right: 10px;">PERINGKAT (RANKING)</th>
-                <td colspan="2" class="text-center" style="font-weight: bold; font-size: 11px; background-color: #f1f5f9;">${rankStr}</td>
+                <td colspan="3" class="text-center" style="font-weight: bold; font-size: 11px; background-color: #f1f5f9;">${rankStr}</td>
               </tr>
             </tbody>
           </table>
           <div style="font-size: 8px; font-style: italic; color: #555; margin-top: -4px; margin-bottom: 12px;">
-            * Pembobotan Nilai Akhir: 30% Akhlaq, 10% Kehadiran, 10% UH/Bulanan/Mid Semester, 60% Ujian Semester Tulis. Ujian Lisan dipisahkan sendiri pada kolom khusus.
+            * Pembobotan Nilai Akhir (Total 100%): 20% Akhlaq Keseharian, 10% Kehadiran, 10% UH/Bulanan/Mid Semester, 60% Ujian Semester Tulis. Ujian Lisan dipisahkan sendiri pada kolom khusus.
           </div>
 
           <!-- C. KETAHFIZHAN -->

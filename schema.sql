@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS rpps (
   status TEXT DEFAULT 'Draft',
   profil_pelajar TEXT,
   sarana TEXT,
+  capai_pembelajaran TEXT,
   capaian_pembelajaran TEXT,
   tujuan_pembelajaran TEXT,
   alur_tp TEXT,
@@ -85,6 +86,8 @@ CREATE TABLE IF NOT EXISTS rpps (
   pengayaan TEXT,
   catatan TEXT,
   syllabus_items TEXT,
+  attachment_url TEXT,
+  attachment_name TEXT,
   revision_notes TEXT,
   updated_at TEXT,
   created_at TEXT
@@ -190,20 +193,28 @@ CREATE TABLE IF NOT EXISTS pengumuman (
 
 CREATE TABLE IF NOT EXISTS evaluasi_pembelajaran (
   id TEXT PRIMARY KEY,
+  bulan INTEGER,
+  tahun INTEGER,
   teacher_id TEXT,
-  class_id TEXT,
   subject_id TEXT,
+  class_id TEXT,
   academic_year_id TEXT,
   semester_id TEXT,
-  bulan TEXT,
-  tahun TEXT,
-  capaian_materi TEXT,
+  total_pertemuan_rencana INTEGER DEFAULT 0,
+  total_pertemuan_terlaksana INTEGER DEFAULT 0,
+  persentase_terlaksana REAL DEFAULT 0,
+  tp_tercapai TEXT,
+  tp_belum_tercapai TEXT,
+  asesmen_formatif_hasil TEXT,
+  asesmen_catatan TEXT,
   kendala TEXT,
   solusi TEXT,
+  diferenciasi_dilakukan TEXT,
   rencana_bulan_depan TEXT,
-  nilai_rata_santri REAL DEFAULT 0,
-  persentase_kehadiran REAL DEFAULT 0,
-  created_at TEXT
+  refleksi_guru TEXT,
+  predikat_ketercapaian TEXT DEFAULT 'Baik',
+  created_at TEXT,
+  updated_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS password_reset_requests (
@@ -214,6 +225,23 @@ CREATE TABLE IF NOT EXISTS password_reset_requests (
   status TEXT DEFAULT 'Pending',
   created_at TEXT,
   resolved_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS akhlaq_santri (
+  id TEXT PRIMARY KEY,
+  santri_id TEXT NOT NULL,
+  class_id TEXT NOT NULL,
+  academic_year_id TEXT NOT NULL,
+  semester_id TEXT NOT NULL,
+  nilai_akhlaq REAL DEFAULT 90,
+  predikat TEXT DEFAULT 'A',
+  adab_kesopanan REAL DEFAULT 90,
+  kedisiplinan_ibadah REAL DEFAULT 90,
+  kebersihan_kerapian REAL DEFAULT 90,
+  catatan TEXT,
+  recorded_by TEXT,
+  created_at TEXT,
+  updated_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS evaluasi_wali_kelas (

@@ -32,10 +32,12 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
   const [errorMessage, setErrorMessage] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
 
-  const filteredTeachers = (teachers || []).filter(t => 
-    (t.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (t.email || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTeachers = (teachers || [])
+    .filter(t => 
+      (t.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.email || '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'id', { sensitivity: 'base' }));
 
   const openAddModal = () => {
     setSelectedTeacher(null);
@@ -225,7 +227,7 @@ export default function MasterTeachers({ teachers, onRefresh }: MasterTeachersPr
                   <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-50 dark:border-slate-800/80">
                     <button
                       onClick={() => openEditModal(teacher)}
-                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold cursor-pointer"
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 text-xs font-semibold cursor-pointer"
                     >
                       <Edit className="w-3.5 h-3.5" />
                       <span>Edit</span>

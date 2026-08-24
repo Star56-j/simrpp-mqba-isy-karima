@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, BookOpen, GraduationCap, Calendar, 
   FileText, User, Lock, LogOut, Moon, Sun, Activity, 
   FileSpreadsheet, Users2, Crown, Megaphone, HelpCircle,
-  ChevronDown, ChevronRight
+  ChevronDown, ChevronRight, MessageSquare
 } from 'lucide-react';
 import { User as UserType } from '../types';
 
@@ -92,6 +92,7 @@ export default function Sidebar({
         {
           title: 'SISTEM & KOMUNIKASI',
           items: [
+            { id: 'tanya-wali-kelas', label: 'Konsultasi Wali Santri', icon: MessageSquare },
             { id: 'tanya-admin', label: 'Tanya Admin', icon: HelpCircle },
             { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
             { id: 'activity-logs', label: 'Activity Log', icon: Activity },
@@ -119,10 +120,10 @@ export default function Sidebar({
           ]
         },
         {
-          title: 'EVALUASI & INFORMASI',
+          title: 'EVALUASI & KONSULTASI',
           items: [
+            { id: 'tanya-wali-kelas', label: 'Konsultasi Wali Santri', icon: MessageSquare },
             { id: 'evaluasi-wali-kelas', label: 'Evaluasi Wali Kelas', icon: FileText },
-            { id: 'evaluasi-pembelajaran', label: 'Evaluasi Mapel', icon: Activity },
             { id: 'tanya-admin', label: 'Tanya Admin', icon: HelpCircle },
             { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
             { id: 'profile-settings', label: 'Profil Saya', icon: User },
@@ -154,8 +155,9 @@ export default function Sidebar({
         ]
       },
       {
-        title: 'INFORMASI & PROFIL',
+        title: 'INFORMASI & KONSULTASI',
         items: [
+          { id: 'tanya-wali-kelas', label: 'Konsultasi Wali Santri', icon: MessageSquare },
           { id: 'tanya-admin', label: 'Tanya Admin', icon: HelpCircle },
           { id: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
           { id: 'profile-settings', label: 'Profil Saya', icon: User },

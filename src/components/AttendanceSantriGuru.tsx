@@ -1,9 +1,12 @@
 import React from 'react';
-import { ClipboardList, Plus, CheckCircle, AlertCircle, Download, Upload, Calendar } from 'lucide-react';
-import { Santri, SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester, TeachingSchedule } from '../types';
+import { ClipboardList, Plus, CheckCircle, AlertCircle, Download, Upload, Calendar, Printer, BookOpen, FileText, Filter, Users } from 'lucide-react';
+import { Santri, SantriAttendance, SantriAttendanceSummary, SchoolClass, AcademicYear, Semester, TeachingSchedule, Subject, WaliKelas as TWaliKelas } from '../types';
 import { api } from '../api';
-import { exportToExcel } from '../utils/exportExcel';
+import { exportToExcel, exportRekapSantriExcel } from '../utils/exportExcel';
 import { parseExcelFile } from '../utils/importExcel';
+import { printRekapKehadiranSantri } from '../utils/printRekapKehadiran';
+import { downloadRekapSantriPdf } from '../utils/pdfDownloader';
+import { printGenericTable } from '../utils/printUtils';
 import BulkMonthlySantriModal from './BulkMonthlySantriModal';
 
 interface AttendanceSantriGuruProps {
@@ -12,61 +15,142 @@ interface AttendanceSantriGuruProps {
   classes: SchoolClass[];
   schedules: TeachingSchedule[];
   santriList: Santri[];
+  subjects?: Subject[];
+  waliKelas?: TWaliKelas[];
 }
 
 const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
-export default function AttendanceSantriGuru({ academicYears, semesters, classes, schedules, santriList }: AttendanceSantriGuruProps) {
+export default function AttendanceSantriGuru({
+  academicYears,
+  semesters,
+  classes,
+  schedules = [],
+  santriList,
+  subjects = [],
+  waliKelas = []
+}: AttendanceSantriGuruProps) {
   const currentYear  = new Date().getFullYear().toString();
   const currentMonth = (new Date().getMonth() + 1).toString();
   const todayStr     = new Date().toISOString().split('T')[0];
 
   const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+  const currentUser = myUser;
+  const isWaliRole = myUser.role === 'WaliKelas';
+  const isAdminRole = myUser.role === 'Admin';
 
-  const teacherId = myUser.teacherId || myUser.teacher_id;
-  const myClassIds = [...new Set(
-    schedules.filter(s => s.teacherId === teacherId).map(s => s.classId)
-  )];
-  const scheduleClasses = classes.filter(c => myClassIds.includes(c.id));
-  
-  // Apabila Wali Kelas, Admin, atau tidak ada jadwal mengajar, tampilkan semua kelas agar bisa diisi langsung
-  const availableClasses = (myUser.role === 'WaliKelas' || myUser.role === 'Admin' || scheduleClasses.length === 0)
-    ? classes
-    : scheduleClasses;
+  const teacherIds = React.useMemo(() => {
+    return [
+      myUser.teacherId,
+      myUser.teacher_id,
+      (myUser.teacher && myUser.teacher.id),
+      myUser.id
+    ].filter(Boolean);
+  }, [myUser]);
+  const myTeacherId = myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || 't-12';
+
+  // Jadwal mengajar guru yang login
+  const mySchedules = React.useMemo(() => {
+    if (isAdminRole) return schedules;
+    return schedules.filter(s => teacherIds.includes(s.teacherId) || teacherIds.includes((s as any).teacher_id));
+  }, [isAdminRole, schedules, teacherIds]);
+
+  const myScheduleSubjectIds = React.useMemo(() => {
+    return Array.from(new Set(mySchedules.map(s => s.subjectId || (s as any).subject_id).filter(Boolean)));
+  }, [mySchedules]);
+
+  const myScheduleClassIds = React.useMemo(() => {
+    return Array.from(new Set(mySchedules.map(s => s.classId || (s as any).class_id).filter(Boolean)));
+  }, [mySchedules]);
+
+  const myWaliClassIds = React.useMemo(() => {
+    return waliKelas
+      .filter(w => teacherIds.includes(w.teacherId) || teacherIds.includes((w as any).teacher_id))
+      .map(w => w.classId || (w as any).class_id)
+      .filter(Boolean);
+  }, [waliKelas, teacherIds]);
+
+  // Mata pelajaran yang diampu oleh guru ini
+  const availableSubjects = React.useMemo(() => {
+    if (isAdminRole) return subjects;
+    const filtered = subjects.filter(s => myScheduleSubjectIds.includes(s.id));
+    return filtered.length > 0 ? filtered : (isWaliRole ? subjects : subjects);
+  }, [isAdminRole, isWaliRole, subjects, myScheduleSubjectIds]);
+
+  // Kelas yang diampu oleh guru ini (atau dibimbing jika Wali Kelas)
+  const availableClasses = React.useMemo(() => {
+    if (isAdminRole) return classes;
+    if (isWaliRole) {
+      const combined = classes.filter(c => myWaliClassIds.includes(c.id) || myScheduleClassIds.includes(c.id));
+      return combined.length > 0 ? combined : classes;
+    }
+    const filtered = classes.filter(c => myScheduleClassIds.includes(c.id));
+    return filtered.length > 0 ? filtered : classes;
+  }, [isAdminRole, isWaliRole, classes, myWaliClassIds, myScheduleClassIds]);
 
   const [activeTab, setActiveTab] = React.useState<'isi' | 'riwayat' | 'rekap'>('isi');
+  const [rekapSubTab, setRekapSubTab] = React.useState<'kelas' | 'santri'>('kelas');
 
   // Filter riwayat & rekap
-  const [filterAY,    setFilterAY]    = React.useState(academicYears[0]?.id || '');
-  const [filterSem,   setFilterSem]   = React.useState(semesters[0]?.id || '');
-  const [filterYear,  setFilterYear]  = React.useState(currentYear);
-  const [filterMonth, setFilterMonth] = React.useState(currentMonth);
-  const [rekapMode,   setRekapMode]   = React.useState<'bulan'|'semester'|'tahun'>('bulan');
+  const [filterAY,      setFilterAY]      = React.useState(academicYears[0]?.id || '');
+  const [filterSem,     setFilterSem]     = React.useState(semesters[0]?.id || '');
+  const [filterYear,    setFilterYear]    = React.useState(currentYear);
+  const [filterMonth,   setFilterMonth]   = React.useState(currentMonth);
+  const [filterClass,   setFilterClass]   = React.useState('Semua');
+  const [filterSubject, setFilterSubject] = React.useState('Semua');
+  const [rekapMode,     setRekapMode]     = React.useState<'bulan'|'semester'|'tahun'>('bulan');
 
   const [attendances, setAttendances] = React.useState<SantriAttendance[]>([]);
   const [summary,     setSummary]     = React.useState<SantriAttendanceSummary[]>([]);
   const [loading,     setLoading]     = React.useState(false);
 
   // Form isi absensi
-  const [fClass,  setFClass]  = React.useState(availableClasses[0]?.id || '');
-  const [fDate,   setFDate]   = React.useState(todayStr);
-  const [fNotes,  setFNotes]  = React.useState('');
-  const [fAY,     setFAY]     = React.useState(academicYears[0]?.id || '');
-  const [fSem,    setFSem]    = React.useState(semesters[0]?.id || '');
+  const [fClass,     setFClass]     = React.useState(availableClasses[0]?.id || '');
+  const [fSubjectId, setFSubjectId] = React.useState(availableSubjects[0]?.id || '');
+  const [fDate,      setFDate]      = React.useState(todayStr);
+  const [fNotes,     setFNotes]     = React.useState('');
+  const [fAY,        setFAY]        = React.useState(academicYears[0]?.id || '');
+  const [fSem,       setFSem]       = React.useState(semesters[0]?.id || '');
   const [santriStatuses, setSantriStatuses] = React.useState<Record<string, string>>({});
   
-  // Update fClass default jika availableClasses berubah
   React.useEffect(() => {
     if (availableClasses.length > 0 && (!fClass || !availableClasses.some(c => c.id === fClass))) {
       setFClass(availableClasses[0].id);
     }
-  }, [availableClasses]);
+  }, [availableClasses, fClass]);
 
-  // Update santriStatuses when fClass changes
+  React.useEffect(() => {
+    if (availableSubjects.length > 0 && (!fSubjectId || !availableSubjects.some(s => s.id === fSubjectId))) {
+      setFSubjectId(availableSubjects[0].id);
+    }
+  }, [availableSubjects, fSubjectId]);
+
+  // When class changes in form, auto-sync subject if taught by this teacher in that class
+  const handleFormClassChange = (selectedCId: string) => {
+    setFClass(selectedCId);
+    const schedInClass = mySchedules.filter(s => (s.classId || (s as any).class_id) === selectedCId);
+    if (schedInClass.length > 0) {
+      const matchSubjId = schedInClass[0].subjectId || (schedInClass[0] as any).subject_id;
+      if (matchSubjId) setFSubjectId(matchSubjId);
+    }
+  };
+
+  // When subject changes in form, auto-sync class if scheduled
+  const handleFormSubjectChange = (selectedSId: string) => {
+    setFSubjectId(selectedSId);
+    const schedForSubj = mySchedules.filter(s => (s.subjectId || (s as any).subject_id) === selectedSId);
+    if (schedForSubj.length > 0) {
+      const matchClassId = schedForSubj[0].classId || (schedForSubj[0] as any).class_id;
+      if (matchClassId && availableClasses.some(c => c.id === matchClassId)) {
+        setFClass(matchClassId);
+      }
+    }
+  };
+
   React.useEffect(() => {
     const classSantris = santriList.filter(s => s.classId === fClass);
     const initialStatuses: Record<string, string> = {};
-    classSantris.forEach(s => initialStatuses[s.id] = 'Hadir'); // Default Hadir
+    classSantris.forEach(s => initialStatuses[s.id] = 'Hadir');
     setSantriStatuses(initialStatuses);
   }, [fClass, santriList]);
   
@@ -77,10 +161,16 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
   const [showBulkSantriModal, setShowBulkSantriModal] = React.useState(false);
 
   const buildParams = React.useCallback(() => {
-    const p: Record<string, string> = { academicYearId: filterAY, semesterId: filterSem, year: filterYear };
+    const p: Record<string, string> = { 
+      academicYearId: filterAY, 
+      semesterId: filterSem, 
+      year: filterYear 
+    };
     if (rekapMode === 'bulan') p.month = filterMonth;
+    if (filterClass !== 'Semua') p.classId = filterClass;
+    if (filterSubject !== 'Semua') p.subjectId = filterSubject;
     return p;
-  }, [filterAY, filterSem, filterYear, filterMonth, rekapMode]);
+  }, [filterAY, filterSem, filterYear, filterMonth, rekapMode, filterClass, filterSubject]);
 
   const loadData = React.useCallback(() => {
     setLoading(true);
@@ -88,24 +178,83 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
     Promise.all([
       api.getSantriAttendances(params),
       api.getSantriAttendanceSummary(params),
-    ]).then(([list, sum]) => {
-      setAttendances(list);
-      setSummary(sum);
-    }).catch(() => { setAttendances([]); setSummary([]); })
-      .finally(() => setLoading(false));
-  }, [buildParams]);
+    ]).then(([list, sumList]) => {
+      // Filter list strictly based on teacher scope
+      const scopedList = list.filter(a => {
+        if (isAdminRole) return true;
+        const recTid = (a as any).teacherId || (a as any).teacher_id;
+        if (recTid && teacherIds.includes(recTid)) return true;
+        if (myScheduleSubjectIds.includes(a.subjectId) && myScheduleClassIds.includes(a.classId)) return true;
+        if (isWaliRole && myWaliClassIds.includes(a.classId)) return true;
+        return false;
+      });
+      setAttendances(scopedList);
+
+      // Filter summary for available classes only
+      const validClassIds = availableClasses.map(c => c.id);
+      const scopedSummary = sumList.filter(s => validClassIds.includes(s.classId));
+      setSummary(scopedSummary);
+    }).catch(() => { 
+      setAttendances([]); 
+      setSummary([]); 
+    }).finally(() => setLoading(false));
+  }, [buildParams, isAdminRole, isWaliRole, teacherIds, myScheduleSubjectIds, myScheduleClassIds, myWaliClassIds, availableClasses]);
 
   React.useEffect(() => { loadData(); }, [loadData]);
 
-  const handleExport = () => {
-    const ayName = academicYears.find(a => a.id === filterAY)?.name || '';
-    const semName = semesters.find(s => s.id === filterSem)?.name || '';
+  // Calculations for Per-Santri (Individu) Summary Array with % Hadir
+  const perSantriSummary = React.useMemo(() => {
+    const targetClassId = filterClass !== 'Semua' ? filterClass : (availableClasses[0]?.id || '');
+    const classSantris = santriList
+      .filter(s => !targetClassId || s.classId === targetClassId)
+      .slice()
+      .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'id', { sensitivity: 'base' }));
     
+    return classSantris.map(s => {
+      const clsObj = classes.find(c => c.id === s.classId);
+      const clsName = clsObj ? clsObj.name : s.classId;
+      const myAtts = attendances.filter(a => (a as any).santriId === s.id);
+      
+      let hadir = 0, izin = 0, sakit = 0, alpha = 0;
+      if (myAtts.length > 0) {
+        hadir = myAtts.filter(a => a.status === 'Hadir').length;
+        izin  = myAtts.filter(a => a.status === 'Izin').length;
+        sakit = myAtts.filter(a => a.status === 'Sakit').length;
+        alpha = myAtts.filter(a => a.status === 'Alpha').length;
+      }
+
+      const total = hadir + izin + sakit + alpha;
+      const persentaseHadir = total > 0 ? Math.round((hadir / total) * 100) : 0;
+
+      return {
+        santriId: s.id,
+        santriName: s.name,
+        nis: s.nis || '-',
+        classId: s.classId,
+        className: `Kelas ${clsName}`,
+        hadir,
+        izin,
+        sakit,
+        alpha,
+        total,
+        persentaseHadir
+      };
+    });
+  }, [santriList, filterClass, availableClasses, classes, attendances]);
+
+  const rekapLabel = rekapMode === 'bulan'
+    ? `${MONTHS[parseInt(filterMonth) - 1]} ${filterYear}`
+    : rekapMode === 'semester'
+    ? `Semester ${semesters.find(s => s.id === filterSem)?.name || ''} ${filterYear}`
+    : `Tahun ${filterYear}`;
+
+  const handleExport = () => {
     if (activeTab === 'riwayat') {
       const dataToExport = attendances.map((a, idx) => ({
         'No': idx + 1,
         'Tanggal': new Date(a.date).toLocaleDateString('id-ID'),
         'Kelas': classes.find(c => c.id === a.classId)?.name || a.classId,
+        'Mata Pelajaran': a.subjectName || subjects.find(s => s.id === a.subjectId)?.name || 'Mapel Umum',
         'Hadir': a.jumlahHadir,
         'Izin': a.jumlahIzin,
         'Sakit': a.jumlahSakit,
@@ -113,18 +262,97 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
         'Total': a.jumlahTotal,
         'Keterangan': a.notes || '-'
       }));
-      exportToExcel(dataToExport, `Absensi_Santri_Guru_${ayName}_${semName}`);
+      exportToExcel(dataToExport, `Absensi_Santri_Guru_${rekapLabel.replace(/ /g, '_')}`);
     } else if (activeTab === 'rekap') {
-      const dataToExport = summary.map((s, idx) => ({
-        'No': idx + 1,
-        'Kelas': classes.find(c => c.id === s.classId)?.name || s.classId,
-        'Total Pertemuan': s.total,
-        'Rata-rata Hadir': Math.round(s.hadir / (s.total || 1)),
-        'Rata-rata Izin': Math.round(s.izin / (s.total || 1)),
-        'Rata-rata Sakit': Math.round(s.sakit / (s.total || 1)),
-        'Rata-rata Alpha': Math.round(s.alpha / (s.total || 1))
-      }));
-      exportToExcel(dataToExport, `Rekap_Absensi_Santri_Guru_${ayName}_${semName}`);
+      if (rekapSubTab === 'santri') {
+        exportRekapSantriExcel(perSantriSummary, rekapLabel, `Rekap_Kehadiran_Santri_Individu_${rekapLabel.replace(/ /g, '_')}`);
+      } else {
+        const enrichedClassSummary = summary.map(s => ({
+          ...s,
+          santriName: `Kelas ${classes.find(c => c.id === s.classId)?.name || s.classId}`,
+          nis: `Per Kelas`,
+          persentaseHadir: s.rataHadir !== undefined ? s.rataHadir : 0
+        }));
+        exportRekapSantriExcel(enrichedClassSummary, rekapLabel, `Rekap_Kehadiran_Santri_Kelas_${rekapLabel.replace(/ /g, '_')}`);
+      }
+    }
+  };
+
+  const handlePrint = () => {
+    if (activeTab === 'riwayat') {
+      const title = 'Data Riwayat Absensi Santri';
+      const subtitle = `Nama Guru: ${myUser.name || 'Pengajar MQBA'} | Periode: ${rekapLabel}`;
+      const headers = ['No', 'Tanggal', 'Kelas', 'Mata Pelajaran', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Total', 'Keterangan'];
+      const dataRows = attendances.map((a, idx) => [
+        idx + 1, 
+        new Date(a.date).toLocaleDateString('id-ID'), 
+        classes.find(c => c.id === a.classId)?.name || a.classId, 
+        a.subjectName || subjects.find(s => s.id === a.subjectId)?.name || 'Mapel Umum',
+        a.jumlahHadir, a.jumlahIzin, a.jumlahSakit, a.jumlahAlpha, a.jumlahTotal, a.notes || '-'
+      ]);
+      printGenericTable(title, subtitle, headers, dataRows);
+    } else {
+      if (rekapSubTab === 'santri') {
+        printRekapKehadiranSantri(perSantriSummary, academicYears, filterAY, `Santri (Individu) - ${rekapLabel}`);
+      } else {
+        const enrichedClassSummary = summary.map(s => ({
+          ...s,
+          santriName: `Kelas ${classes.find(c => c.id === s.classId)?.name || s.classId}`,
+          nis: `Per Kelas`,
+          persentaseHadir: s.rataHadir !== undefined ? s.rataHadir : 0
+        }));
+        printRekapKehadiranSantri(enrichedClassSummary, academicYears, filterAY, `Per Kelas - ${rekapLabel}`);
+      }
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    if (activeTab === 'riwayat') {
+      const title = 'Data Riwayat Absensi Santri';
+      const subtitle = `Nama Guru: ${myUser.name || 'Pengajar MQBA'} | Periode: ${rekapLabel}`;
+      const headers = ['No', 'Tanggal', 'Kelas', 'Mata Pelajaran', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Total', 'Keterangan'];
+      const dataRows = attendances.map((a, idx) => [
+        idx + 1, 
+        new Date(a.date).toLocaleDateString('id-ID'), 
+        classes.find(c => c.id === a.classId)?.name || a.classId, 
+        a.subjectName || subjects.find(s => s.id === a.subjectId)?.name || 'Mapel Umum',
+        a.jumlahHadir, a.jumlahIzin, a.jumlahSakit, a.jumlahAlpha, a.jumlahTotal, a.notes || '-'
+      ]);
+      downloadRekapSantriPdf(title, subtitle, headers, dataRows, `Riwayat_Absensi_Santri_${rekapLabel.replace(/\s+/g, '_')}.pdf`);
+    } else {
+      if (rekapSubTab === 'santri') {
+        const title = `Rekap Kehadiran Santri Individu - ${rekapLabel}`;
+        const subtitle = `Tahun Pelajaran: ${academicYears.find(a => a.id === filterAY)?.name || '-'}`;
+        const headers = ['No', 'NIS', 'Nama Santri', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Total', '% Hadir'];
+        const dataRows = perSantriSummary.map((s, idx) => [
+          idx + 1,
+          s.nis || '-',
+          s.santriName,
+          classes.find(c => c.id === s.classId)?.name || s.classId,
+          s.hadir,
+          s.izin,
+          s.sakit,
+          s.alpha,
+          s.total,
+          `${s.persentaseHadir}%`
+        ]);
+        downloadRekapSantriPdf(title, subtitle, headers, dataRows, `Rekap_Absensi_Santri_Individu_${rekapLabel.replace(/\s+/g, '_')}.pdf`);
+      } else {
+        const title = `Rekap Kehadiran Santri Per Kelas - ${rekapLabel}`;
+        const subtitle = `Tahun Pelajaran: ${academicYears.find(a => a.id === filterAY)?.name || '-'}`;
+        const headers = ['No', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Total', '% Rata Hadir'];
+        const dataRows = summary.map((s, idx) => [
+          idx + 1,
+          classes.find(c => c.id === s.classId)?.name || s.classId,
+          s.hadir,
+          s.izin,
+          s.sakit,
+          s.alpha,
+          s.total,
+          `${s.rataHadir || 0}%`
+        ]);
+        downloadRekapSantriPdf(title, subtitle, headers, dataRows, `Rekap_Absensi_Santri_Kelas_${rekapLabel.replace(/\s+/g, '_')}.pdf`);
+      }
     }
   };
 
@@ -142,6 +370,7 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
         if (!cls) return null;
         return {
           classId: cls.id,
+          subjectId: fSubjectId,
           date: row['Tanggal'] || new Date().toISOString().split('T')[0],
           jumlahHadir: Number(row['Hadir'] || 0),
           jumlahIzin: Number(row['Izin'] || 0),
@@ -150,11 +379,12 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
           jumlahTotal: Number(row['Total'] || 0),
           notes: row['Keterangan'] || '',
           academicYearId: filterAY,
-          semesterId: filterSem
+          semesterId: filterSem,
+          teacherId: myTeacherId
         };
       }).filter(Boolean);
       await api.createSantriAttendanceBulk({ attendances: attendancesToSave });
-      alert(`Berhasil mengimport data absensi`);
+      alert(`Berhasil mengimport data absensi santri.`);
       loadData();
     } catch (err: any) {
       alert("Gagal mengimport: " + err.message);
@@ -175,10 +405,11 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
     setSubmitting(true);
     try {
       const cls = availableClasses.find(c => c.id === fClass);
+      const selectedSubj = subjects.find(s => s.id === fSubjectId);
+      const subjName = selectedSubj ? selectedSubj.name : '';
       
       if (editingId) {
-        // Hapus catatan absensi lama untuk kelas & tanggal ini agar di-overwrite
-        const recordsToDelete = attendances.filter(rec => rec.date === fDate && rec.classId === fClass);
+        const recordsToDelete = attendances.filter(rec => rec.date === fDate && rec.classId === fClass && (rec.subjectId === fSubjectId || !rec.subjectId));
         for (const rec of recordsToDelete) {
           await api.deleteSantriAttendance(rec.id).catch(() => {});
         }
@@ -186,6 +417,8 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
       
       const attendancesToSave = classSantris.map(santri => ({
         classId: fClass,
+        subjectId: fSubjectId,
+        subjectName: subjName,
         date: fDate,
         santriId: santri.id,
         status: santriStatuses[santri.id] || 'Hadir',
@@ -193,15 +426,14 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
         notes: fNotes,
         academicYearId: fAY,
         semesterId: fSem,
-        teacherId: currentUser.teacherId || currentUser.id,
-        recordedBy: currentUser.name || 'Pengajar'
+        teacherId: myTeacherId,
+        recordedBy: currentUser.name || (currentUser.teacher ? currentUser.teacher.name : 'Ust. Aidil Aqli, S.Ag.')
       }));
 
       await api.createSantriAttendanceBulk({ attendances: attendancesToSave });
-      setFormSuccess(`Absensi santri Kelas ${cls?.name} tanggal ${fDate} berhasil ${editingId ? 'diperbarui' : 'dicatat'}.`);
+      setFormSuccess(`Absensi santri Kelas ${cls?.name} mapel "${subjName || 'Umum'}" tanggal ${fDate} berhasil ${editingId ? 'diperbarui' : 'dicatat'}.`);
       setEditingId(null);
       
-      // Reset
       const initialStatuses: Record<string, string> = {};
       classSantris.forEach(s => initialStatuses[s.id] = 'Hadir');
       setSantriStatuses(initialStatuses);
@@ -214,52 +446,54 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
     }
   };
 
-  const rekapLabel = rekapMode === 'bulan'
-    ? `${MONTHS[parseInt(filterMonth) - 1]} ${filterYear}`
-    : rekapMode === 'semester'
-    ? `Semester ${semesters.find(s => s.id === filterSem)?.name || ''} ${filterYear}`
-    : `Tahun ${filterYear}`;
-
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Absensi Santri</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Catat dan pantau kehadiran seluruh santri per kelas secara langsung.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            Catat dan pantau kehadiran santri pada mata pelajaran yang Anda ampu secara presisi.
+          </p>
         </div>
         <button onClick={() => setShowBulkSantriModal(true)}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition">
+          className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition cursor-pointer">
           <Calendar className="w-4 h-4"/><span>⚡ Input Rekap Bulanan Santri Massal</span>
         </button>
       </div>
 
       {/* Tab & Export */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap justify-between">
         <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
           {([
-            { id: 'isi', label: 'Isi Absensi' },
+            { id: 'isi', label: editingId ? 'Edit Absensi' : 'Isi Absensi' },
             { id: 'riwayat', label: 'Riwayat' },
-            { id: 'rekap', label: 'Rekapitulasi' }
+            { id: 'rekap', label: 'Rekapitulasi & Persentase' }
           ] as const).map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
-              className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition
-                ${activeTab === t.id ? 'bg-white dark:bg-slate-700 shadow text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700'}`}>
+              className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer
+                ${activeTab === t.id ? 'bg-[#0f2942] text-white shadow' : 'text-slate-500 hover:text-slate-700'}`}>
               {t.label}
             </button>
           ))}
         </div>
         
         {activeTab !== 'isi' && (
-          <>
+          <div className="flex items-center space-x-2">
             <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleImport} className="hidden" />
-            <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
-              <Upload className="w-4 h-4" /><span>Import</span>
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 cursor-pointer" title="Import Excel">
+              <Upload className="w-3.5 h-3.5" /><span>Import</span>
             </button>
-            <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50">
-              <Download className="w-4 h-4" /><span>Export</span>
+            <button onClick={handleExport} className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer" title="Export Excel">
+              <Download className="w-3.5 h-3.5" /><span>Excel</span>
             </button>
-          </>
+            <button onClick={handlePrint} className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 cursor-pointer" title="Print Cetak Fisik">
+              <Printer className="w-3.5 h-3.5" /><span>Print</span>
+            </button>
+            <button onClick={handleDownloadPDF} className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition bg-[#0f2942] text-white hover:bg-[#1e3a5f] cursor-pointer" title="Download File PDF">
+              <Download className="w-3.5 h-3.5" /><span>Download PDF</span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -267,9 +501,25 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
       {activeTab === 'isi' && (
         <div className="w-full max-w-4xl">
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs overflow-hidden">
-            <div className="bg-indigo-800 px-6 py-4">
-              <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">Form Pengisian Absensi Santri (Per Kelas)</h3>
-              <p className="text-indigo-300 text-xs mt-0.5">Pilih kelas & tanggal, lalu tandai dan simpan kehadiran seluruh santri sekaligus.</p>
+            <div className="bg-[#0f2942] px-6 py-4 flex items-center justify-between">
+              <div>
+                <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">
+                  {editingId ? 'Form Edit Absensi Santri' : 'Form Pengisian Absensi Santri (Per Kelas & Mapel)'}
+                </h3>
+                <p className="text-slate-300 text-xs mt-0.5">Pilih kelas, mata pelajaran & tanggal, lalu tandai dan simpan kehadiran santri.</p>
+              </div>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingId(null);
+                    setFNotes('');
+                  }}
+                  className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-lg transition"
+                >
+                  Batal Edit
+                </button>
+              )}
             </div>
             <form onSubmit={handleSelfSubmit} className="p-6 space-y-4">
               {formError && (
@@ -279,179 +529,135 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                 </div>
               )}
               {formSuccess && (
-                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs">
-                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-start space-x-2 text-xs">
+                  <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                   <span>{formSuccess}</span>
                 </div>
               )}
 
-              {availableClasses.length === 0 ? (
-                <div className="py-10 text-center text-slate-400 space-y-2">
-                  <ClipboardList className="w-10 h-10 mx-auto text-slate-200 dark:text-slate-700" />
-                  <p className="text-sm font-medium">Belum ada kelas terdaftar.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Pilih Kelas</label>
+                  <select
+                    value={fClass}
+                    onChange={e => handleFormClassChange(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    {availableClasses.map(c => (
+                      <option key={c.id} value={c.id}>Kelas {c.name}</option>
+                    ))}
+                  </select>
                 </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Kelas */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Pilih Kelas</label>
-                      <select required value={fClass} onChange={e => setFClass(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        {availableClasses.map(c => <option key={c.id} value={c.id}>Kelas {c.name}</option>)}
-                      </select>
-                    </div>
 
-                    {/* Tanggal */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal Absensi</label>
-                      <input type="date" required value={fDate} onChange={e => setFDate(e.target.value)}
-                        max={todayStr}
-                        className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                    </div>
-                  </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Pilih Mata Pelajaran</label>
+                  <select
+                    value={fSubjectId}
+                    onChange={e => handleFormSubjectChange(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    {availableSubjects.map(s => (
+                      <option key={s.id} value={s.id}>📖 {s.name}</option>
+                    ))}
+                  </select>
+                </div>
 
-                  {/* Daftar Santri */}
-                  <div className="space-y-3 mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <label className="text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider block">
-                        Daftar Santri Kelas {availableClasses.find(c => c.id === fClass)?.name} ({santriList.filter(s => s.classId === fClass).length} Santri)
-                      </label>
-                      
-                      {/* Quick Action Bulk Buttons */}
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Tandai Semua:</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const classSantris = santriList.filter(s => s.classId === fClass);
-                            const updated: Record<string, string> = {};
-                            classSantris.forEach(s => updated[s.id] = 'Hadir');
-                            setSantriStatuses(updated);
-                          }}
-                          className="px-2.5 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 rounded-lg text-[10px] font-extrabold uppercase transition cursor-pointer"
-                        >
-                          ✓ Semua Hadir
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const classSantris = santriList.filter(s => s.classId === fClass);
-                            const updated: Record<string, string> = {};
-                            classSantris.forEach(s => updated[s.id] = 'Izin');
-                            setSantriStatuses(updated);
-                          }}
-                          className="px-2.5 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 rounded-lg text-[10px] font-extrabold uppercase transition cursor-pointer"
-                        >
-                          Semua Izin
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const classSantris = santriList.filter(s => s.classId === fClass);
-                            const updated: Record<string, string> = {};
-                            classSantris.forEach(s => updated[s.id] = 'Sakit');
-                            setSantriStatuses(updated);
-                          }}
-                          className="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 rounded-lg text-[10px] font-extrabold uppercase transition cursor-pointer"
-                        >
-                          Semua Sakit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const classSantris = santriList.filter(s => s.classId === fClass);
-                            const updated: Record<string, string> = {};
-                            classSantris.forEach(s => updated[s.id] = 'Alpha');
-                            setSantriStatuses(updated);
-                          }}
-                          className="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 rounded-lg text-[10px] font-extrabold uppercase transition cursor-pointer"
-                        >
-                          Semua Alpha
-                        </button>
-                      </div>
-                    </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal Absensi</label>
+                  <input
+                    type="date"
+                    value={fDate}
+                    max={todayStr}
+                    onChange={e => setFDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
 
-                    {santriList.filter(s => s.classId === fClass).length === 0 ? (
-                      <div className="text-center py-8 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-                        <p className="text-xs text-slate-500 font-medium">Tidak ada santri terdaftar di kelas ini.</p>
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
-                        <table className="w-full text-left text-xs whitespace-nowrap">
-                          <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase">
-                            <tr>
-                              <th className="px-4 py-3">No</th>
-                              <th className="px-4 py-3">Nama Santri</th>
-                              <th className="px-4 py-3 text-center">Hadir</th>
-                              <th className="px-4 py-3 text-center">Izin</th>
-                              <th className="px-4 py-3 text-center">Sakit</th>
-                              <th className="px-4 py-3 text-center">Alpha</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                            {santriList.filter(s => s.classId === fClass).map((santri, idx) => (
-                              <tr key={santri.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                                <td className="px-4 py-3 text-slate-400 font-mono">{idx + 1}</td>
-                                <td className="px-4 py-3 font-extrabold text-slate-800 dark:text-slate-100">{santri.name}</td>
-                                {['Hadir', 'Izin', 'Sakit', 'Alpha'].map(status => (
-                                  <td key={status} className="px-4 py-3 text-center">
-                                    <label className="inline-flex items-center justify-center p-1 cursor-pointer">
-                                      <input 
-                                        type="radio" 
-                                        name={`status-${santri.id}`}
-                                        checked={santriStatuses[santri.id] === status || (!santriStatuses[santri.id] && status === 'Hadir')}
-                                        onChange={() => setSantriStatuses(p => ({...p, [santri.id]: status}))}
-                                        className={`w-4 h-4 cursor-pointer ${
-                                          status === 'Hadir' ? 'accent-indigo-600' :
-                                          status === 'Izin' ? 'accent-blue-500' :
-                                          status === 'Sakit' ? 'accent-amber-500' : 'accent-rose-500'
-                                        }`}
-                                      />
-                                    </label>
-                                  </td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
+              {/* Tahun Ajaran & Semester */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tahun Ajaran</label>
+                  <select value={fAY} onChange={e => setFAY(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    {academicYears.map(y => <option key={y.id} value={y.id}>TA {y.name}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Semester</label>
+                  <select value={fSem} onChange={e => setFSem(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+              </div>
 
-                  {/* Keterangan */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Keterangan (opsional)</label>
-                    <textarea rows={2} placeholder="Contoh: Libur, ada kegiatan pesantren..."
-                      value={fNotes} onChange={e => setFNotes(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                  </div>
+              {/* Daftar Santri */}
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                    Daftar Santri Kelas {classes.find(c => c.id === fClass)?.name} ({subjects.find(s => s.id === fSubjectId)?.name || 'Mapel'})
+                  </label>
+                  <span className="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-1 rounded-lg">
+                    {santriList.filter(s => s.classId === fClass).length} Santri
+                  </span>
+                </div>
 
-                  {/* Tahun Ajaran & Semester */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tahun Ajaran</label>
-                      <select required value={fAY} onChange={e => setFAY(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        {academicYears.map(y => <option key={y.id} value={y.id}>TA {y.name}</option>)}
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Semester</label>
-                      <select required value={fSem} onChange={e => setFSem(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                      </select>
-                    </div>
-                  </div>
+                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#0f2942] text-white">
+                      <tr>
+                        <th className="px-4 py-2.5 font-bold uppercase w-12 text-center">No</th>
+                        <th className="px-4 py-2.5 font-bold uppercase">Nama Santri</th>
+                        <th className="px-4 py-2.5 font-bold uppercase text-center w-20">Hadir</th>
+                        <th className="px-4 py-2.5 font-bold uppercase text-center w-20">Izin</th>
+                        <th className="px-4 py-2.5 font-bold uppercase text-center w-20">Sakit</th>
+                        <th className="px-4 py-2.5 font-bold uppercase text-center w-20">Alpha</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {santriList.filter(s => s.classId === fClass).map((santri, idx) => (
+                        <tr key={santri.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                          <td className="px-4 py-2.5 text-center font-mono text-slate-400">{idx + 1}</td>
+                          <td className="px-4 py-2.5 font-bold text-slate-800 dark:text-slate-100">{santri.name}</td>
+                          {['Hadir', 'Izin', 'Sakit', 'Alpha'].map(st => (
+                            <td key={st} className="px-4 py-2.5 text-center">
+                              <input
+                                type="radio"
+                                name={`st-${santri.id}`}
+                                checked={santriStatuses[santri.id] === st}
+                                onChange={() => setSantriStatuses(p => ({ ...p, [santri.id]: st }))}
+                                className="w-4 h-4 cursor-pointer accent-indigo-600"
+                              />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-                  <button type="submit" disabled={submitting || availableClasses.length === 0}
-                    className="w-full py-3 rounded-xl text-sm font-extrabold uppercase tracking-wider text-white bg-indigo-700 hover:bg-indigo-800 shadow-sm transition flex items-center justify-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed">
-                    <Plus className="w-4 h-4" />
-                    <span>{submitting ? 'Menyimpan...' : 'Simpan Absensi Santri'}</span>
-                  </button>
-                </>
-              )}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Catatan / Keterangan Tambahan</label>
+                <input
+                  type="text"
+                  placeholder="Opsional: Keterangan materi / kegiatan..."
+                  value={fNotes}
+                  onChange={e => setFNotes(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-6 py-3 bg-[#0f2942] hover:bg-[#1e3a5f] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow transition cursor-pointer disabled:opacity-50"
+                >
+                  {submitting ? 'Menyimpan...' : editingId ? 'Perbarui Absensi Santri' : 'Simpan Absensi Santri'}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -484,7 +690,7 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
             </select>
           </div>
           {rekapMode === 'bulan' && (
-            <div className="space-y-1 min-w-[130px]">
+            <div className="space-y-1 min-w-[120px]">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bulan</label>
               <select value={filterMonth} onChange={e => setFilterMonth(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -492,27 +698,45 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
               </select>
             </div>
           )}
-          <div className="space-y-1 min-w-[80px]">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tahun</label>
-            <input type="number" value={filterYear} onChange={e => setFilterYear(e.target.value)} min={2020} max={2035}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <div className="space-y-1 min-w-[130px]">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Filter Kelas</label>
+            <select value={filterClass} onChange={e => setFilterClass(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Semua">Semua Kelas</option>
+              {availableClasses.map(c => (
+                <option key={c.id} value={c.id}>Kelas {c.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1 min-w-[160px]">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Filter Mapel</label>
+            <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Semua">Semua Mapel</option>
+              {availableSubjects.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
           </div>
         </div>
       )}
 
       {/* ===== TAB: RIWAYAT ===== */}
       {activeTab === 'riwayat' && (() => {
-        // Group by date and class
         const groupedAttendances = Object.values(
           attendances.reduce((acc, a) => {
-            const key = `${a.date}-${a.classId}`;
+            const subjName = a.subjectName || (a as any).subject?.name || subjects.find(s => s.id === a.subjectId)?.name || 'Mapel Umum';
+            const key = `${a.date}-${a.classId}-${a.subjectId || 'gen'}`;
             if (!acc[key]) {
               acc[key] = {
                 id: key,
                 date: a.date,
                 classId: a.classId,
+                subjectId: a.subjectId,
+                subjectName: subjName,
                 className: (a as any).class?.name || classes.find(c => c.id === a.classId)?.name || a.classId,
                 teacherName: (a as any).teacher?.name || a.recordedBy || currentUser.name || 'Pengajar',
+                teacherId: (a as any).teacherId || (a as any).teacher_id,
                 hadir: 0, izin: 0, sakit: 0, alpha: 0, total: 0, notes: a.notes,
                 absentees: []
               };
@@ -520,11 +744,10 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
             if (a.status) {
               acc[key].total++;
               if (a.status === 'Hadir') acc[key].hadir++;
-              else if (a.status === 'Izin') { acc[key].izin++; acc[key].absentees.push(`${a.santri?.name} (I)`); }
-              else if (a.status === 'Sakit') { acc[key].sakit++; acc[key].absentees.push(`${a.santri?.name} (S)`); }
-              else if (a.status === 'Alpha') { acc[key].alpha++; acc[key].absentees.push(`${a.santri?.name} (A)`); }
+              else if (a.status === 'Izin') { acc[key].izin++; acc[key].absentees.push(`${(a as any).santri?.name || 'Santri'} (I)`); }
+              else if (a.status === 'Sakit') { acc[key].sakit++; acc[key].absentees.push(`${(a as any).santri?.name || 'Santri'} (S)`); }
+              else if (a.status === 'Alpha') { acc[key].alpha++; acc[key].absentees.push(`${(a as any).santri?.name || 'Santri'} (A)`); }
             } else {
-              // Legacy format support
               acc[key].hadir += (a.jumlahHadir || 0);
               acc[key].izin += (a.jumlahIzin || 0);
               acc[key].sakit += (a.jumlahSakit || 0);
@@ -539,9 +762,9 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs overflow-hidden">
             <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
-                Riwayat Absensi Santri — {rekapLabel}
+                Daftar Absensi Harian Santri — {rekapLabel}
               </span>
-              <span className="text-xs text-slate-400">{groupedAttendances.length} sesi pertemuan</span>
+              <span className="text-xs text-slate-400 font-bold">{groupedAttendances.length} sesi pertemuan</span>
             </div>
             {loading ? (
               <div className="p-12 text-center text-slate-400 text-sm">Memuat data...</div>
@@ -550,19 +773,20 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
               <ClipboardList className="w-10 h-10 mx-auto mb-2 text-slate-200 dark:text-slate-800" />
               <p className="text-sm font-medium">Belum ada data absensi santri untuk periode ini.</p>
               <button onClick={() => setActiveTab('isi')}
-                className="mt-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                className="mt-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
                 + Isi Absensi Santri Sekarang
               </button>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-left border-collapse">
                 <thead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/30 dark:bg-slate-800/20">
                   <tr>
                     <th className="px-4 py-3 w-10 text-center">No</th>
                     <th className="px-4 py-3">Tanggal</th>
                     <th className="px-4 py-3">Kelas</th>
-                    <th className="px-4 py-3">Pengabsen (Ust/Ustadzah)</th>
+                    <th className="px-4 py-3">Mata Pelajaran</th>
+                    <th className="px-4 py-3">Pengabsen</th>
                     <th className="px-4 py-3 text-center">Hadir</th>
                     <th className="px-4 py-3 text-center">Izin</th>
                     <th className="px-4 py-3 text-center">Sakit</th>
@@ -584,62 +808,71 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                         <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">
                           {classDisplayName}
                         </td>
-                        <td className="px-4 py-3 font-semibold text-xs text-indigo-700 dark:text-indigo-300">
+                        <td className="px-4 py-3 font-extrabold text-xs text-indigo-700 dark:text-indigo-300">
+                          <div className="flex items-center space-x-1">
+                            <BookOpen className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>{a.subjectName}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-xs text-slate-700 dark:text-slate-300">
                           {a.teacherName || 'Pengajar'}
                         </td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-indigo-600">{a.hadir}</td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-blue-600">{a.izin}</td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-amber-600">{a.sakit}</td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-rose-600">{a.alpha}</td>
-                      <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-300 font-semibold">{a.total}</td>
-                      <td className="px-4 py-3 text-xs text-slate-500 italic">
-                        {a.notes || '-'}
-                        {a.absentees.length > 0 && (
-                          <div className="mt-1 text-[10px] text-rose-500 font-semibold">{a.absentees.join(', ')}</div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <button onClick={() => {
-                          setFClass(a.classId);
-                          setFDate(a.date);
-                          const sessionRecords = attendances.filter(rec => rec.date === a.date && rec.classId === a.classId);
-                          const existingStatuses: Record<string, string> = {};
-                          sessionRecords.forEach(rec => {
-                            existingStatuses[rec.santriId] = rec.status;
-                          });
-                          setSantriStatuses(existingStatuses);
-                          if (a.notes) setFNotes(a.notes);
-                          setActiveTab('isi');
-                        }}
-                          className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition mr-1"
-                          title="Edit Absensi Sesi Ini"
-                        >
-                          Edit
-                        </button>
-                        <button onClick={async () => {
-                          if (window.confirm('Hapus seluruh absensi kelas ini pada tanggal tersebut?')) {
-                            setLoading(true);
-                            // Find all records for this date and class
-                            const recordsToDelete = attendances.filter(rec => rec.date === a.date && rec.classId === a.classId);
-                            try {
-                              for (const rec of recordsToDelete) {
-                                await api.deleteSantriAttendance(rec.id);
+                        <td className="px-4 py-3 text-center font-mono font-bold text-indigo-600">{a.hadir}</td>
+                        <td className="px-4 py-3 text-center font-mono font-bold text-blue-600">{a.izin}</td>
+                        <td className="px-4 py-3 text-center font-mono font-bold text-amber-600">{a.sakit}</td>
+                        <td className="px-4 py-3 text-center font-mono font-bold text-rose-600">{a.alpha}</td>
+                        <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-300 font-semibold">{a.total}</td>
+                        <td className="px-4 py-3 text-xs text-slate-500 italic">
+                          {a.notes || '-'}
+                          {a.absentees.length > 0 && (
+                            <div className="mt-1 text-[10px] text-rose-500 font-semibold">{a.absentees.join(', ')}</div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex items-center justify-center space-x-1">
+                            <button onClick={() => {
+                              setFClass(a.classId);
+                              setFDate(a.date);
+                              if (a.subjectId) setFSubjectId(a.subjectId);
+                              const sessionRecords = attendances.filter(rec => rec.date === a.date && rec.classId === a.classId && (rec.subjectId === a.subjectId || !rec.subjectId));
+                              const existingStatuses: Record<string, string> = {};
+                              sessionRecords.forEach(rec => {
+                                existingStatuses[rec.santriId] = rec.status;
+                              });
+                              setSantriStatuses(existingStatuses);
+                              if (a.notes) setFNotes(a.notes);
+                              setEditingId(a.id);
+                              setActiveTab('isi');
+                            }}
+                              className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition cursor-pointer"
+                              title="Edit Absensi Sesi Ini"
+                            >
+                              Edit
+                            </button>
+                            <button onClick={async () => {
+                              if (window.confirm(`Hapus seluruh absensi ${classDisplayName} tanggal ${a.date} (${a.subjectName})?`)) {
+                                setLoading(true);
+                                const recordsToDelete = attendances.filter(rec => rec.date === a.date && rec.classId === a.classId && (rec.subjectId === a.subjectId || !rec.subjectId));
+                                try {
+                                  for (const rec of recordsToDelete) {
+                                    await api.deleteSantriAttendance(rec.id);
+                                  }
+                                  loadData();
+                                } catch (e) {
+                                  alert('Gagal menghapus data.');
+                                } finally {
+                                  setLoading(false);
+                                }
                               }
-                              loadData();
-                            } catch (e) {
-                              alert('Gagal menghapus data.');
-                            } finally {
-                              setLoading(false);
-                            }
-                          }
-                        }}
-                          className="px-2 py-1 text-xs font-bold text-slate-400 hover:text-rose-600 transition"
-                          title="Hapus"
-                        >
-                          Hapus
-                        </button>
-                      </td>
-                    </tr>
+                            }}
+                              className="px-2 py-1 text-xs font-bold text-slate-400 hover:text-rose-600 transition cursor-pointer"
+                              title="Hapus Sesi Ini"
+                            >
+                              Hapus
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
                     );
                   })}
                 </tbody>
@@ -650,61 +883,174 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
         );
       })()}
 
-      {/* ===== TAB: REKAP ===== */}
+      {/* ===== TAB: REKAPITULASI & PERSENTASE ===== */}
       {activeTab === 'rekap' && (
         <div className="space-y-5">
-          {summary.length > 0 ? (
-            <>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: 'Total Hadir', val: summary.reduce((s,r)=>s+r.hadir,0), cls: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30 text-indigo-700 dark:text-indigo-400' },
-                  { label: 'Izin',  val: summary.reduce((s,r)=>s+r.izin,0),  cls: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-700 dark:text-blue-400' },
-                  { label: 'Sakit', val: summary.reduce((s,r)=>s+r.sakit,0), cls: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400' },
-                  { label: 'Alpha', val: summary.reduce((s,r)=>s+r.alpha,0), cls: 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-700 dark:text-rose-400' },
-                ].map(c => (
-                  <div key={c.label} className={`p-5 rounded-2xl border ${c.cls}`}>
-                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">{c.label}</p>
-                    <p className="text-4xl font-black mt-1">{c.val}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Rekap per kelas */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs overflow-hidden">
-                <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
-                  <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Rekap Per Kelas — {rekapLabel}</span>
+          {summary.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Total Hadir', val: summary.reduce((s,r)=>s+r.hadir,0), cls: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30 text-indigo-700 dark:text-indigo-400' },
+                { label: 'Izin',  val: summary.reduce((s,r)=>s+r.izin,0),  cls: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-700 dark:text-blue-400' },
+                { label: 'Sakit', val: summary.reduce((s,r)=>s+r.sakit,0), cls: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400' },
+                { label: 'Alpha', val: summary.reduce((s,r)=>s+r.alpha,0), cls: 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-700 dark:text-rose-400' },
+              ].map(c => (
+                <div key={c.label} className={`p-5 rounded-2xl border ${c.cls}`}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">{c.label}</p>
+                  <p className="text-4xl font-black mt-1">{c.val}</p>
                 </div>
+              ))}
+            </div>
+          )}
+
+          {/* Sub-Tab Selection: Per-Kelas vs Per-Santri */}
+          <div className="flex items-center space-x-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <button
+              onClick={() => setRekapSubTab('kelas')}
+              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition cursor-pointer ${
+                rekapSubTab === 'kelas' ? 'bg-[#0f2942] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              🏢 Rekapitulasi Per-Kelas
+            </button>
+            <button
+              onClick={() => setRekapSubTab('santri')}
+              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition cursor-pointer ${
+                rekapSubTab === 'santri' ? 'bg-[#0f2942] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              👦 Rekapitulasi Per-Santri (Individu)
+            </button>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs overflow-hidden">
+            <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider block">
+                  {rekapSubTab === 'kelas' ? 'Rekap Kehadiran Santri Per-Kelas' : 'Rekapitulasi Kehadiran Individu Santri (% Hadir)'}
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Periode: {rekapLabel}</span>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  onClick={handleExport}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Excel (.xlsx)</span>
+                </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="px-3.5 py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Download PDF</span>
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="px-3.5 py-1.5 bg-[#0f2942] hover:bg-[#1e3a5f] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Cetak (Print)</span>
+                </button>
+              </div>
+            </div>
+
+            {/* TABEL REKAP KELAS */}
+            {rekapSubTab === 'kelas' && (
+              summary.length === 0 ? (
+                <div className="p-10 text-center text-slate-400 text-sm">Belum ada data kehadiran untuk periode ini.</div>
+              ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/30 dark:bg-slate-800/20">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-[#0f2942] text-white text-[11px] font-black uppercase tracking-wider">
                       <tr>
-                        <th className="px-4 py-3">Kelas</th>
-                        <th className="px-4 py-3 text-center">Hadir</th>
-                        <th className="px-4 py-3 text-center">Izin</th>
-                        <th className="px-4 py-3 text-center">Sakit</th>
-                        <th className="px-4 py-3 text-center">Alpha</th>
-                        <th className="px-4 py-3 text-center">Total</th>
-                        <th className="px-4 py-3 text-center">% Hadir</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-10">No</th>
+                        <th rowSpan={2} className="px-4 py-2.5 border border-[#1e3a5f]">Nama Kelas</th>
+                        <th colSpan={4} className="px-3 py-1.5 text-center border border-[#1e3a5f] bg-[#0b2545]">Kehadiran Santri</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-32 bg-[#0d2847]">Total Hari Sesi</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-28">% Hadir Kelas</th>
+                      </tr>
+                      <tr>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">H</th>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">S</th>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">I</th>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">A</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-sm">
-                      {summary.map(r => (
-                        <tr key={r.classId} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
-                          <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">Kelas {r.className}</td>
-                          <td className="px-4 py-3 text-center font-mono font-bold text-indigo-600">{r.hadir}</td>
-                          <td className="px-4 py-3 text-center font-mono font-bold text-blue-600">{r.izin}</td>
-                          <td className="px-4 py-3 text-center font-mono font-bold text-amber-600">{r.sakit}</td>
-                          <td className="px-4 py-3 text-center font-mono font-bold text-rose-600">{r.alpha}</td>
-                          <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-300">{r.total}</td>
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center space-x-2">
-                              <div className="w-20 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div className={`h-full rounded-full transition-all duration-700 ${r.rataHadir>=80?'bg-indigo-500':r.rataHadir>=60?'bg-amber-500':'bg-rose-500'}`}
-                                  style={{ width: `${r.rataHadir}%` }} />
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
+                      {summary.map((r, idx) => {
+                        const pct = r.rataHadir !== undefined ? r.rataHadir : 0;
+                        return (
+                        <tr key={r.classId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
+                          <td className="px-3 py-3 text-center text-slate-400 font-mono text-xs border-r border-slate-200 dark:border-slate-800">{idx + 1}</td>
+                          <td className="px-4 py-3 font-extrabold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800">Kelas {r.className}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800">{r.hadir}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{r.sakit}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{r.izin}</td>
+                          <td className={`px-3 py-3 text-center font-mono border-r border-slate-200 dark:border-slate-800 ${r.alpha > 0 ? 'text-rose-600 font-black' : 'font-bold text-slate-700 dark:text-slate-300'}`}>{r.alpha}</td>
+                          <td className="px-3 py-3 text-center font-mono font-black text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/40 border-r border-slate-200 dark:border-slate-800">{r.total}</td>
+                          <td className="px-3 py-3 text-center bg-[#0f2942] text-white font-extrabold">
+                            <div className="flex items-center justify-center space-x-1.5">
+                              <div className="w-12 bg-slate-700 rounded-full h-1.5 overflow-hidden hidden sm:block">
+                                <div className="bg-emerald-400 h-full rounded-full" style={{width:`${pct}%`}}/>
                               </div>
-                              <span className={`text-xs font-extrabold ${r.rataHadir>=80?'text-indigo-600':r.rataHadir>=60?'text-amber-600':'text-rose-600'}`}>
-                                {r.rataHadir}%
-                              </span>
+                              <span>{pct}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            )}
+
+            {/* TABEL REKAP INDIVIDU SANTRI */}
+            {rekapSubTab === 'santri' && (
+              perSantriSummary.length === 0 ? (
+                <div className="p-10 text-center text-slate-400 text-sm">Belum ada data santri untuk kelas terpilih.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-[#0f2942] text-white text-[11px] font-black uppercase tracking-wider">
+                      <tr>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-10">No</th>
+                        <th rowSpan={2} className="px-4 py-2.5 border border-[#1e3a5f]">Nama Santri</th>
+                        <th rowSpan={2} className="px-4 py-2.5 border border-[#1e3a5f] bg-[#0d2847]">NIS / Kelas</th>
+                        <th colSpan={4} className="px-3 py-1.5 text-center border border-[#1e3a5f] bg-[#0b2545]">Status Kehadiran</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-28 bg-[#0d2847]">Total Hari</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-28">% Hadir Santri</th>
+                      </tr>
+                      <tr>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">H</th>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">S</th>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">I</th>
+                        <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">A</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
+                      {perSantriSummary.map((s, idx) => (
+                        <tr key={s.santriId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
+                          <td className="px-3 py-3 text-center text-slate-400 font-mono text-xs border-r border-slate-200 dark:border-slate-800">{idx + 1}</td>
+                          <td className="px-4 py-3 font-extrabold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800">{s.santriName}</td>
+                          <td className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800">
+                            <div>
+                              <span>NIS: {s.nis}</span>
+                              <span className="block text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">{s.className}</span>
+                            </div>
+                          </td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800">{s.hadir}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{s.sakit}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{s.izin}</td>
+                          <td className={`px-3 py-3 text-center font-mono border-r border-slate-200 dark:border-slate-800 ${s.alpha > 0 ? 'text-rose-600 font-black' : 'font-bold text-slate-700 dark:text-slate-300'}`}>{s.alpha}</td>
+                          <td className="px-3 py-3 text-center font-mono font-black text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/40 border-r border-slate-200 dark:border-slate-800">{s.total}</td>
+                          <td className="px-3 py-3 text-center bg-[#0f2942] text-white font-extrabold">
+                            <div className="flex items-center justify-center space-x-1.5">
+                              <div className="w-12 bg-slate-700 rounded-full h-1.5 overflow-hidden hidden sm:block">
+                                <div className="bg-emerald-400 h-full rounded-full" style={{width:`${s.persentaseHadir}%`}}/>
+                              </div>
+                              <span>{s.persentaseHadir}%</span>
                             </div>
                           </td>
                         </tr>
@@ -712,14 +1058,9 @@ export default function AttendanceSantriGuru({ academicYears, semesters, classes
                     </tbody>
                   </table>
                 </div>
-              </div>
-            </>
-          ) : (
-            <div className="bg-white dark:bg-slate-900 py-16 text-center border border-slate-100 dark:border-slate-800 rounded-2xl text-slate-400">
-              <ClipboardList className="w-10 h-10 mx-auto mb-2 text-slate-200 dark:text-slate-800" />
-              <p className="text-sm font-medium">Belum ada data rekap untuk periode ini.</p>
-            </div>
-          )}
+              )
+            )}
+          </div>
         </div>
       )}
 

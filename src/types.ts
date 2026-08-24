@@ -2,9 +2,15 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'Admin' | 'Guru' | 'WaliSantri';
+  role: 'Admin' | 'Guru' | 'WaliSantri' | 'WaliKelas';
   teacherId?: string;
   santriId?: string; // Khusus untuk wali santri
+  santriName?: string;
+  nis?: string;
+  classId?: string;
+  className?: string;
+  waliKelasName?: string;
+  waliKelasTeacherId?: string;
   teacher?: Teacher;
   securityQuestion?: string;
 }
@@ -140,6 +146,7 @@ export type AttendanceStatus = 'Hadir' | 'Izin' | 'Sakit' | 'Alpha';
 export interface Attendance {
   id: string;
   teacherId: string;
+  subjectId?: string;
   date: string;           // ISO date string YYYY-MM-DD
   status: AttendanceStatus;
   notes: string;
@@ -150,6 +157,7 @@ export interface Attendance {
   updatedAt: string;
   // Decorated
   teacher?: Teacher;
+  subject?: Subject;
   academicYear?: AcademicYear;
   semester?: Semester;
 }
@@ -157,6 +165,8 @@ export interface Attendance {
 export interface AttendanceSummary {
   teacherId: string;
   teacherName: string;
+  subjectId?: string;
+  subjectName?: string;
   hadir: number;
   izin: number;
   sakit: number;
@@ -168,6 +178,8 @@ export interface AttendanceSummary {
 export interface SantriAttendance {
   id: string;
   classId: string;
+  subjectId?: string;
+  subjectName?: string;
   date: string;
   santriId?: string;
   status?: string;
@@ -185,6 +197,7 @@ export interface SantriAttendance {
   updatedAt: string;
   // Decorated
   class?: SchoolClass;
+  subject?: Subject;
   academicYear?: AcademicYear;
   semester?: Semester;
   santri?: Santri;
@@ -203,12 +216,15 @@ export interface SantriAttendanceSummary {
 
 export interface ActivityLog {
   id: string;
-  userId: string;
-  userName: string;
-  userRole: string;
+  userId?: string;
+  user_id?: string;
+  userName?: string;
+  user_name?: string;
+  userRole?: string;
+  user_role?: string;
   action: string;
   details: string;
-  timestamp: string;
+  timestamp: string | number;
 }
 
 export interface WaliKelas {
@@ -217,9 +233,9 @@ export interface WaliKelas {
   teacherId: string;
   academicYearId: string;
   semesterId: string;
-  assignedBy: string;
-  createdAt: string;
-  updatedAt: string;
+  assignedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
   // Decorated
   class?: SchoolClass;
   teacher?: Teacher;
@@ -264,10 +280,39 @@ export interface Nilai {
   teacher?: Teacher;
 }
 
+export interface AkhlaqSantri {
+  id: string;
+  santriId: string;
+  classId: string;
+  academicYearId: string;
+  semesterId: string;
+  nilaiAkhlaq: number; // Nilai Akhlaq Keseharian Santri (0-100, bobot 20% pada rapor)
+  predikat: string;    // 'A' | 'B' | 'C' | 'D'
+  adabKesopanan?: number;
+  kedisiplinanIbadah?: number;
+  kebersihanKerapian?: number;
+  catatan?: string;
+  recordedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Decorated
+  santri?: Santri;
+  class?: SchoolClass;
+  academicYear?: AcademicYear;
+  semester?: Semester;
+}
+
 export interface Pengumuman {
   id: string;
   title: string;
   content: string;
+  targetType?: 'semua' | 'guru' | 'wali_kelas' | 'perorangan';
+  targetId?: string;
+  targetName?: string;
+  imageUrl?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: string;
   createdAt: string;
   updatedAt: string;
   authorId: string;
@@ -360,6 +405,10 @@ export interface TanyaAdmin {
   status: 'Pending' | 'Dijawab';
   imageUrl?: string;
   image_url?: string;
+  fileUrl?: string;
+  file_url?: string;
+  fileName?: string;
+  file_name?: string;
   createdAt?: string;
   created_at?: string;
   updatedAt?: string;
@@ -426,5 +475,42 @@ export interface EvaluasiWaliKelas {
   tanggapanAdmin?: string;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface TanyaWaliKelas {
+  id: string;
+  santriId?: string;
+  santri_id?: string;
+  santriName?: string;
+  santri_name?: string;
+  classId?: string;
+  class_id?: string;
+  className?: string;
+  class_name?: string;
+  waliSantriId?: string;
+  wali_santri_id?: string;
+  waliSantriName?: string;
+  wali_santri_name?: string;
+  waliKelasId?: string;
+  wali_kelas_id?: string;
+  waliKelasName?: string;
+  wali_kelas_name?: string;
+  subject: string;
+  message: string;
+  waliReply?: string;
+  wali_reply?: string;
+  replyAt?: string;
+  reply_at?: string;
+  status: 'Pending' | 'Dijawab';
+  imageUrl?: string;
+  image_url?: string;
+  fileUrl?: string;
+  file_url?: string;
+  fileName?: string;
+  file_name?: string;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
 }
 

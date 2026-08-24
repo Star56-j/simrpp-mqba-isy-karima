@@ -11,7 +11,7 @@ export function printPerkembangan(
   timeframeDetail: string,
   waliKelasName: string
 ) {
-  const ketuaUnitName = "Ust. Umar Alamuddin, Lc.";
+  const ketuaUnitName = "Ustadz. Umar Alamuddin, Lc. Al-Hafizh";
 
   const getAverage = (n: Nilai): number => {
     const count = [n.harian, n.bulanan, n.uts, n.uas, n.uasLisan || 0].filter(v => v > 0).length;

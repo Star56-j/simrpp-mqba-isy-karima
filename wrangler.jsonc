@@ -1,14 +1,18 @@
 {
   "name": "akademikmqbaisykarima",
+  "pages_build_output_dir": "./dist",
   "compatibility_date": "2026-07-29",
   "observability": {
     "enabled": true
   },
-  "assets": {
-    "directory": "./dist",
-    "not_found_handling": "single-page-application"
-  },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "simrpp_db",
+      "database_id": "43116587-6602-4f6e-b912-6aac5273e8e0"
+    }
   ]
 }

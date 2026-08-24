@@ -1,7 +1,9 @@
 import React from 'react';
-import { X, Save, Plus, Trash2 } from 'lucide-react';
+import { X, Save, Plus, Trash2, Printer, Download } from 'lucide-react';
 import { Santri, RaporDetail, KepribadianItem, KetahfizhanItem, EkstrakurikulerItem } from '../types';
 import { api } from '../api';
+import { printRapor } from '../utils/printRapor';
+import { downloadRaporPdf } from '../utils/pdfDownloader';
 
 interface RaporModalProps {
   santri: Santri;
@@ -15,6 +17,8 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
   const [rapor, setRapor] = React.useState<RaporDetail | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
+  const [printing, setPrinting] = React.useState(false);
+  const [downloading, setDownloading] = React.useState(false);
   const [error, setError] = React.useState('');
 
   // Form states
@@ -25,6 +29,58 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
   const [catatanWaliKelas, setCatatanWaliKelas] = React.useState('');
   const [keputusanKenaikan, setKeputusanKenaikan] = React.useState('');
   const [nisn, setNisn] = React.useState('');
+
+  const handlePrintRapor = async () => {
+    setPrinting(true);
+    try {
+      const [clsList, ayList, semList, nilaiList, subjects, akhlaqList] = await Promise.all([
+        api.getClasses().catch(() => []),
+        api.getAcademicYears().catch(() => []),
+        api.getSemesters().catch(() => []),
+        api.getNilai({ classId: santri.classId, academicYearId, semesterId }).catch(() => []),
+        api.getSubjects().catch(() => []),
+        api.getAkhlaqSantri({ classId: santri.classId, academicYearId, semesterId }).catch(() => [])
+      ]);
+      const cls = clsList.find(c => c.id === santri.classId) || { id: santri.classId, name: 'Kelas', level: 'I\'dad' };
+      const ay = ayList.find(a => a.id === academicYearId) || { id: academicYearId, name: 'TA' };
+      const sem = semList.find(s => s.id === semesterId) || { id: semesterId, name: 'Ganjil' };
+      const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      const santriAkhlaq = akhlaqList.find(a => a.santriId === santri.id || (a as any).santri_id === santri.id);
+      const akhlaqScore = santriAkhlaq && typeof santriAkhlaq.nilaiAkhlaq === 'number' ? santriAkhlaq.nilaiAkhlaq : 90;
+
+      printRapor(santri, cls as any, ay as any, sem as any, nilaiList, subjects, rapor, myUser.name || 'Wali Kelas', 'Ust. Aidil Aqli, S.Ag.');
+    } catch (err: any) {
+      alert('Gagal mencetak Rapor: ' + (err.message || 'Error'));
+    } finally {
+      setPrinting(false);
+    }
+  };
+
+  const handleDownloadRaporPDF = async () => {
+    setDownloading(true);
+    try {
+      const [clsList, ayList, semList, nilaiList, subjects, akhlaqList] = await Promise.all([
+        api.getClasses().catch(() => []),
+        api.getAcademicYears().catch(() => []),
+        api.getSemesters().catch(() => []),
+        api.getNilai({ classId: santri.classId, academicYearId, semesterId }).catch(() => []),
+        api.getSubjects().catch(() => []),
+        api.getAkhlaqSantri({ classId: santri.classId, academicYearId, semesterId }).catch(() => [])
+      ]);
+      const cls = clsList.find(c => c.id === santri.classId) || { id: santri.classId, name: 'Kelas', level: 'I\'dad' };
+      const ay = ayList.find(a => a.id === academicYearId) || { id: academicYearId, name: 'TA' };
+      const sem = semList.find(s => s.id === semesterId) || { id: semesterId, name: 'Ganjil' };
+      const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+      const santriAkhlaq = akhlaqList.find(a => a.santriId === santri.id || (a as any).santri_id === santri.id);
+      const akhlaqScore = santriAkhlaq && typeof santriAkhlaq.nilaiAkhlaq === 'number' ? santriAkhlaq.nilaiAkhlaq : 90;
+
+      downloadRaporPdf(santri, cls as any, ay as any, sem as any, nilaiList, subjects, rapor, myUser.name || 'Wali Kelas', 'Ust. Aidil Aqli, S.Ag.', akhlaqScore);
+    } catch (err: any) {
+      alert('Gagal mengunduh Rapor PDF: ' + (err.message || 'Error'));
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   React.useEffect(() => {
     api.getRaporDetail({ santriId: santri.id, academicYearId, semesterId }).then(res => {
@@ -91,6 +147,20 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
     }
   };
 
+  const handleDeleteRapor = async () => {
+    if (!rapor) return;
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus / mereset seluruh detail rapor santri ${santri.name}?`)) return;
+    setSaving(true);
+    try {
+      await api.deleteRaporDetail(rapor.id);
+      onSave();
+    } catch (err: any) {
+      setError(err.message || 'Gagal menghapus detail rapor');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
@@ -107,9 +177,29 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Detail Rapor Santri</h2>
             <p className="text-sm text-slate-500">{santri.name} (NIS: {santri.nis})</p>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrintRapor}
+              disabled={printing}
+              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 rounded-lg font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+              title="Print Cetak Fisik"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Print</span>
+            </button>
+            <button
+              onClick={handleDownloadRaporPDF}
+              disabled={downloading}
+              className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+              title="Download File PDF"
+            >
+              <Download className="w-4 h-4" />
+              <span>{downloading ? 'Mengunduh...' : 'Download PDF'}</span>
+            </button>
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
@@ -242,11 +332,23 @@ export default function RaporModal({ santri, academicYearId, semesterId, onClose
           </section>
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition">Batal</button>
-          <button onClick={handleSave} disabled={saving} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition flex items-center">
-            {saving ? 'Menyimpan...' : <><Save className="w-4 h-4 mr-2"/> Simpan Detail</>}
-          </button>
+        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/50">
+          {rapor ? (
+            <button 
+              onClick={handleDeleteRapor} 
+              disabled={saving}
+              className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/30 dark:hover:bg-rose-900/40 dark:text-rose-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Hapus Detail Rapor</span>
+            </button>
+          ) : <div />}
+          <div className="flex items-center gap-3">
+            <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition cursor-pointer">Batal</button>
+            <button onClick={handleSave} disabled={saving} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition flex items-center cursor-pointer">
+              {saving ? 'Menyimpan...' : <><Save className="w-4 h-4 mr-2"/> Simpan Detail</>}
+            </button>
+          </div>
         </div>
       </div>
     </div>

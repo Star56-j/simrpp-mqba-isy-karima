@@ -45,6 +45,7 @@ import EvaluasiPembelajaranPage from './components/EvaluasiPembelajaran';
 import RekapRaporWaliKelas from './components/RekapRaporWaliKelas';
 import ResetRequests from './components/ResetRequests';
 import TanyaAdmin from './components/TanyaAdmin';
+import TanyaWaliKelas from './components/TanyaWaliKelas';
 import { EvaluasiWaliKelasComponent } from './components/EvaluasiWaliKelas';
 
 export default function App() {
@@ -86,6 +87,14 @@ export default function App() {
   // Statistics
   const [adminStats, setAdminStats] = React.useState<AdminStats | null>(null);
   const [guruStats, setGuruStats] = React.useState<GuruStats | null>(null);
+
+  const [rppStatusFilter, setRppStatusFilter] = React.useState<string>('Semua');
+
+  const handleNavigate = (view: string, filter?: string) => {
+    if (filter) setRppStatusFilter(filter);
+    else setRppStatusFilter('Semua');
+    setView(view);
+  };
 
   const [loading, setLoading] = React.useState<boolean>(true);
 
@@ -175,7 +184,20 @@ export default function App() {
       setAcademicYears(ay);
       setSemesters(sem);
       setSchedules(sch);
-      setRpps(r);
+      
+      const decoratedRpps = r.map((item: any) => {
+        const itemTeacherId = item.teacherId || item.teacher_id;
+        const matchedTeacher = item.teacher || tch.find((t: any) => t.id === itemTeacherId) || (tch.find((t: any) => t.name && item.teacherName && t.name.toLowerCase() === item.teacherName.toLowerCase()));
+        return {
+          ...item,
+          teacherId: itemTeacherId || (matchedTeacher ? matchedTeacher.id : ''),
+          teacher: matchedTeacher,
+          subject: item.subject || sbj.find((s: any) => s.id === item.subjectId),
+          class: item.class || cls.find((c: any) => c.id === item.classId),
+          academicYear: item.academicYear || ay.find((a: any) => a.id === item.academicYearId)
+        };
+      });
+      setRpps(decoratedRpps);
       setAttendances(att);
 
       // Fetch santri
@@ -187,7 +209,8 @@ export default function App() {
       setWaliKelas(waliRes);
 
       // Fetch Stats
-      const statRes = await api.getDashboardStats().catch(() => null);
+      const teacherParam = currentUser.role === 'Admin' ? undefined : (currentUser.teacherId || (currentUser as any).teacher_id || currentUser.id);
+      const statRes = await api.getDashboardStats(teacherParam).catch(() => null);
       if (statRes) {
         if (currentUser.role === 'Admin') {
           setAdminStats(statRes as AdminStats);
@@ -270,37 +293,79 @@ export default function App() {
       activityLogs: activityLogs || []
     };
 
+    const effectiveTeacherId = user?.teacherId || (user as any)?.teacher_id || (user?.teacher && (user?.teacher as any).id) || user?.id;
     const defaultGuruStats: GuruStats = {
-      mySchedulesCount: schedules.filter(s => s.teacherId === user?.teacherId).length,
+      mySchedulesCount: schedules.filter(s => s.teacherId === effectiveTeacherId || s.teacherId === user?.teacherId).length,
       rpp: {
-        total: rpps.filter(r => r.teacherId === user?.teacherId).length,
-        draft: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Draft').length,
-        pending: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Menunggu Persetujuan').length,
-        approved: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Disetujui').length,
-        revision: rpps.filter(r => r.teacherId === user?.teacherId && r.status === 'Revisi').length
+        total: rpps.filter(r => {
+          const rTid = r.teacherId || (r as any).teacher_id || (r.teacher && r.teacher.id);
+          return (effectiveTeacherId && rTid === effectiveTeacherId) || !rTid || (r.teacher?.name && user?.name && r.teacher.name.toLowerCase().includes(user.name.toLowerCase()));
+        }).length,
+        draft: rpps.filter(r => {
+          const rTid = r.teacherId || (r as any).teacher_id || (r.teacher && r.teacher.id);
+          const isMatch = (effectiveTeacherId && rTid === effectiveTeacherId) || !rTid || (r.teacher?.name && user?.name && r.teacher.name.toLowerCase().includes(user.name.toLowerCase()));
+          return isMatch && r.status === 'Draft';
+        }).length,
+        pending: rpps.filter(r => {
+          const rTid = r.teacherId || (r as any).teacher_id || (r.teacher && r.teacher.id);
+          const isMatch = (effectiveTeacherId && rTid === effectiveTeacherId) || !rTid || (r.teacher?.name && user?.name && r.teacher.name.toLowerCase().includes(user.name.toLowerCase()));
+          return isMatch && r.status === 'Menunggu Persetujuan';
+        }).length,
+        approved: rpps.filter(r => {
+          const rTid = r.teacherId || (r as any).teacher_id || (r.teacher && r.teacher.id);
+          const isMatch = (effectiveTeacherId && rTid === effectiveTeacherId) || !rTid || (r.teacher?.name && user?.name && r.teacher.name.toLowerCase().includes(user.name.toLowerCase()));
+          return isMatch && r.status === 'Disetujui';
+        }).length,
+        revision: rpps.filter(r => {
+          const rTid = r.teacherId || (r as any).teacher_id || (r.teacher && r.teacher.id);
+          const isMatch = (effectiveTeacherId && rTid === effectiveTeacherId) || !rTid || (r.teacher?.name && user?.name && r.teacher.name.toLowerCase().includes(user.name.toLowerCase()));
+          return isMatch && r.status === 'Revisi';
+        }).length
       }
     };
+
+    const safeAdminStats: AdminStats = (typeof adminStats !== 'undefined' && adminStats) ? adminStats : (defaultAdminStats || {
+      teachers: 0, subjects: 0, classes: 0, schedules: 0, santri: 0,
+      rpp: { total: 0, draft: 0, pending: 0, approved: 0, revision: 0 },
+      activityLogs: []
+    });
+
+    const safeGuruStats: GuruStats = (typeof guruStats !== 'undefined' && guruStats) ? guruStats : (defaultGuruStats || {
+      mySchedulesCount: 0,
+      rpp: { total: 0, draft: 0, pending: 0, approved: 0, revision: 0 }
+    });
 
     switch (currentView) {
       case 'admin-dashboard':
         return (
           <AdminDashboard 
-            stats={adminStats || defaultAdminStats} 
-            onNavigate={(view) => setView(view)} 
+            stats={safeAdminStats} 
+            onNavigate={handleNavigate} 
             rpps={rpps} 
+            teachers={teachers}
+            santriList={santriList}
+            subjects={subjects}
+            classes={classes}
+            schedules={schedules}
+            academicYears={academicYears}
+            semesters={semesters}
+            waliKelas={waliKelas}
           />
         );
 
       case 'guru-dashboard':
         return (
           <GuruDashboard 
-            stats={guruStats || defaultGuruStats} 
-            onNavigate={(view) => setView(view)} 
+            stats={safeGuruStats} 
+            onNavigate={handleNavigate} 
             rpps={rpps} 
             schedules={schedules} 
             subjects={subjects} 
             classes={classes} 
             waliKelas={waliKelas}
+            santriList={santriList}
+            academicYears={academicYears}
+            semesters={semesters}
           />
         );
 
@@ -343,6 +408,7 @@ export default function App() {
             classes={classes}
             academicYears={academicYears}
             onRefresh={fetchData}
+            initialStatusFilter={rppStatusFilter}
           />
         );
 
@@ -358,6 +424,9 @@ export default function App() {
             teachers={teachers}
             academicYears={academicYears}
             semesters={semesters}
+            schedules={schedules}
+            subjects={subjects}
+            classes={classes}
           />
         );
 
@@ -366,6 +435,8 @@ export default function App() {
           <AttendanceGuru
             academicYears={academicYears}
             semesters={semesters}
+            subjects={subjects}
+            schedules={schedules}
           />
         );
 
@@ -376,6 +447,8 @@ export default function App() {
             academicYears={academicYears}
             semesters={semesters}
             santriList={santriList}
+            subjects={subjects}
+            schedules={schedules}
           />
         );
 
@@ -387,6 +460,8 @@ export default function App() {
             semesters={semesters}
             schedules={schedules}
             santriList={santriList}
+            subjects={subjects}
+            waliKelas={waliKelas}
           />
         );
 
@@ -394,7 +469,7 @@ export default function App() {
         return <ProfileSettings onRefresh={fetchData} />;
 
       case 'pengumuman':
-        return <Pengumuman currentUser={user} />;
+        return <Pengumuman currentUser={user} teachers={teachers} />;
 
       case 'wali-kelas':
         return (
@@ -441,6 +516,7 @@ export default function App() {
             waliKelasList={waliKelas}
             currentUser={user}
             teachers={teachers}
+            schedules={schedules}
           />
         );
 
@@ -460,6 +536,11 @@ export default function App() {
       case 'tanya-admin':
         return (
           <TanyaAdmin currentUser={user} />
+        );
+
+      case 'tanya-wali-kelas':
+        return (
+          <TanyaWaliKelas currentUser={user} />
         );
 
       case 'evaluasi-wali-kelas':
@@ -494,6 +575,7 @@ export default function App() {
       case 'wali-kelas': return 'Wali Kelas';
       case 'rekap-rapor-wali-kelas': return 'Rekap Rapor Kelas Binaan';
       case 'tanya-admin': return user?.role === 'Admin' ? 'Pesan & Pertanyaan Guru (Tanya Admin)' : 'Tanya Admin';
+      case 'tanya-wali-kelas': return 'Konsultasi & Tanya Wali Kelas';
       case 'profile-settings': return 'Pengaturan Profil';
       case 'pengumuman': return 'Pengumuman Akademik';
       case 'evaluasi-pembelajaran': return 'Evaluasi Pembelajaran Bulanan';

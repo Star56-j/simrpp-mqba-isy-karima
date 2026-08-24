@@ -2,12 +2,14 @@ import React from 'react';
 import {
   FileText, Edit, Trash, Search, X, AlertCircle,
   CheckCircle, Upload, CloudLightning, Send, Save,
-  ChevronDown, ChevronUp, PlusCircle, Trash2, BookOpen, Download
+  ChevronDown, ChevronUp, PlusCircle, Trash2, BookOpen, Download, Printer
 } from 'lucide-react';
 import { RPP, Subject, SchoolClass, AcademicYear, SyllabusItem } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
 import { parseExcelFile } from '../utils/importExcel';
+import { printRPP } from '../utils/printRPP';
+import { downloadRPPPdf } from '../utils/pdfDownloader';
 
 interface MyRPPsProps {
   rpps: RPP[];
@@ -15,6 +17,7 @@ interface MyRPPsProps {
   classes: SchoolClass[];
   academicYears: AcademicYear[];
   onRefresh: () => void;
+  initialStatusFilter?: string;
 }
 
 // Langkah-langkah form sebagai wizard
@@ -27,18 +30,46 @@ const STEPS = [
   { id: 6, label: 'Silabus',       desc: 'Rincian Per Pertemuan' },
 ];
 
-export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefresh }: MyRPPsProps) {
+export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefresh, initialStatusFilter }: MyRPPsProps) {
   const [activeTab, setActiveTab] = React.useState<'history' | 'create'>('history');
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [statusFilter, setStatusFilter] = React.useState<string>('Semua');
+  const [statusFilter, setStatusFilter] = React.useState<string>(initialStatusFilter || 'Semua');
   const [expandedRppId, setExpandedRppId] = React.useState<string | null>(null);
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
-  const myRpps = rpps.filter(r => r.teacherId === myUser.teacherId);
+  const activeTeacherId = myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || 't-12';
+  const teacherIds = [
+    myUser.teacherId,
+    myUser.teacher_id,
+    myUser.teacher?.id,
+    myUser.id
+  ].filter(Boolean);
+
+  const teacherNames = [
+    myUser.name,
+    myUser.teacher?.name
+  ].filter(Boolean).map((n: string) => n.trim().toLowerCase());
+
+  const myRpps = rpps.filter(r => {
+    if (myUser.role === 'Admin') return true;
+
+    const rTid = r.teacherId || (r as any).teacher_id || (r.teacher && r.teacher.id);
+    if (rTid && teacherIds.includes(rTid)) {
+      return true;
+    }
+    // Match by teacher name if available
+    const rTeacherName = (r.teacher?.name || (r as any).teacher_name || (r as any).teacherName || '').trim().toLowerCase();
+    if (rTeacherName && teacherNames.some(tn => tn === rTeacherName || tn.includes(rTeacherName) || rTeacherName.includes(tn))) {
+      return true;
+    }
+    return false;
+  });
 
   // === FORM STATE ===
   const [editingRppId, setEditingRppId] = React.useState<string | null>(null);
+  const [editingRppStatus, setEditingRppStatus] = React.useState<string | null>(null);
+  const [editingRppRevisionNotes, setEditingRppRevisionNotes] = React.useState<string | null>(null);
 
   // Step 1: Identitas
   const [subjectId, setSubjectId]           = React.useState('');
@@ -87,6 +118,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
   const [successMessage, setSuccessMessage] = React.useState('');
 
   const buildPayload = (status: 'Draft' | 'Menunggu Persetujuan') => ({
+    teacherId: activeTeacherId || myUser.teacherId || myUser.teacher_id || 't-12',
     subjectId, classId, academicYearId,
     profilPelajar, sarana,
     capaiPembelajaran, tujuanPembelajaran, alurTP,
@@ -120,7 +152,10 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
       diferensiasi, pengayaan, catatan, syllabusItems, activeTab]);
 
   const resetForm = () => {
-    setEditingRppId(null); setCurrentStep(1);
+    setEditingRppId(null);
+    setEditingRppStatus(null);
+    setEditingRppRevisionNotes(null);
+    setCurrentStep(1);
     setSubjectId(''); setClassId(''); setAcademicYearId('');
     setProfilPelajar(''); setSarana('');
     setCapaiPembelajaran(''); setTujuanPembelajaran(''); setAlurTP('');
@@ -135,7 +170,10 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
   };
 
   const handleEditClick = (rpp: RPP) => {
-    setEditingRppId(rpp.id); setCurrentStep(1);
+    setEditingRppId(rpp.id);
+    setEditingRppStatus(rpp.status);
+    setEditingRppRevisionNotes(rpp.revisionNotes || null);
+    setCurrentStep(1);
     setSubjectId(rpp.subjectId); setClassId(rpp.classId); setAcademicYearId(rpp.academicYearId);
     setProfilPelajar(rpp.profilPelajar || ''); setSarana(rpp.sarana || '');
     setCapaiPembelajaran(rpp.capaiPembelajaran || '');
@@ -242,6 +280,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
         
         if (!subj || !cls) return null;
         return {
+          teacherId: activeTeacherId || myUser.teacherId || myUser.teacher_id || 't-12',
           subjectId: subj.id,
           classId: cls.id,
           academicYearId: ay?.id,
@@ -326,54 +365,92 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
           ) : (
             <div className="space-y-3">
               {filteredMyRpps.map(rpp => (
-                <div key={rpp.id} className={`bg-white dark:bg-slate-900 rounded-2xl border shadow-xs overflow-hidden
-                  ${rpp.status === 'Revisi' ? 'border-rose-200 dark:border-rose-900/40' : 'border-slate-100 dark:border-slate-800'}`}>
-                  <div className="p-5 flex items-center justify-between gap-3 flex-wrap">
-                    <div className="flex items-center space-x-4 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 flex items-center justify-center flex-shrink-0">
-                        <BookOpen className="w-5 h-5 text-indigo-600" />
+                <div key={rpp.id} className={`bg-white dark:bg-slate-900 rounded-2xl border shadow-xs overflow-hidden transition
+                  ${rpp.status === 'Revisi' ? 'border-rose-300 dark:border-rose-800/80 bg-rose-50/10' : rpp.status === 'Disetujui' ? 'border-emerald-200 dark:border-emerald-900/40' : 'border-slate-100 dark:border-slate-800'}`}>
+                  <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="flex items-start sm:items-center space-x-4 min-w-0">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0 ${rpp.status === 'Revisi' ? 'bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400' : 'bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600'}`}>
+                        <BookOpen className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-extrabold text-slate-800 dark:text-slate-100 truncate">{rpp.subject?.name}</h3>
-                        <p className="text-xs text-slate-500 mt-0.5">Kelas {rpp.class?.name} &bull; TA {rpp.academicYear?.name} &bull; {rpp.totalMeetingsGanjil + rpp.totalMeetingsGenap} pertemuan</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Kelas {rpp.class?.name} &bull; TA {rpp.academicYear?.name} &bull; {(rpp.totalMeetingsGanjil || 16) + (rpp.totalMeetingsGenap || 16)} pertemuan</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2 flex-shrink-0">
-                      <span className={`hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border
-                        ${rpp.status === 'Disetujui' ? 'bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400' :
-                          rpp.status === 'Menunggu Persetujuan' ? 'bg-amber-50 text-amber-800 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400' :
-                          rpp.status === 'Revisi' ? 'bg-rose-50 text-rose-800 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400' :
+                    <div className="flex items-center space-x-2 flex-wrap flex-shrink-0 self-end md:self-center">
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border
+                        ${rpp.status === 'Disetujui' ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/40' :
+                          rpp.status === 'Menunggu Persetujuan' ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/40' :
+                          rpp.status === 'Revisi' ? 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/40' :
                           'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400'}`}>
                         {rpp.status}
                       </span>
-                      {rpp.status !== 'Disetujui' && (
-                        <button onClick={() => handleEditClick(rpp)} className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><Edit className="w-4 h-4" /></button>
+                      
+                      {/* Tombol Perbaiki RPP khusus jika status Revisi */}
+                      {rpp.status === 'Revisi' && (
+                        <button
+                          onClick={() => handleEditClick(rpp)}
+                          title="Perbaiki RPP sesuai catatan revisi"
+                          className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                          <span>Perbaiki RPP</span>
+                        </button>
                       )}
+
+                      {/* Tombol Edit Biasa jika bukan Disetujui & bukan Revisi */}
+                      {rpp.status !== 'Disetujui' && rpp.status !== 'Revisi' && (
+                        <button onClick={() => handleEditClick(rpp)} title="Edit RPP" className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      )}
+
                       {rpp.status === 'Draft' && (
-                        <button onClick={() => handleDelete(rpp)} className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition"><Trash className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete(rpp)} title="Hapus Draft" className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition cursor-pointer"><Trash className="w-4 h-4" /></button>
                       )}
+
+                      <button onClick={() => printRPP(rpp)} title="Print Cetak Fisik" className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition print:hidden flex items-center gap-1 text-xs font-bold cursor-pointer">
+                        <Printer className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Print</span>
+                      </button>
+
+                      <button onClick={() => downloadRPPPdf(rpp)} title="Download File PDF" className="px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white transition print:hidden flex items-center gap-1 text-xs font-bold cursor-pointer shadow-xs">
+                        <Download className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Download PDF</span>
+                      </button>
+
                       <button onClick={() => setExpandedRppId(expandedRppId === rpp.id ? null : rpp.id)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                        className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
                         {expandedRppId === rpp.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
+
+                  {/* Banner Catatan Revisi dari Kurikulum */}
                   {rpp.status === 'Revisi' && rpp.revisionNotes && (
-                    <div className="mx-5 mb-3 p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-700">
-                      <span className="font-bold">Catatan Revisi: </span><em>"{rpp.revisionNotes}"</em>
+                    <div className="mx-5 mb-4 p-3.5 rounded-xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-xs text-rose-800 dark:text-rose-300 flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-extrabold uppercase tracking-wider text-[11px] text-rose-700 dark:text-rose-400">Catatan Revisi dari Kurikulum:</p>
+                        <p className="mt-0.5 italic">"{rpp.revisionNotes}"</p>
+                        <p className="mt-1.5 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                          Klik tombol <strong>"Perbaiki RPP"</strong> di atas untuk memperbarui isi dan mengirim ulang untuk persetujuan.
+                        </p>
+                      </div>
                     </div>
                   )}
+
                   {expandedRppId === rpp.id && (
                     <div className="border-t border-slate-100 dark:border-slate-800 p-5 space-y-4 text-xs text-slate-600 dark:text-slate-400">
                       {rpp.capaiPembelajaran && <div><p className="font-bold text-indigo-700 dark:text-indigo-400 mb-1">Capaian Pembelajaran</p><p className="whitespace-pre-wrap">{rpp.capaiPembelajaran}</p></div>}
                       {rpp.tujuanPembelajaran && <div><p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Tujuan Pembelajaran</p><p className="whitespace-pre-wrap">{rpp.tujuanPembelajaran}</p></div>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20">
-                          <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Materi Ganjil ({rpp.totalMeetingsGanjil} pertemuan)</p>
+                          <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Materi Ganjil ({rpp.totalMeetingsGanjil || 16} pertemuan)</p>
                           <p className="whitespace-pre-wrap">{rpp.materiGanjil || '-'}</p>
                         </div>
                         <div className="p-3 rounded-xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/20">
-                          <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Materi Genap ({rpp.totalMeetingsGenap} pertemuan)</p>
+                          <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Materi Genap ({rpp.totalMeetingsGenap || 16} pertemuan)</p>
                           <p className="whitespace-pre-wrap">{rpp.materiGenap || '-'}</p>
                         </div>
                       </div>
@@ -394,7 +471,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
             <div className="flex items-center justify-between overflow-x-auto gap-1">
               {STEPS.map((step, i) => (
                 <button key={step.id} onClick={() => setCurrentStep(step.id)} type="button"
-                  className={`flex flex-col items-center px-3 py-2 rounded-xl transition flex-shrink-0 min-w-[80px]
+                  className={`flex flex-col items-center px-3 py-2 rounded-xl transition flex-shrink-0 min-w-[80px] cursor-pointer
                     ${currentStep === step.id ? 'bg-indigo-700 text-white' : currentStep > step.id ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                   <span className={`text-[10px] font-extrabold uppercase tracking-wider ${currentStep === step.id ? 'text-white' : ''}`}>{step.label}</span>
                   <span className={`text-[9px] mt-0.5 hidden sm:block ${currentStep === step.id ? 'text-indigo-100' : 'text-slate-400'}`}>{step.desc}</span>
@@ -416,6 +493,20 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                   : <span>Auto-save aktif</span>}
               </div>
             </div>
+
+            {/* Banner Catatan Revisi Aktif di Atas Form Wizard */}
+            {editingRppStatus === 'Revisi' && editingRppRevisionNotes && (
+              <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 space-y-1 animate-fade-in">
+                <div className="flex items-center gap-2 font-bold text-xs">
+                  <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                  <span>Perhatian: RPP ini memerlukan perbaikan berdasarkan catatan Kurikulum</span>
+                </div>
+                <p className="text-xs italic pl-6">"{editingRppRevisionNotes}"</p>
+                <p className="text-[11px] text-rose-600 dark:text-rose-400 pl-6 mt-1 font-medium">
+                  Silakan sesuaikan data pada langkah form di bawah, lalu klik <strong>"Kirim untuk Persetujuan Kurikulum"</strong> di langkah terakhir.
+                </p>
+              </div>
+            )}
 
             {errorMessage && <div className="p-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 flex items-center space-x-2 text-xs"><AlertCircle className="w-4 h-4"/><span>{errorMessage}</span></div>}
             {successMessage && <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs"><CheckCircle className="w-4 h-4"/><span>{successMessage}</span></div>}
@@ -648,6 +739,48 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
                 )}
               </div>
               <div className="flex items-center space-x-2">
+                <button type="button" onClick={() => {
+                  const payload = buildPayload('Draft');
+                  const targetSubject = subjects.find(s => s.id === subjectId) || { name: 'Mata Pelajaran', category: 'Umum' };
+                  const targetClass = classes.find(c => c.id === classId) || { name: 'Kelas', level: 'I\'dad' };
+                  const targetAY = academicYears.find(a => a.id === academicYearId) || { name: 'TA' };
+                  printRPP({
+                    id: editingRppId || 'temp',
+                    teacherId: myUser.teacherId || '',
+                    ...payload,
+                    subject: targetSubject as any,
+                    class: targetClass as any,
+                    academicYear: targetAY as any,
+                    teacher: { id: myUser.teacherId || '', name: myUser.name, email: myUser.email },
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                  });
+                }}
+                  className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-xl text-xs font-extrabold uppercase tracking-wider transition flex items-center space-x-1.5 cursor-pointer"
+                  title="Print Cetak Fisik">
+                  <Printer className="w-4 h-4"/><span>Print</span>
+                </button>
+                <button type="button" onClick={() => {
+                  const payload = buildPayload('Draft');
+                  const targetSubject = subjects.find(s => s.id === subjectId) || { name: 'Mata Pelajaran', category: 'Umum' };
+                  const targetClass = classes.find(c => c.id === classId) || { name: 'Kelas', level: 'I\'dad' };
+                  const targetAY = academicYears.find(a => a.id === academicYearId) || { name: 'TA' };
+                  downloadRPPPdf({
+                    id: editingRppId || 'temp',
+                    teacherId: myUser.teacherId || '',
+                    ...payload,
+                    subject: targetSubject as any,
+                    class: targetClass as any,
+                    academicYear: targetAY as any,
+                    teacher: { id: myUser.teacherId || '', name: myUser.name, email: myUser.email },
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                  });
+                }}
+                  className="px-3.5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition flex items-center space-x-1.5 cursor-pointer"
+                  title="Download File PDF">
+                  <Download className="w-4 h-4"/><span>Download PDF</span>
+                </button>
                 <button type="button" onClick={() => handleSaveRPP('Draft')} disabled={isAutosaving}
                   className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-xl text-xs font-extrabold uppercase tracking-wider transition flex items-center space-x-1.5 disabled:opacity-50">
                   <Save className="w-4 h-4"/><span>Simpan Draft</span>

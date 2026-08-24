@@ -10,6 +10,18 @@ export interface User {
   role: 'Admin' | 'Guru' | 'WaliSantri';
   teacherId?: string;
   santriId?: string;
+  securityQuestion?: string;
+  securityAnswerHash?: string;
+}
+
+export interface PasswordResetRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Teacher {
@@ -240,6 +252,7 @@ export interface DatabaseSchema {
   raporDetails: RaporDetail[];
   pengumuman: Pengumuman[];
   evaluasiPembelajaran: EvaluasiPembelajaran[];
+  passwordResetRequests: PasswordResetRequest[];
 }
 
 export interface KepribadianItem {
@@ -455,6 +468,12 @@ export function getDatabase(): DatabaseSchema {
       saveDatabase(parsed);
       console.log('Migrated database: added evaluasiPembelajaran collection');
     }
+    // Migrate: tambah passwordResetRequests jika belum ada
+    if (!parsed.passwordResetRequests) {
+      parsed.passwordResetRequests = [];
+      saveDatabase(parsed);
+      console.log('Migrated database: added passwordResetRequests collection');
+    }
     // Migrate: konversi score tunggal → 4 kategori (harian, bulanan, uts, uas)
     if (parsed.nilai && parsed.nilai.length > 0 && (parsed.nilai[0] as any).score !== undefined) {
       parsed.nilai = parsed.nilai.map((n: any) => ({
@@ -585,7 +604,7 @@ export function saveDatabase(db: DatabaseSchema) {
 export function logActivity(userId: string, userName: string, userRole: string, action: string, details: string) {
   const db = getDatabase();
   const newLog: ActivityLog = {
-    id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+    id: `log-${crypto.randomUUID()}`,
     userId,
     userName,
     userRole,
@@ -952,6 +971,7 @@ function seedDatabase(): DatabaseSchema {
     activityLogs,
     raporDetails: [],
     pengumuman: [],
-    evaluasiPembelajaran: []
+    evaluasiPembelajaran: [],
+    passwordResetRequests: []
   };
 }

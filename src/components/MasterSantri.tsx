@@ -112,11 +112,13 @@ export default function MasterSantri({ classes, onRefresh }: MasterSantriProps) 
   };
 
   // Filtered List
-  const filteredList = santriList.filter(s => {
-    const matchClass = filterClass === 'all' || s.classId === filterClass;
-    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.nis.toLowerCase().includes(search.toLowerCase());
-    return matchClass && matchSearch;
-  });
+  const filteredList = santriList
+    .filter(s => {
+      const matchClass = filterClass === 'all' || s.classId === filterClass;
+      const matchSearch = (s.name || '').toLowerCase().includes(search.toLowerCase()) || (s.nis || '').toLowerCase().includes(search.toLowerCase());
+      return matchClass && matchSearch;
+    })
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'id', { sensitivity: 'base' }));
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -175,7 +177,8 @@ export default function MasterSantri({ classes, onRefresh }: MasterSantriProps) 
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            {/* Desktop Table */}
+            <table className="w-full text-left hidden sm:table">
               <thead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/30 dark:bg-slate-800/20">
                 <tr>
                   <th className="px-4 py-3">NIS</th>
@@ -206,6 +209,39 @@ export default function MasterSantri({ classes, onRefresh }: MasterSantriProps) 
                 ))}
               </tbody>
             </table>
+
+            {/* Mobile Card List */}
+            <div className="block sm:hidden divide-y divide-slate-50 dark:divide-slate-800">
+              {filteredList.map(s => (
+                <div key={s.id} className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="font-mono text-xs font-bold text-indigo-650 dark:text-indigo-400 block">{s.nis}</span>
+                      <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-xs mt-0.5">{s.name}</h4>
+                    </div>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 border border-indigo-100/50 dark:border-indigo-900/30">
+                      {classes.find(c => c.id === s.classId)?.name || s.classId}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-50 dark:border-slate-800/80">
+                    <button
+                      onClick={() => openEdit(s)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 text-xs font-semibold cursor-pointer"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      onClick={() => setDeleteId(s.id)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-500 text-xs font-semibold cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

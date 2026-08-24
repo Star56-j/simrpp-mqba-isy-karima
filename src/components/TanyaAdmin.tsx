@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { 
   HelpCircle, Send, MessageSquare, CheckCircle, Clock, 
-  AlertCircle, Trash2, Edit3, Search, Image as ImageIcon, X, ZoomIn
+  AlertCircle, Trash2, Edit3, Search, Image as ImageIcon, X, ZoomIn,
+  Paperclip, FileText, FileSpreadsheet, Download, File, ExternalLink
 } from 'lucide-react';
 import { User, TanyaAdmin as TanyaAdminType } from '../types';
 import { api } from '../api';
@@ -22,6 +23,14 @@ export default function TanyaAdmin({ currentUser }: TanyaAdminProps) {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [attachedFile, setAttachedFile] = useState<{
+    url: string;
+    name: string;
+    type: string;
+    isImage: boolean;
+    sizeFormatted?: string;
+  } | null>(null);
+
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
@@ -82,21 +91,55 @@ export default function TanyaAdmin({ currentUser }: TanyaAdminProps) {
     });
   };
 
-  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert('Mohon pilih file gambar (JPG, PNG, WEBP).');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Ukuran file maksimal adalah 10MB.');
       return;
     }
 
+    const sizeInKb = (file.size / 1024).toFixed(1);
+    const sizeFormatted = file.size > 1024 * 1024 
+      ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` 
+      : `${sizeInKb} KB`;
+
     try {
-      const base64 = await compressImageToBase64(file);
-      setImagePreview(base64);
+      if (file.type.startsWith('image/')) {
+        const base64 = await compressImageToBase64(file);
+        setAttachedFile({
+          url: base64,
+          name: file.name,
+          type: file.type,
+          isImage: true,
+          sizeFormatted
+        });
+        setImagePreview(base64);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const fileDataUrl = ev.target?.result as string;
+          setAttachedFile({
+            url: fileDataUrl,
+            name: file.name,
+            type: file.type || 'application/octet-stream',
+            isImage: false,
+            sizeFormatted
+          });
+          setImagePreview(null);
+        };
+        reader.readAsDataURL(file);
+      }
     } catch (err: any) {
-      alert('Gagal memproses gambar: ' + err.message);
+      alert('Gagal memproses lampiran file: ' + err.message);
     }
+  };
+
+  const clearAttachedFile = () => {
+    setAttachedFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const loadMessages = useCallback(async () => {
@@ -156,7 +199,9 @@ export default function TanyaAdmin({ currentUser }: TanyaAdminProps) {
         sender_role: currentUser.role === 'WaliSantri' ? 'Wali Santri' : currentUser.role,
         subject: subject.trim(),
         message: message.trim(),
-        image_url: imagePreview || '',
+        image_url: attachedFile?.isImage ? attachedFile.url : (imagePreview || ''),
+        file_url: attachedFile ? attachedFile.url : '',
+        file_name: attachedFile ? attachedFile.name : '',
         status: 'Pending',
         created_at: new Date().toISOString()
       };
@@ -165,8 +210,7 @@ export default function TanyaAdmin({ currentUser }: TanyaAdminProps) {
       setFormSuccess('Pertanyaan Anda telah berhasil dikirim ke Admin.');
       setSubject('');
       setMessage('');
-      setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      clearAttachedFile();
       loadMessages();
     } catch (err: any) {
       setFormError(err.message || 'Gagal mengirim pertanyaan.');
@@ -329,48 +373,65 @@ export default function TanyaAdmin({ currentUser }: TanyaAdminProps) {
               />
             </div>
 
-            {/* Image Attachment Field */}
+            {/* File & Image Attachment Field */}
             <div className="space-y-2 pt-1">
               <input 
                 type="file" 
                 ref={fileInputRef} 
-                accept="image/*" 
-                onChange={handleImageSelect} 
+                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" 
+                onChange={handleFileSelect} 
                 className="hidden" 
               />
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-slate-700"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-slate-700"
                 >
-                  <ImageIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  <span>{imagePreview ? 'Ganti Foto/Gambar' : 'Lampirkan Foto/Gambar (Opsional)'}</span>
+                  <Paperclip className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <span>{attachedFile ? 'Ganti File/Gambar' : 'Upload File / Foto / Dokumen (Opsional)'}</span>
                 </button>
 
-                {imagePreview && (
+                {attachedFile && (
                   <button
                     type="button"
-                    onClick={() => { setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                    className="text-xs text-rose-600 hover:underline font-semibold"
+                    onClick={clearAttachedFile}
+                    className="text-xs text-rose-600 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
                   >
-                    Hapus Lampiran
+                    <X className="w-3.5 h-3.5" />
+                    <span>Hapus Lampiran</span>
                   </button>
                 )}
               </div>
 
-              {/* Image Preview Box */}
-              {imagePreview && (
-                <div className="relative inline-block mt-2 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm max-w-xs group">
-                  <img src={imagePreview} alt="Preview Foto" className="max-h-48 w-auto object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => setImagePreview(null)}
-                    className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/70 text-white hover:bg-rose-600 transition"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+              {/* Attachment Preview Box */}
+              {attachedFile && (
+                <div className="mt-2 p-3.5 rounded-xl border border-indigo-100 dark:border-indigo-900/60 bg-indigo-50/50 dark:bg-indigo-950/30 flex items-center justify-between gap-3 max-w-md">
+                  <div className="flex items-center space-x-3 overflow-hidden">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                      {attachedFile.isImage ? (
+                        <ImageIcon className="w-5 h-5" />
+                      ) : attachedFile.name.endsWith('.pdf') ? (
+                        <FileText className="w-5 h-5" />
+                      ) : attachedFile.name.endsWith('.xlsx') || attachedFile.name.endsWith('.xls') ? (
+                        <FileSpreadsheet className="w-5 h-5" />
+                      ) : (
+                        <File className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-extrabold text-slate-800 dark:text-slate-200 truncate">
+                        {attachedFile.name}
+                      </p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                        {attachedFile.isImage ? 'Gambar / Foto' : 'Dokumen File'} {attachedFile.sizeFormatted ? `(${attachedFile.sizeFormatted})` : ''}
+                      </p>
+                    </div>
+                  </div>
+                  {attachedFile.isImage && imagePreview && (
+                    <img src={imagePreview} alt="Preview Mini" className="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
+                  )}
                 </div>
               )}
             </div>
@@ -502,25 +563,75 @@ export default function TanyaAdmin({ currentUser }: TanyaAdminProps) {
                       {msg.message}
                     </p>
 
-                    {/* Attached Image Section */}
-                    {imgUrl && (
-                      <div className="pt-2">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                          <ImageIcon className="w-3.5 h-3.5 text-indigo-500" />
-                          <span>Foto/Gambar Lampiran:</span>
-                        </p>
-                        <div 
-                          onClick={() => setModalImage(imgUrl)}
-                          className="relative inline-block rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group hover:opacity-95 transition"
-                        >
-                          <img src={imgUrl} alt="Foto Lampiran" className="max-h-56 w-auto object-cover rounded-2xl" />
-                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-xs">
-                            <ZoomIn className="w-4 h-4" />
-                            <span>Klik untuk Memperbesar</span>
+                    {/* Attached Image or File Section */}
+                    {(() => {
+                      const fileUrl = msg.file_url || msg.fileUrl || imgUrl;
+                      const fileName = msg.file_name || msg.fileName || 'dokumen_lampiran';
+                      if (!fileUrl) return null;
+
+                      const isImage = fileUrl.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileUrl) || (imgUrl && !msg.file_url);
+
+                      if (isImage) {
+                        return (
+                          <div className="pt-2">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                              <ImageIcon className="w-3.5 h-3.5 text-indigo-500" />
+                              <span>Foto / Gambar Lampiran:</span>
+                            </p>
+                            <div 
+                              onClick={() => setModalImage(fileUrl)}
+                              className="relative inline-block rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group hover:opacity-95 transition"
+                            >
+                              <img src={fileUrl} alt="Foto Lampiran" className="max-h-56 w-auto object-cover rounded-2xl" />
+                              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-xs">
+                                <ZoomIn className="w-4 h-4" />
+                                <span>Klik untuk Memperbesar</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="pt-2">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                            <Paperclip className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>Berkas Lampiran Dokumen:</span>
+                          </p>
+                          <div className="p-3.5 rounded-xl border border-indigo-100 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/30 flex items-center justify-between gap-3 max-w-md">
+                            <div className="flex items-center space-x-3 overflow-hidden">
+                              <div className="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                                {fileName.endsWith('.pdf') ? (
+                                  <FileText className="w-5 h-5" />
+                                ) : fileName.endsWith('.xlsx') || fileName.endsWith('.xls') ? (
+                                  <FileSpreadsheet className="w-5 h-5" />
+                                ) : (
+                                  <File className="w-5 h-5" />
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-extrabold text-slate-800 dark:text-slate-200 truncate">
+                                  {fileName}
+                                </p>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                  Dokumen Terlampir
+                                </p>
+                              </div>
+                            </div>
+                            <a
+                              href={fileUrl}
+                              download={fileName}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-xs cursor-pointer"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Unduh / Buka</span>
+                            </a>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
 
                   {/* Admin Reply Box */}

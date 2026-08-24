@@ -1,12 +1,17 @@
 import React from 'react';
 import {
-  FileText, Search, X, AlertCircle, Check, Eye,
+  FileText, Search, X, AlertCircle, Check, CheckCircle2, Eye,
   Filter, Trash2, Printer, Download, BookOpen,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, RotateCcw
 } from 'lucide-react';
 import { RPP } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
+import { printRPP } from '../utils/printRPP';
+import { downloadRPPPdf, downloadRekapSantriPdf } from '../utils/pdfDownloader';
+import { printGenericTable } from '../utils/printUtils';
+import { shareToWhatsApp } from '../utils/whatsappUtils';
+import ExportBar from './ExportBar';
 
 interface ManageRPPsProps {
   rpps: RPP[];
@@ -22,9 +27,23 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
   const [revisionNotes, setRevisionNotes] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
+  
+  // Quick Actions Modals State
+  const [approveConfirmRpp, setApproveConfirmRpp] = React.useState<RPP | null>(null);
+  const [isApproving, setIsApproving] = React.useState(false);
+  const [revisionModalRpp, setRevisionModalRpp] = React.useState<RPP | null>(null);
+  const [quickRevisionNotes, setQuickRevisionNotes] = React.useState('');
+  const [isSubmittingRevision, setIsSubmittingRevision] = React.useState(false);
+  
   const [deleteConfirmRpp, setDeleteConfirmRpp] = React.useState<RPP | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [expandedRppId, setExpandedRppId] = React.useState<string | null>(null);
+  const [toastMessage, setToastMessage] = React.useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' = 'success') => {
+    setToastMessage({ text, type });
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   const filteredRpps = rpps.filter(r => {
     const matchSearch =
@@ -39,7 +58,7 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
   const openDetailModal = (rpp: RPP) => {
     setSelectedRpp(rpp);
     setIsReviewMode(false);
-    setRevisionNotes('');
+    setRevisionNotes(rpp.revisionNotes || '');
     setErrorMessage('');
     setSuccessMessage('');
   };
@@ -49,15 +68,56 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
     if (!selectedRpp) return;
     setErrorMessage(''); setSuccessMessage('');
     if (reviewStatus === 'Revisi' && !revisionNotes.trim()) {
-      setErrorMessage('Harap isi catatan revisi.');
+      setErrorMessage('Harap isi catatan revisi untuk guru.');
       return;
     }
     try {
       await api.reviewRPP(selectedRpp.id, reviewStatus, revisionNotes);
       setSuccessMessage(`RPP berhasil diberi status: ${reviewStatus}`);
+      showToast(`Status RPP ${selectedRpp.subject?.name} berhasil diubah menjadi "${reviewStatus}"`);
       setTimeout(() => { setSelectedRpp(null); onRefresh(); }, 1200);
     } catch (err: any) {
       setErrorMessage(err.message || 'Gagal menyimpan hasil review.');
+    }
+  };
+
+  // Quick direct approve action
+  const handleDirectApprove = async () => {
+    if (!approveConfirmRpp) return;
+    setIsApproving(true);
+    try {
+      await api.reviewRPP(approveConfirmRpp.id, 'Disetujui', '');
+      showToast(`RPP ${approveConfirmRpp.subject?.name} (${approveConfirmRpp.teacher?.name || 'Guru'}) berhasil disetujui!`);
+      setApproveConfirmRpp(null);
+      if (selectedRpp?.id === approveConfirmRpp.id) setSelectedRpp(null);
+      onRefresh();
+    } catch (err: any) {
+      showToast(err.message || 'Gagal menyetujui RPP.', 'error');
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  // Quick direct revision action
+  const handleDirectRevisionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!revisionModalRpp) return;
+    if (!quickRevisionNotes.trim()) {
+      alert('Harap tuliskan catatan revisi agar guru mengetahui bagian mana yang perlu diperbaiki.');
+      return;
+    }
+    setIsSubmittingRevision(true);
+    try {
+      await api.reviewRPP(revisionModalRpp.id, 'Revisi', quickRevisionNotes);
+      showToast(`Catatan revisi berhasil dikirim ke guru (${revisionModalRpp.teacher?.name || 'Guru'})!`);
+      setRevisionModalRpp(null);
+      setQuickRevisionNotes('');
+      if (selectedRpp?.id === revisionModalRpp.id) setSelectedRpp(null);
+      onRefresh();
+    } catch (err: any) {
+      showToast(err.message || 'Gagal mengirim catatan revisi.', 'error');
+    } finally {
+      setIsSubmittingRevision(false);
     }
   };
 
@@ -66,110 +126,13 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
     setIsDeleting(true);
     try {
       await api.deleteRPP(deleteConfirmRpp.id);
+      showToast('RPP berhasil dihapus.');
       setDeleteConfirmRpp(null);
       setSelectedRpp(null);
       onRefresh();
     } catch (err: any) {
-      alert(err.message || 'Gagal menghapus RPP.');
+      showToast(err.message || 'Gagal menghapus RPP.', 'error');
     } finally { setIsDeleting(false); }
-  };
-
-  const printRPP = (rpp: RPP) => {
-    const w = window.open('', '_blank');
-    if (!w) return;
-    const ganjilRows = (rpp.syllabusItems || []).filter(s => s.semester === 'Ganjil')
-      .map(s => `<tr><td style="text-align:center;padding:4px 8px;border:1px solid #ccc;">${s.meetingNo}</td><td style="padding:4px 8px;border:1px solid #ccc;">${s.topic}</td><td style="text-align:center;padding:4px 8px;border:1px solid #ccc;">${s.date || '-'}</td></tr>`).join('');
-    const genapRows = (rpp.syllabusItems || []).filter(s => s.semester === 'Genap')
-      .map(s => `<tr><td style="text-align:center;padding:4px 8px;border:1px solid #ccc;">${s.meetingNo}</td><td style="padding:4px 8px;border:1px solid #ccc;">${s.topic}</td><td style="text-align:center;padding:4px 8px;border:1px solid #ccc;">${s.date || '-'}</td></tr>`).join('');
-
-    w.document.write(`<!DOCTYPE html><html><head><title>RPP - ${rpp.subject?.name}</title>
-    <style>
-      body{font-family:'Times New Roman',serif;line-height:1.7;padding:40px;color:#111;font-size:13px;}
-      .header{text-align:center;border-bottom:3px double #000;padding-bottom:14px;margin-bottom:22px;}
-      .header h1{font-size:17px;margin:0;font-weight:bold;text-transform:uppercase;}
-      .header h2{font-size:14px;margin:4px 0 0;font-weight:normal;}
-      .header p{font-size:11px;margin:2px 0 0;color:#555;}
-      .title{text-align:center;font-weight:bold;font-size:14px;text-transform:uppercase;margin-bottom:20px;text-decoration:underline;letter-spacing:1px;}
-      table.id{width:100%;border-collapse:collapse;margin-bottom:18px;}
-      table.id td{padding:3px 0;vertical-align:top;}
-      table.id td.lbl{width:200px;}
-      table.id td.col{width:16px;text-align:center;}
-      .sec{font-weight:bold;font-size:12px;text-transform:uppercase;margin-top:16px;margin-bottom:6px;border-bottom:1px solid #000;padding-bottom:2px;letter-spacing:.5px;}
-      .cnt{font-size:13px;margin-left:12px;white-space:pre-wrap;text-align:justify;margin-bottom:12px;}
-      .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
-      .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
-      .box{border:1px solid #bbb;border-radius:4px;padding:10px;}
-      .box-title{font-weight:bold;font-size:11px;text-transform:uppercase;margin-bottom:6px;}
-      .box-blue .box-title{color:#1d4ed8;}
-      .box-violet .box-title{color:#7c3aed;}
-      .box-amber .box-title{color:#b45309;}
-      .box-indigo .box-title{color:#065f46;}
-      .sem-box{border:1px solid #bbb;border-radius:4px;padding:12px;margin-bottom:14px;}
-      .sem-title{font-weight:bold;font-size:12px;margin-bottom:8px;text-transform:uppercase;}
-      table.syl{width:100%;border-collapse:collapse;font-size:12px;}
-      table.syl th{background:#f0f0f0;padding:5px 8px;border:1px solid #ccc;text-align:left;}
-      .sigs{width:100%;border-collapse:collapse;margin-top:48px;}
-      .sigs td{text-align:center;font-size:13px;width:50%;}
-      .sig-space{height:70px;}
-    </style></head><body>
-    <div class="header">
-      <h1>Markaz Qur'an dan Bahasa Arab (MQBA) Isy Karima</h1>
-      <h2>Yayasan Sosial dan Pendidikan Isy Karima</h2>
-      <p>Karanganyar, Jawa Tengah, Indonesia &nbsp;|&nbsp; info@isykarima.id</p>
-    </div>
-    <div class="title">Rencana Pelaksanaan Pembelajaran (RPP) Kurikulum Merdeka</div>
-    <table class="id">
-      <tr><td class="lbl">Mata Pelajaran</td><td class="col">:</td><td><strong>${rpp.subject?.name} (${rpp.subject?.category})</strong></td></tr>
-      <tr><td class="lbl">Kelas / Jenjang</td><td class="col">:</td><td>Kelas ${rpp.class?.name} (${rpp.class?.level})</td></tr>
-      <tr><td class="lbl">Nama Pengajar</td><td class="col">:</td><td>${rpp.teacher?.name}</td></tr>
-      <tr><td class="lbl">Tahun Ajaran</td><td class="col">:</td><td>Tahun Pelajaran ${rpp.academicYear?.name}</td></tr>
-      <tr><td class="lbl">Jumlah Pertemuan</td><td class="col">:</td><td>Ganjil: ${rpp.totalMeetingsGanjil} &nbsp;|&nbsp; Genap: ${rpp.totalMeetingsGenap} pertemuan</td></tr>
-      <tr><td class="lbl">Profil Pelajar</td><td class="col">:</td><td>${rpp.profilPelajar || '-'}</td></tr>
-      <tr><td class="lbl">Sarana & Prasarana</td><td class="col">:</td><td>${rpp.sarana || '-'}</td></tr>
-    </table>
-    <div class="sec">I. Capaian Pembelajaran (CP)</div><div class="cnt">${rpp.capaiPembelajaran || '-'}</div>
-    <div class="sec">II. Tujuan Pembelajaran (TP)</div><div class="cnt">${rpp.tujuanPembelajaran || '-'}</div>
-    <div class="sec">III. Alur Tujuan Pembelajaran (ATP)</div><div class="cnt">${rpp.alurTP || '-'}</div>
-    <div class="sec">IV. Materi Pembelajaran</div>
-    <div class="grid2">
-      <div class="box box-blue"><div class="box-title">Semester Ganjil (${rpp.totalMeetingsGanjil} pertemuan)</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.materiGanjil || '-'}</div></div>
-      <div class="box box-violet"><div class="box-title">Semester Genap (${rpp.totalMeetingsGenap} pertemuan)</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.materiGenap || '-'}</div></div>
-    </div>
-    <div class="sec">V. Kegiatan Pembelajaran</div>
-    <div class="box box-amber" style="margin-bottom:8px;"><div class="box-title">Pendahuluan</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.pendahuluan || '-'}</div></div>
-    <div class="box box-indigo" style="margin-bottom:8px;"><div class="box-title">Kegiatan Inti</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.kegiatanInti || '-'}</div></div>
-    <div class="box" style="margin-bottom:14px;"><div class="box-title" style="color:#1d4ed8;">Penutup</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.penutup || '-'}</div></div>
-    <div class="sec">VI. Metode & Media</div>
-    <div class="grid2">
-      <div class="box"><div class="box-title">Metode / Model Pembelajaran</div><div style="font-size:12px;">${rpp.metode || '-'}</div></div>
-      <div class="box"><div class="box-title">Media & Alat</div><div style="font-size:12px;">${rpp.media || '-'}</div></div>
-    </div>
-    <div class="sec">VII. Asesmen</div>
-    <div class="grid3">
-      <div class="box"><div class="box-title">Diagnostik</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.asesmenDiagnostik || '-'}</div></div>
-      <div class="box box-blue"><div class="box-title">Formatif</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.asesmenFormatif || '-'}</div></div>
-      <div class="box box-indigo"><div class="box-title">Sumatif</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.asesmenSumatif || '-'}</div></div>
-    </div>
-    <div class="sec">VIII. Diferensiasi & Pengayaan</div>
-    <div class="grid2">
-      <div class="box"><div class="box-title">Pembelajaran Berdiferensiasi</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.diferensiasi || '-'}</div></div>
-      <div class="box"><div class="box-title">Pengayaan & Remedial</div><div style="white-space:pre-wrap;font-size:12px;">${rpp.pengayaan || '-'}</div></div>
-    </div>
-    ${rpp.catatan ? `<div class="sec">Catatan Guru</div><div class="cnt">${rpp.catatan}</div>` : ''}
-    ${ganjilRows || genapRows ? `
-    <div class="sec">IX. Silabus Rincian Per Pertemuan</div>
-    ${ganjilRows ? `<div class="sem-box"><div class="sem-title">Semester Ganjil</div>
-    <table class="syl"><tr><th style="width:40px;">No</th><th>Pokok Bahasan / Materi</th><th style="width:90px;">Tgl Rencana</th></tr>${ganjilRows}</table></div>` : ''}
-    ${genapRows ? `<div class="sem-box"><div class="sem-title">Semester Genap</div>
-    <table class="syl"><tr><th style="width:40px;">No</th><th>Pokok Bahasan / Materi</th><th style="width:90px;">Tgl Rencana</th></tr>${genapRows}</table></div>` : ''}
-    ` : ''}
-    <table class="sigs"><tr>
-      <td>Menyetujui,<br/><strong>Kepala Kurikulum MQBA</strong><div class="sig-space"></div>( ................................................ )</td>
-      <td>Karanganyar, ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}<br/><strong>Guru Pengajar</strong><div class="sig-space"></div><strong>( ${rpp.teacher?.name} )</strong></td>
-    </tr></table>
-    <script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);}</script>
-    </body></html>`);
-    w.document.close();
   };
 
   const handleExport = () => {
@@ -179,7 +142,8 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
       'Mata Pelajaran': r.subject?.name || r.subjectId,
       'Kelas': r.class?.name || r.classId,
       'Tahun Ajaran': r.academicYear?.name || r.academicYearId,
-      'Fase / Semester': '-',
+      'Pertemuan Ganjil': r.totalMeetingsGanjil || 16,
+      'Pertemuan Genap': r.totalMeetingsGenap || 16,
       'Status': r.status,
       'Tgl Dibuat': new Date(r.createdAt).toLocaleDateString('id-ID'),
       'Catatan Revisi': r.revisionNotes || '-'
@@ -187,20 +151,62 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
     exportToExcel(dataToExport, `Data_Persetujuan_RPP`);
   };
 
+  const handlePrint = () => {
+    const title = 'Data Persetujuan RPP Tahunan';
+    const subtitle = 'Semua Status';
+    const headers = ['No', 'Guru Pengajar', 'Mata Pelajaran', 'Kelas', 'Tahun Ajaran', 'Status'];
+    const dataRows = filteredRpps.map((r, idx) => [
+      idx + 1, r.teacher?.name || r.teacherId, r.subject?.name || r.subjectId, r.class?.name || r.classId, r.academicYear?.name || r.academicYearId, r.status
+    ]);
+    printGenericTable(title, subtitle, headers, dataRows);
+  };
+
+  const handleDownloadPDFTable = () => {
+    const title = 'Data Persetujuan RPP Tahunan';
+    const subtitle = `Total: ${filteredRpps.length} Dokumen RPP Kurikulum Merdeka`;
+    const headers = ['No', 'Guru Pengajar', 'Mata Pelajaran', 'Kelas', 'Tahun Ajaran', 'Pertemuan', 'Status'];
+    const dataRows = filteredRpps.map((r, idx) => [
+      idx + 1,
+      r.teacher?.name || r.teacherId,
+      r.subject?.name || r.subjectId,
+      `Kelas ${r.class?.name || r.classId}`,
+      `TA ${r.academicYear?.name || r.academicYearId}`,
+      `G: ${r.totalMeetingsGanjil || 16} | Gn: ${r.totalMeetingsGenap || 16}`,
+      r.status
+    ]);
+    downloadRekapSantriPdf(title, subtitle, headers, dataRows, `Rekap_Persetujuan_RPP_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
+  const handleWhatsApp = () => {
+    const title = 'Laporan Status Persetujuan RPP';
+    let text = ``;
+    text += filteredRpps.slice(0, 50).map(r => `- ${r.teacher?.name || r.teacherId} (${r.subject?.name || r.subjectId}, Kelas ${r.class?.name || r.classId}): *${r.status}*`).join('\n');
+    if (filteredRpps.length > 50) text += `\n...dan ${filteredRpps.length - 50} data lainnya.`;
+    shareToWhatsApp(title, text);
+  };
+
   const statusBadge = (status: string) => {
     const base = 'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border';
-    if (status === 'Disetujui') return `${base} bg-indigo-50 text-indigo-800 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30`;
-    if (status === 'Menunggu Persetujuan') return `${base} bg-amber-50 text-amber-800 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400`;
-    if (status === 'Revisi') return `${base} bg-rose-50 text-rose-800 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400`;
+    if (status === 'Disetujui') return `${base} bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/40`;
+    if (status === 'Menunggu Persetujuan') return `${base} bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/40`;
+    if (status === 'Revisi') return `${base} bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/40`;
     return `${base} bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400`;
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={`fixed bottom-5 right-5 z-[90] px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 text-xs font-bold transition-all transform animate-bounce-short ${toastMessage.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}`}>
+          {toastMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          <span>{toastMessage.text}</span>
+        </div>
+      )}
+
       {/* Title */}
       <div>
         <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Persetujuan RPP Tahunan</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review dan setujui RPP Kurikulum Merdeka yang diajukan oleh guru.</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review, setujui, beri catatan revisi, dan unduh dokumen RPP Kurikulum Merdeka para guru.</p>
       </div>
 
       {/* Filter */}
@@ -216,15 +222,21 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
             className="bg-transparent border-none text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
             <option value="Semua">Semua Status</option>
-            <option value="Menunggu Persetujuan">Menunggu</option>
+            <option value="Menunggu Persetujuan">Menunggu Persetujuan</option>
             <option value="Disetujui">Disetujui</option>
-            <option value="Revisi">Revisi</option>
+            <option value="Revisi">Perlu Revisi</option>
+            <option value="Draft">Draft</option>
           </select>
         </div>
-        <button onClick={handleExport} className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 whitespace-nowrap">
-          <Download className="w-4 h-4" /><span>Export</span>
-        </button>
       </div>
+
+      <ExportBar 
+        onExportExcel={handleExport}
+        onPrint={handlePrint}
+        onDownloadPDF={handleDownloadPDFTable}
+        onWhatsApp={handleWhatsApp}
+        itemName="Persetujuan RPP"
+      />
 
       {/* RPP list */}
       <div className="space-y-3">
@@ -234,39 +246,101 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
             <p className="text-sm font-medium">Tidak ada RPP yang sesuai filter.</p>
           </div>
         ) : filteredRpps.map((rpp, index) => (
-          <div key={rpp.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs overflow-hidden">
+          <div key={rpp.id} className={`bg-white dark:bg-slate-900 rounded-2xl border shadow-xs overflow-hidden transition hover:shadow-md ${rpp.status === 'Revisi' ? 'border-rose-200 dark:border-rose-900/40' : rpp.status === 'Disetujui' ? 'border-emerald-200 dark:border-emerald-900/40' : 'border-slate-100 dark:border-slate-800/80'}`}>
             {/* Row */}
-            <div className="p-5 flex items-center justify-between gap-4">
-              <div className="flex items-center space-x-4 min-w-0">
-                <span className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-extrabold text-slate-500 flex-shrink-0">{index + 1}</span>
+            <div className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center space-x-3.5 min-w-0">
+                <span className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-extrabold text-slate-500 flex-shrink-0 mt-0.5 sm:mt-0">{index + 1}</span>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-extrabold text-slate-800 dark:text-slate-100">{rpp.teacher?.name}</span>
+                    <span className="font-extrabold text-slate-800 dark:text-slate-100">{rpp.teacher?.name || rpp.teacherId}</span>
                     <span className="text-slate-300 dark:text-slate-700">|</span>
-                    <span className="font-semibold text-indigo-700 dark:text-indigo-400">{rpp.subject?.name}</span>
+                    <span className="font-bold text-indigo-700 dark:text-indigo-400">{rpp.subject?.name || rpp.subjectId}</span>
                     <span className="text-slate-300 dark:text-slate-700">|</span>
-                    <span className="text-xs font-bold text-slate-500">Kelas {rpp.class?.name}</span>
-                    <span className="text-xs text-slate-400 font-mono">TA {rpp.academicYear?.name}</span>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Kelas {rpp.class?.name || rpp.classId}</span>
+                    <span className="text-xs text-slate-400 font-mono">TA {rpp.academicYear?.name || rpp.academicYearId}</span>
                   </div>
-                  <div className="flex items-center gap-3 mt-1 text-[11px] text-slate-400">
-                    <span>Ganjil: <strong>{rpp.totalMeetingsGanjil}</strong> ptm</span>
-                    <span>Genap: <strong>{rpp.totalMeetingsGenap}</strong> ptm</span>
+                  <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-400 flex-wrap">
+                    <span>Ganjil: <strong>{rpp.totalMeetingsGanjil || 16}</strong> ptm</span>
+                    <span>Genap: <strong>{rpp.totalMeetingsGenap || 16}</strong> ptm</span>
                     <span>Silabus: <strong>{(rpp.syllabusItems || []).length}</strong> entri</span>
+                    {rpp.updatedAt && <span className="text-slate-400">&bull; Update: {new Date(rpp.updatedAt).toLocaleDateString('id-ID')}</span>}
                   </div>
+                  {rpp.status === 'Revisi' && rpp.revisionNotes && (
+                    <div className="mt-2 text-[11px] text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 px-2.5 py-1 rounded-lg border border-rose-200 dark:border-rose-900/40 inline-flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span>Catatan: <em>"{rpp.revisionNotes}"</em></span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center space-x-2 flex-shrink-0">
-                <span className={statusBadge(rpp.status)}>{rpp.status === 'Menunggu Persetujuan' ? 'Antrean' : rpp.status}</span>
-                <button onClick={() => openDetailModal(rpp)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center space-x-1 transition">
-                  <Eye className="w-3.5 h-3.5" /><span>Review</span>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-1.5 flex-wrap flex-shrink-0 self-end lg:self-center">
+                <span className={statusBadge(rpp.status)}>
+                  {rpp.status === 'Menunggu Persetujuan' ? 'Antrean' : rpp.status}
+                </span>
+
+                {/* Tombol Download PDF Langsung */}
+                <button
+                  onClick={() => downloadRPPPdf(rpp)}
+                  title="Download File RPP PDF"
+                  className="px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/30 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800/80 text-sky-700 dark:text-sky-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">PDF</span>
                 </button>
-                <button onClick={() => setDeleteConfirmRpp(rpp)}
-                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 transition" title="Hapus">
+
+                {/* Tombol Terima RPP */}
+                {rpp.status !== 'Disetujui' && (
+                  <button
+                    onClick={() => setApproveConfirmRpp(rpp)}
+                    title="Terima & Setujui RPP ini"
+                    className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Terima RPP</span>
+                  </button>
+                )}
+
+                {/* Tombol Minta Revisi */}
+                <button
+                  onClick={() => {
+                    setRevisionModalRpp(rpp);
+                    setQuickRevisionNotes(rpp.revisionNotes || '');
+                  }}
+                  title="Kirim Catatan Revisi ke Guru"
+                  className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800/80 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                  <span className="hidden sm:inline">Perlu Revisi</span>
+                </button>
+
+                {/* Tombol Review Detail */}
+                <button
+                  onClick={() => openDetailModal(rpp)}
+                  title="Lihat Rincian RPP Lengkap"
+                  className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center space-x-1 transition cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+                  <span>Review</span>
+                </button>
+
+                {/* Tombol Hapus */}
+                <button
+                  onClick={() => setDeleteConfirmRpp(rpp)}
+                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 transition cursor-pointer"
+                  title="Hapus RPP"
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setExpandedRppId(expandedRppId === rpp.id ? null : rpp.id)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+
+                {/* Tombol Accordion */}
+                <button
+                  onClick={() => setExpandedRppId(expandedRppId === rpp.id ? null : rpp.id)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  title="Tampilkan ringkasan isi"
+                >
                   {expandedRppId === rpp.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
               </div>
@@ -274,20 +348,26 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
 
             {/* Quick expand preview — format Kurikulum Merdeka */}
             {expandedRppId === rpp.id && (
-              <div className="border-t border-slate-100 dark:border-slate-800 p-5 text-xs text-slate-600 dark:text-slate-400 space-y-3">
+              <div className="border-t border-slate-100 dark:border-slate-800 p-5 text-xs text-slate-600 dark:text-slate-400 space-y-3 bg-slate-50/40 dark:bg-slate-950/20">
                 {rpp.capaiPembelajaran && (
                   <div>
-                    <p className="font-bold text-indigo-700 dark:text-indigo-400 mb-1">Capaian Pembelajaran</p>
-                    <p className="whitespace-pre-wrap">{rpp.capaiPembelajaran}</p>
+                    <p className="font-bold text-indigo-700 dark:text-indigo-400 mb-1">Capaian Pembelajaran (CP)</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{rpp.capaiPembelajaran}</p>
                   </div>
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {rpp.tujuanPembelajaran && (
+                  <div>
+                    <p className="font-bold text-blue-700 dark:text-blue-400 mb-1">Tujuan Pembelajaran (TP)</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{rpp.tujuanPembelajaran}</p>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                   <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20">
-                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Materi Ganjil ({rpp.totalMeetingsGanjil} pertemuan)</p>
+                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Materi Ganjil ({rpp.totalMeetingsGanjil || 16} pertemuan)</p>
                     <p className="whitespace-pre-wrap">{rpp.materiGanjil || '-'}</p>
                   </div>
                   <div className="p-3 rounded-xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/20">
-                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Materi Genap ({rpp.totalMeetingsGenap} pertemuan)</p>
+                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Materi Genap ({rpp.totalMeetingsGenap || 16} pertemuan)</p>
                     <p className="whitespace-pre-wrap">{rpp.materiGenap || '-'}</p>
                   </div>
                 </div>
@@ -299,11 +379,11 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
 
       {/* ===== MODAL DETAIL & REVIEW ===== */}
       {selectedRpp && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
             {/* Modal header */}
             <div className="bg-indigo-800 px-6 py-4 flex items-center justify-between text-white flex-shrink-0">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <BookOpen className="w-5 h-5 text-indigo-200" />
                 <div>
                   <h3 className="font-extrabold text-sm uppercase tracking-wider">{selectedRpp.subject?.name}</h3>
@@ -311,10 +391,27 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <button onClick={() => printRPP(selectedRpp)} className="p-1.5 rounded-lg hover:bg-indigo-700/80 text-indigo-100 transition" title="Cetak RPP">
-                  <Printer className="w-4.5 h-4.5" />
+                <button
+                  onClick={() => printRPP(selectedRpp)}
+                  className="p-2 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white transition flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                  title="Print Cetak Fisik"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span className="hidden sm:inline">Print</span>
                 </button>
-                <button onClick={() => setSelectedRpp(null)} className="p-1.5 rounded-lg hover:bg-indigo-700/80 transition">
+                <button
+                  onClick={() => downloadRPPPdf(selectedRpp)}
+                  className="p-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white transition flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-xs"
+                  title="Download File PDF"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Download PDF</span>
+                </button>
+                <button
+                  onClick={() => setSelectedRpp(null)}
+                  className="p-2 rounded-lg hover:bg-indigo-700 transition cursor-pointer"
+                  title="Tutup Modal"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -324,12 +421,12 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
             <div className="p-6 overflow-y-auto flex-1 space-y-5 text-xs">
 
               {/* A. Identitas */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-950/20">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/20">
                 <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mata Pelajaran</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">{selectedRpp.subject?.name}</p></div>
                 <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Kelas</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">Kelas {selectedRpp.class?.name}</p></div>
                 <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tahun Ajaran</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">TA {selectedRpp.academicYear?.name}</p></div>
-                <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pertemuan</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">G: {selectedRpp.totalMeetingsGanjil} &bull; Gnp: {selectedRpp.totalMeetingsGenap}</p></div>
-                <div className="md:col-span-2"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Profil Pelajar</span><p className="text-slate-700 dark:text-slate-300 mt-0.5">{selectedRpp.profilPelajar || '-'}</p></div>
+                <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pertemuan</span><p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">Ganjil: {selectedRpp.totalMeetingsGanjil || 16} &bull; Genap: {selectedRpp.totalMeetingsGenap || 16}</p></div>
+                <div className="md:col-span-2"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Profil Pelajar Pancasila</span><p className="text-slate-700 dark:text-slate-300 mt-0.5">{selectedRpp.profilPelajar || '-'}</p></div>
                 <div className="col-span-2 md:col-span-3"><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sarana & Prasarana</span><p className="text-slate-700 dark:text-slate-300 mt-0.5">{selectedRpp.sarana || '-'}</p></div>
               </div>
 
@@ -357,11 +454,11 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
                 <h4 className="font-black text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5 uppercase tracking-wider mb-3">II. Materi Pembelajaran</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/20">
-                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Semester Ganjil ({selectedRpp.totalMeetingsGanjil} pertemuan)</p>
+                    <p className="font-extrabold text-blue-700 dark:text-blue-400 mb-1">Semester Ganjil ({selectedRpp.totalMeetingsGanjil || 16} pertemuan)</p>
                     <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.materiGanjil || '-'}</p>
                   </div>
                   <div className="p-3 rounded-xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/20">
-                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Semester Genap ({selectedRpp.totalMeetingsGenap} pertemuan)</p>
+                    <p className="font-extrabold text-violet-700 dark:text-violet-400 mb-1">Semester Genap ({selectedRpp.totalMeetingsGenap || 16} pertemuan)</p>
                     <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">{selectedRpp.materiGenap || '-'}</p>
                   </div>
                 </div>
@@ -470,9 +567,9 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
 
               {/* Revisi info */}
               {selectedRpp.status === 'Revisi' && (
-                <div className="p-4 rounded-xl border border-rose-100 dark:border-rose-900/30 bg-rose-50/10 text-rose-800 dark:text-rose-400">
-                  <span className="font-extrabold uppercase tracking-wide block mb-1">Catatan Revisi Aktif</span>
-                  <p><em>"{selectedRpp.revisionNotes}"</em></p>
+                <div className="p-4 rounded-xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/30 dark:bg-rose-950/20 text-rose-800 dark:text-rose-300">
+                  <span className="font-extrabold uppercase tracking-wide block mb-1">Catatan Revisi Saat Ini</span>
+                  <p className="italic font-medium">"{selectedRpp.revisionNotes}"</p>
                 </div>
               )}
             </div>
@@ -480,49 +577,70 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
             {/* Modal footer — review form */}
             <div className="border-t border-slate-100 dark:border-slate-800 p-5 bg-slate-50/40 dark:bg-slate-950/15 flex-shrink-0">
               {!isReviewMode ? (
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                   <div className="flex items-center space-x-2 text-xs">
-                    <span className="text-slate-400 font-semibold uppercase">Status:</span>
+                    <span className="text-slate-400 font-semibold uppercase">Status Saat Ini:</span>
                     <span className={statusBadge(selectedRpp.status)}>{selectedRpp.status}</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <button onClick={() => setDeleteConfirmRpp(selectedRpp)}
-                      className="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition">
+                  <div className="flex items-center space-x-2 flex-wrap">
+                    <button
+                      onClick={() => setDeleteConfirmRpp(selectedRpp)}
+                      className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition cursor-pointer"
+                    >
                       <Trash2 className="w-3.5 h-3.5"/><span>Hapus</span>
                     </button>
-                    {selectedRpp.status === 'Menunggu Persetujuan' && (
-                      <button onClick={() => setIsReviewMode(true)}
-                        className="px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition">
-                        Mulai Review
+                    
+                    {/* Tombol Terima RPP langsung */}
+                    {selectedRpp.status !== 'Disetujui' && (
+                      <button
+                        onClick={() => {
+                          setApproveConfirmRpp(selectedRpp);
+                        }}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Terima RPP</span>
                       </button>
                     )}
+
+                    {/* Tombol Minta Revisi */}
+                    <button
+                      onClick={() => {
+                        setReviewStatus('Revisi');
+                        setIsReviewMode(true);
+                      }}
+                      className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Minta Revisi</span>
+                    </button>
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                <form onSubmit={handleReviewSubmit} className="space-y-4 animate-fade-in">
                   {errorMessage && <div className="p-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 flex items-center space-x-2 text-xs"><AlertCircle className="w-4 h-4"/><span>{errorMessage}</span></div>}
-                  {successMessage && <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center space-x-2 text-xs"><Check className="w-4 h-4"/><span>{successMessage}</span></div>}
+                  {successMessage && <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center space-x-2 text-xs"><Check className="w-4 h-4"/><span>{successMessage}</span></div>}
                   <div className="flex items-center space-x-4">
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Hasil Review:</span>
                     <label className="flex items-center space-x-1.5 cursor-pointer">
-                      <input type="radio" name="rv" checked={reviewStatus === 'Disetujui'} onChange={() => setReviewStatus('Disetujui')} className="text-indigo-600"/>
-                      <span className="text-xs font-bold text-indigo-700 uppercase">Setujui</span>
+                      <input type="radio" name="rv" checked={reviewStatus === 'Disetujui'} onChange={() => setReviewStatus('Disetujui')} className="text-emerald-600 focus:ring-emerald-500"/>
+                      <span className="text-xs font-bold text-emerald-700 uppercase">Setujui RPP</span>
                     </label>
                     <label className="flex items-center space-x-1.5 cursor-pointer">
-                      <input type="radio" name="rv" checked={reviewStatus === 'Revisi'} onChange={() => setReviewStatus('Revisi')} className="text-rose-600"/>
-                      <span className="text-xs font-bold text-rose-700 uppercase">Minta Revisi</span>
+                      <input type="radio" name="rv" checked={reviewStatus === 'Revisi'} onChange={() => setReviewStatus('Revisi')} className="text-rose-600 focus:ring-rose-500"/>
+                      <span className="text-xs font-bold text-rose-700 uppercase">Minta Revisi Guru</span>
                     </label>
                   </div>
                   {reviewStatus === 'Revisi' && (
-                    <textarea required rows={3} placeholder="Tuliskan catatan revisi untuk guru..."
+                    <textarea required rows={3} placeholder="Tuliskan catatan detail revisi yang perlu diperbaiki oleh guru..."
                       value={revisionNotes} onChange={e => setRevisionNotes(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-rose-500"/>
+                      className="w-full px-4 py-2.5 rounded-xl border border-rose-200 dark:border-rose-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-rose-500"/>
                   )}
                   <div className="flex justify-end space-x-2 pt-1">
                     <button type="button" onClick={() => setIsReviewMode(false)}
-                      className="px-4 py-2 text-slate-500 hover:bg-slate-50 rounded-xl text-xs font-bold uppercase tracking-wider">Kembali</button>
+                      className="px-4 py-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer">Batal</button>
                     <button type="submit"
-                      className={`px-5 py-2.5 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition ${reviewStatus === 'Disetujui' ? 'bg-indigo-700 hover:bg-indigo-800' : 'bg-rose-600 hover:bg-rose-700'}`}>
+                      className={`px-5 py-2.5 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition cursor-pointer ${reviewStatus === 'Disetujui' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'}`}>
                       Kirim Keputusan
                     </button>
                   </div>
@@ -533,9 +651,98 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
         </div>
       )}
 
+      {/* ===== MODAL QUICK KONFIRMASI TERIMA RPP ===== */}
+      {approveConfirmRpp && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-[70] animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md border border-slate-100 dark:border-slate-800 shadow-2xl p-6 space-y-5">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400"/>
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">Terima & Setujui RPP?</h3>
+                <p className="text-xs text-slate-500 mt-0.5">RPP akan resmi disetujui untuk pelaksanaan KBM.</p>
+              </div>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1.5 text-xs">
+              <p className="text-slate-500">Guru: <span className="font-bold text-slate-700 dark:text-slate-200">{approveConfirmRpp.teacher?.name || approveConfirmRpp.teacherId}</span></p>
+              <p className="text-slate-500">Mata Pelajaran: <span className="font-bold text-slate-700 dark:text-slate-200">{approveConfirmRpp.subject?.name || approveConfirmRpp.subjectId}</span></p>
+              <p className="text-slate-500">Kelas: <span className="font-bold text-slate-700 dark:text-slate-200">Kelas {approveConfirmRpp.class?.name || approveConfirmRpp.classId}</span></p>
+              <p className="text-slate-500">Tahun Ajaran: <span className="font-bold text-slate-700 dark:text-slate-200">TA {approveConfirmRpp.academicYear?.name || approveConfirmRpp.academicYearId}</span></p>
+            </div>
+            <div className="flex justify-end space-x-2 pt-1">
+              <button onClick={() => setApproveConfirmRpp(null)} disabled={isApproving}
+                className="px-4 py-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition disabled:opacity-50 cursor-pointer">Batal</button>
+              <button onClick={handleDirectApprove} disabled={isApproving}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 disabled:opacity-60 cursor-pointer">
+                <Check className="w-3.5 h-3.5"/><span>{isApproving ? 'Menyetujui...' : 'Ya, Terima & Setujui'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== MODAL QUICK MINTA REVISI RPP ===== */}
+      {revisionModalRpp && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-[70] animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg border border-slate-100 dark:border-slate-800 shadow-2xl p-6 space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/30 flex items-center justify-center flex-shrink-0">
+                <RotateCcw className="w-5 h-5 text-rose-600 dark:text-rose-400"/>
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">Instruksi Revisi RPP</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Catatan ini akan langsung tampil di akun Guru terkait.</p>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1 text-xs">
+              <p className="text-slate-600 dark:text-slate-300">
+                <strong>{revisionModalRpp.subject?.name}</strong> &bull; Kelas {revisionModalRpp.class?.name} &bull; Guru: <strong>{revisionModalRpp.teacher?.name}</strong>
+              </p>
+            </div>
+
+            <form onSubmit={handleDirectRevisionSubmit} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+                  Catatan / Bagian yang Perlu Diperbaiki: <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="Contoh: Harap lengkapi tujuan pembelajaran pertemuan 3-6, sesuaikan asesmen formatif, dan perjelas silabus semester genap..."
+                  value={quickRevisionNotes}
+                  onChange={e => setQuickRevisionNotes(e.target.value)}
+                  className="w-full p-3 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 text-slate-800 dark:text-slate-100"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setRevisionModalRpp(null); setQuickRevisionNotes(''); }}
+                  disabled={isSubmittingRevision}
+                  className="px-4 py-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition disabled:opacity-50 cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingRevision}
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 disabled:opacity-60 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5"/>
+                  <span>{isSubmittingRevision ? 'Mengirim...' : 'Kirim Catatan Revisi'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* ===== MODAL KONFIRMASI HAPUS ===== */}
       {deleteConfirmRpp && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-[60]">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-[70] animate-fade-in">
           <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md border border-slate-100 dark:border-slate-800 shadow-2xl p-6 space-y-5">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/30 flex items-center justify-center flex-shrink-0">
@@ -551,13 +758,13 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
               <p className="text-slate-500">Mata Pelajaran: <span className="font-bold text-slate-700 dark:text-slate-200">{deleteConfirmRpp.subject?.name}</span></p>
               <p className="text-slate-500">Kelas: <span className="font-bold text-slate-700 dark:text-slate-200">Kelas {deleteConfirmRpp.class?.name}</span></p>
               <p className="text-slate-500">Tahun Ajaran: <span className="font-bold text-slate-700 dark:text-slate-200">TA {deleteConfirmRpp.academicYear?.name}</span></p>
-              <p className="text-slate-500">Status: <span className={`font-bold ${deleteConfirmRpp.status==='Disetujui'?'text-indigo-600':deleteConfirmRpp.status==='Menunggu Persetujuan'?'text-amber-600':deleteConfirmRpp.status==='Revisi'?'text-rose-600':'text-slate-500'}`}>{deleteConfirmRpp.status}</span></p>
+              <p className="text-slate-500">Status: <span className={`font-bold ${deleteConfirmRpp.status==='Disetujui'?'text-emerald-600':deleteConfirmRpp.status==='Menunggu Persetujuan'?'text-amber-600':deleteConfirmRpp.status==='Revisi'?'text-rose-600':'text-slate-500'}`}>{deleteConfirmRpp.status}</span></p>
             </div>
             <div className="flex justify-end space-x-2 pt-1">
               <button onClick={() => setDeleteConfirmRpp(null)} disabled={isDeleting}
-                className="px-4 py-2.5 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition disabled:opacity-50">Batal</button>
+                className="px-4 py-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition disabled:opacity-50 cursor-pointer">Batal</button>
               <button onClick={handleDeleteConfirm} disabled={isDeleting}
-                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 disabled:opacity-60">
+                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-sm transition flex items-center space-x-1.5 disabled:opacity-60 cursor-pointer">
                 <Trash2 className="w-3.5 h-3.5"/><span>{isDeleting ? 'Menghapus...' : 'Ya, Hapus'}</span>
               </button>
             </div>
@@ -567,3 +774,4 @@ export default function ManageRPPs({ rpps, onRefresh }: ManageRPPsProps) {
     </div>
   );
 }
+

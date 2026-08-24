@@ -192,7 +192,7 @@ export default function WaliKelasPage({ teachers, classes, academicYears, semest
                           <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                         </div>
                         <span className="font-bold text-slate-800 dark:text-slate-100">
-                          Kelas {(w as any).class?.name || classes.find(c => c.id === w.classId)?.name || w.classId}
+                          {(w as any).class?.name || classes.find(c => c.id === w.classId)?.name || w.classId}
                         </span>
                       </div>
                     </td>

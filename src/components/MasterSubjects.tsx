@@ -155,7 +155,8 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
 
         {/* Subjects Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          {/* Desktop Table */}
+          <table className="w-full text-left border-collapse hidden sm:table">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50/10">
                 <th className="p-4 w-12 text-center">No</th>
@@ -205,12 +206,53 @@ export default function MasterSubjects({ subjects, onRefresh }: MasterSubjectsPr
               ) : (
                 <tr>
                   <td colSpan={4} className="p-8 text-center text-slate-400">
-                    Tidak ditemukan mata pelajaran yang cocok dengan kriteria Anda.
+                    Tidak ditemukan mata pelajaran yang cocok dengan pencarian Anda.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+
+          {/* Mobile Card List */}
+          <div className="block sm:hidden divide-y divide-slate-50 dark:divide-slate-800">
+            {filteredSubjects.length > 0 ? (
+              filteredSubjects.map((subject, index) => (
+                <div key={subject.id} className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-xs max-w-[70%]">{subject.name}</h4>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold border
+                      ${subject.category === 'Al-Qur\'an' ? 'bg-indigo-50 text-indigo-850 border-indigo-100 dark:bg-indigo-950/25 dark:text-indigo-400 dark:border-indigo-900/30' : ''}
+                      ${subject.category === 'Diniyah' ? 'bg-teal-50 text-teal-850 border-teal-100 dark:bg-teal-950/25 dark:text-teal-400 dark:border-teal-900/30' : ''}
+                      ${subject.category === 'Bahasa' ? 'bg-indigo-50 text-indigo-850 border-indigo-100 dark:bg-indigo-950/25 dark:text-indigo-400 dark:border-indigo-900/30' : ''}
+                      ${subject.category === 'Umum' ? 'bg-slate-50 text-slate-700 border-slate-100 dark:bg-slate-800 dark:text-slate-350 dark:border-slate-700' : ''}
+                    `}>
+                      {subject.category}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-50 dark:border-slate-800/80">
+                    <button
+                      onClick={() => openEditModal(subject)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 text-xs font-semibold cursor-pointer"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(subject)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 text-rose-500 text-xs font-semibold cursor-pointer"
+                    >
+                      <Trash className="w-3.5 h-3.5" />
+                      <span>Hapus</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-8 text-center text-slate-400 text-xs">
+                Tidak ditemukan mata pelajaran yang cocok.
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

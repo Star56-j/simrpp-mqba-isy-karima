@@ -1,0 +1,20 @@
+INSERT OR IGNORE INTO teachers (id, name) VALUES ('t-29', 'Usth. Hasna Halimatun Basyaria, S.Ag., Al Hafizhah');
+INSERT OR IGNORE INTO teachers (id, name) VALUES ('t-30', 'Ust. Sahmura Maulana al-Maghribi, S.Mat, M.Mat');
+INSERT OR IGNORE INTO teachers (id, name) VALUES ('t-31', 'Ust. Fuad Hanafi, S.Pd');
+INSERT OR IGNORE INTO teachers (id, name) VALUES ('t-32', 'Ust. Ahmad al Musthofa, S.Pd');
+
+DELETE FROM wali_kelas;
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-1', 't-5', 'cls-1', 'ay-1', 'sem-1');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-2', 't-5', 'cls-1', 'ay-1', 'sem-2');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-3', 't-29', 'cls-2', 'ay-1', 'sem-1');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-4', 't-29', 'cls-2', 'ay-1', 'sem-2');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-5', 't-12', 'cls-3', 'ay-1', 'sem-1');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-6', 't-12', 'cls-3', 'ay-1', 'sem-2');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-7', 't-27', 'cls-4', 'ay-1', 'sem-1');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-8', 't-27', 'cls-4', 'ay-1', 'sem-2');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-9', 't-4', 'cls-5', 'ay-1', 'sem-1');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-10', 't-4', 'cls-5', 'ay-1', 'sem-2');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-11', 't-29', 'cls-6', 'ay-1', 'sem-1');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-12', 't-29', 'cls-6', 'ay-1', 'sem-2');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-13', 't-25', 'cls-7', 'ay-1', 'sem-1');
+INSERT INTO wali_kelas (id, teacher_id, class_id, academic_year_id, semester_id) VALUES ('w-14', 't-25', 'cls-7', 'ay-1', 'sem-2');

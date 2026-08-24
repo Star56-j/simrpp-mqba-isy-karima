@@ -240,7 +240,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                       type="text"
                       autoComplete="username"
                       required
-                      placeholder={loginType === 'walikelas' ? "contoh: wali.hasri" : "contoh: ustadz.aidil"}
+                      placeholder="Masukkan username atau email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full rounded-xl border border-white/15 bg-white/10 backdrop-blur-md py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white focus:border-white/40 focus:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 transition-all duration-200 placeholder:text-sky-200/40"
@@ -282,7 +282,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               </>
             ) : (
               <div className="space-y-1.5 relative z-10">
-                <label htmlFor="nis" className="block text-[11px] font-bold uppercase tracking-wider text-sky-200/90">Nama Lengkap Santri</label>
+                <label htmlFor="nis" className="block text-[11px] font-bold uppercase tracking-wider text-sky-200/90">NIS atau Nama Lengkap Santri</label>
                 <div className="relative">
                   <GraduationCap className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-sky-200/70" />
                   <input
@@ -290,13 +290,13 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     name="nis"
                     type="text"
                     required
-                    placeholder="Contoh: Ahmad Abdullah"
+                    placeholder="Contoh: 2026001 atau Ahmad Ajyad"
                     value={nis}
                     onChange={(e) => setNis(e.target.value)}
                     className="w-full rounded-xl border border-white/15 bg-white/10 backdrop-blur-md py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white focus:border-white/40 focus:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 transition-all duration-200 placeholder:text-sky-200/40"
                   />
                 </div>
-                <p className="text-[11px] text-sky-200/70 pt-0.5">Masukkan nama lengkap santri untuk mengakses portal wali.</p>
+                <p className="text-[11px] text-sky-200/70 pt-0.5">Masukkan NIS atau nama lengkap santri untuk masuk ke portal wali santri.</p>
               </div>
             )}
 
@@ -365,7 +365,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     <input
                       type="text"
                       required
-                      placeholder="contoh: ustadz.aidil"
+                      placeholder="Masukkan username atau email"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl border border-slate-300  bg-white  text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition text-slate-800 "

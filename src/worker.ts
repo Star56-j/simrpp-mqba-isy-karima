@@ -308,6 +308,39 @@ api.get('/wali_kelas', async (c) => {
   }
 });
 
+// Attendance Summary endpoint
+api.get('/attendances/summary', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT a.*, t.name as teacherName
+      FROM attendances a
+      LEFT JOIN teachers t ON a.teacher_id = t.id
+    `).all();
+
+    const summary: Record<string, any> = {};
+    for (const a of results as any[]) {
+      const tId = (a.teacher_id && a.teacher_id !== 'pengajar') ? a.teacher_id : 't-12';
+      const tName = a.teacherName || 'Ust. Aidil Aqli, S.Ag.';
+      if (!summary[tId]) {
+        summary[tId] = { teacherId: tId, teacherName: tName, hadir: 0, izin: 0, sakit: 0, alpha: 0, total: 0, persentaseHadir: 0 };
+      }
+      if (a.status === 'Hadir') summary[tId].hadir++;
+      if (a.status === 'Izin') summary[tId].izin++;
+      if (a.status === 'Sakit') summary[tId].sakit++;
+      if (a.status === 'Alpha') summary[tId].alpha++;
+      summary[tId].total++;
+    }
+
+    const list = Object.values(summary).map((s: any) => {
+      s.persentaseHadir = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+      return s;
+    });
+    return c.json(list);
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 // Special GET for attendances with teacher name join
 api.get('/attendances', async (c) => {
   try {
@@ -358,6 +391,47 @@ api.get('/attendances', async (c) => {
       };
     });
     return c.json(mapped);
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// Santri Attendance Summary endpoint
+api.get('/santri_attendances/summary', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT sa.*, c.name as className
+      FROM santri_attendances sa
+      LEFT JOIN classes c ON sa.class_id = c.id
+    `).all();
+
+    const summary: Record<string, any> = {};
+    for (const a of results as any[]) {
+      if (!a.class_id) continue;
+      if (!summary[a.class_id]) {
+        summary[a.class_id] = {
+          classId: a.class_id,
+          className: a.className || 'Kelas',
+          hadir: 0,
+          izin: 0,
+          sakit: 0,
+          alpha: 0,
+          total: 0,
+          rataHadir: 0
+        };
+      }
+      if (a.status === 'Hadir') summary[a.class_id].hadir++;
+      if (a.status === 'Izin') summary[a.class_id].izin++;
+      if (a.status === 'Sakit') summary[a.class_id].sakit++;
+      if (a.status === 'Alpha') summary[a.class_id].alpha++;
+      summary[a.class_id].total++;
+    }
+
+    const list = Object.values(summary).map((s: any) => {
+      s.rataHadir = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+      return s;
+    });
+    return c.json(list);
   } catch (e: any) {
     return c.json({ error: e.message }, 500);
   }

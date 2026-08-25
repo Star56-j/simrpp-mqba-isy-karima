@@ -444,12 +444,57 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
                       </button>
                     </div>
                   </div>
+
+                  {/* 3 Dropdown Mudah: Tanggal, Bulan, Tahun */}
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <select
+                      value={fDate ? parseInt(fDate.split('-')[2], 10) : new Date().getDate()}
+                      onChange={(e) => {
+                        const [y, m] = (fDate || todayStr).split('-');
+                        const d = String(e.target.value).padStart(2, '0');
+                        setFDate(`${y}-${m}-${d}`);
+                      }}
+                      className="px-2 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                        <option key={d} value={d}>Tgl {d}</option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={fDate ? parseInt(fDate.split('-')[1], 10) : (new Date().getMonth() + 1)}
+                      onChange={(e) => {
+                        const [y, _, d] = (fDate || todayStr).split('-');
+                        const m = String(e.target.value).padStart(2, '0');
+                        setFDate(`${y}-${m}-${d}`);
+                      }}
+                      className="px-2 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {MONTHS.map((m, idx) => (
+                        <option key={m} value={idx + 1}>{m}</option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={fDate ? fDate.split('-')[0] : new Date().getFullYear().toString()}
+                      onChange={(e) => {
+                        const [_, m, d] = (fDate || todayStr).split('-');
+                        setFDate(`${e.target.value}-${m}-${d}`);
+                      }}
+                      className="px-2 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {['2024', '2025', '2026', '2027', '2028'].map((yr) => (
+                        <option key={yr} value={yr}>{yr}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Kalender interaktif tambahan */}
                   <input
                     type="date"
                     value={fDate}
                     onChange={e => setFDate(e.target.value)}
-                    onClick={e => (e.currentTarget as any).showPicker?.()}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                    className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div className="space-y-1.5">

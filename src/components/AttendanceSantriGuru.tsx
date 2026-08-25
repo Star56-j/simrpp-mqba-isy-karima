@@ -34,7 +34,13 @@ export default function AttendanceSantriGuru({
   const currentMonth = (new Date().getMonth() + 1).toString();
   const todayStr     = new Date().toISOString().split('T')[0];
 
-  const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+  const myUser = React.useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+    } catch {
+      return {};
+    }
+  }, []);
   const currentUser = myUser;
   const isWaliRole = myUser.role === 'WaliKelas';
   const isAdminRole = myUser.role === 'Admin';
@@ -47,7 +53,9 @@ export default function AttendanceSantriGuru({
       myUser.id
     ].filter(Boolean);
   }, [myUser]);
-  const myTeacherId = myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || 't-12';
+  const myTeacherId = React.useMemo(() => {
+    return myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || 't-12';
+  }, [myUser]);
 
   // Jadwal mengajar guru yang login
   const mySchedules = React.useMemo(() => {
@@ -563,13 +571,35 @@ export default function AttendanceSantriGuru({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal Absensi</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal Absensi</label>
+                    <div className="flex items-center space-x-1">
+                      <button
+                        type="button"
+                        onClick={() => setFDate(todayStr)}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold hover:bg-indigo-100 transition cursor-pointer"
+                      >
+                        Hari Ini
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date();
+                          d.setDate(d.getDate() - 1);
+                          setFDate(d.toISOString().split('T')[0]);
+                        }}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 transition cursor-pointer"
+                      >
+                        Kemarin
+                      </button>
+                    </div>
+                  </div>
                   <input
                     type="date"
                     value={fDate}
-                    max={todayStr}
                     onChange={e => setFDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    onClick={e => (e.currentTarget as any).showPicker?.()}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                   />
                 </div>
               </div>

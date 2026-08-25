@@ -28,7 +28,14 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
   const currentMonth = (new Date().getMonth() + 1).toString();
   const todayStr     = new Date().toISOString().split('T')[0];
 
-  const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+  const myUser = React.useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem('simrpp_user') || '{}');
+    } catch {
+      return {};
+    }
+  }, []);
+
   const teacherIds = React.useMemo(() => {
     return [
       myUser.teacherId,
@@ -37,7 +44,10 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
       myUser.id
     ].filter(Boolean);
   }, [myUser]);
-  const myTeacherId = myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || 't-12';
+
+  const myTeacherId = React.useMemo(() => {
+    return myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || 't-12';
+  }, [myUser]);
 
   // Filter subjects taught by this teacher
   const myTeacherSubjectObjects = React.useMemo(() => {
@@ -92,22 +102,23 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
     return p;
   }, [filterAY, filterSem, filterYear, filterMonth, rekapMode, myTeacherId, filterSubject]);
 
-  const loadData = React.useCallback(() => {
+  const loadData = React.useCallback(async () => {
     setLoading(true);
     const params = buildParams();
-    Promise.all([
-      api.getAttendances(params),
-      api.getAttendanceSummary(params),
-    ]).then(([list, sumList]) => {
+    try {
+      const [list, sumList] = await Promise.all([
+        api.getAttendances(params),
+        api.getAttendanceSummary(params),
+      ]);
       // Filter strictly for this teacher
-      const myRecords = list.filter(a => {
+      const myRecords = (list || []).filter(a => {
         const tId = a.teacherId || (a as any).teacher_id || (a.teacher && a.teacher.id);
-        return teacherIds.includes(tId);
+        return teacherIds.length === 0 || teacherIds.includes(tId);
       });
       setAttendances(myRecords);
 
       // Compute summary strictly for current teacher
-      const targetSum = sumList.find(s => teacherIds.includes(s.teacherId));
+      const targetSum = (sumList || []).find(s => teacherIds.includes(s.teacherId));
       if (targetSum) {
         setSummary(targetSum);
       } else {
@@ -127,10 +138,13 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
           persentaseHadir: tot > 0 ? Math.round((h / tot) * 100) : 0
         });
       }
-    }).catch(() => { 
+    } catch (err) { 
+      console.error('Failed to load teacher attendances:', err);
       setAttendances([]); 
       setSummary(null); 
-    }).finally(() => setLoading(false));
+    } finally {
+      setLoading(false);
+    }
   }, [buildParams, teacherIds, myTeacherId, myUser.name]);
 
   React.useEffect(() => { loadData(); }, [loadData]);
@@ -407,9 +421,36 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
               {/* Tanggal & Mata Pelajaran */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal Jam Mengajar</label>
-                  <input type="date" value={fDate} max={todayStr} onChange={e => setFDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanggal Jam Mengajar</label>
+                    <div className="flex items-center space-x-1">
+                      <button
+                        type="button"
+                        onClick={() => setFDate(todayStr)}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold hover:bg-indigo-100 transition cursor-pointer"
+                      >
+                        Hari Ini
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date();
+                          d.setDate(d.getDate() - 1);
+                          setFDate(d.toISOString().split('T')[0]);
+                        }}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 transition cursor-pointer"
+                      >
+                        Kemarin
+                      </button>
+                    </div>
+                  </div>
+                  <input
+                    type="date"
+                    value={fDate}
+                    onChange={e => setFDate(e.target.value)}
+                    onClick={e => (e.currentTarget as any).showPicker?.()}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Pilih Mata Pelajaran (Jam Sesi)</label>

@@ -1211,11 +1211,86 @@ api.post('/pengumuman', async (c) => {
   }
 });
 
-// --- EVALUASI PEMBELAJARAN (8 DIMENSI KURIKULUM MERDEKA) ---
+// --- DATABASE CONSISTENCY & AUTOMATIC DATA MIGRATION ---
+async function ensureDatabaseConsistency(db: D1Database) {
+  try {
+    // 1. Ust. Abdullah Kristianto, S.Sos. (t-33) - Pengajar ABY di VII Putra (cls-3) dan I'dad Putra (cls-1), serta Wali Kelas I'dad Putra
+    await db.prepare(`
+      INSERT OR IGNORE INTO teachers (id, name, email, subjects, classes)
+      VALUES ('t-33', 'Ust. Abdullah Kristianto, S.Sos.', 'ustadz.abdullah@isykarima.com', '["s-4"]', '["cls-1","cls-3"]');
+    `).run().catch(() => {});
+
+    await db.prepare(`
+      UPDATE teachers
+      SET name = 'Ust. Abdullah Kristianto, S.Sos.',
+          email = 'ustadz.abdullah@isykarima.com',
+          subjects = '["s-4"]',
+          classes = '["cls-1","cls-3"]'
+      WHERE id = 't-33';
+    `).run().catch(() => {});
+
+    // Akun Login Guru Ust. Abdullah Kristianto, S.Sos. (ustadz.abdullah)
+    await db.prepare(`DELETE FROM users WHERE email = 'ustadz.abdullah' AND teacher_id != 't-33'`).run().catch(() => {});
+    await db.prepare(`
+      INSERT OR REPLACE INTO users (id, name, email, password_hash, role, teacher_id)
+      VALUES ('user-t-33-guru', 'Ust. Abdullah Kristianto, S.Sos.', 'ustadz.abdullah', 'guru123', 'Guru', 't-33')
+    `).run().catch(() => {});
+
+    // Akun Login Wali Kelas Ust. Abdullah Kristianto, S.Sos. (wali.abdullah)
+    await db.prepare(`
+      INSERT OR REPLACE INTO users (id, name, email, password_hash, role, teacher_id)
+      VALUES ('user-t-33-wali', 'Ust. Abdullah Kristianto, S.Sos.', 'wali.abdullah', 'wali123', 'WaliKelas', 't-33')
+    `).run().catch(() => {});
+
+    // Jadwal Mengajar ABY (s-4) di VII Putra (cls-3) dan I'dad Putra (cls-1) dialihkan ke t-33
+    await db.prepare(`
+      UPDATE schedules
+      SET teacher_id = 't-33'
+      WHERE subject_id = 's-4' AND (class_id = 'cls-1' OR class_id = 'cls-3')
+    `).run().catch(() => {});
+
+    // 2. Ust. Muhammad Ilyas Abdullah (t-5) - Pengajar Beladiri Tai Chi untuk SEMUA KELAS PUTRA (cls-1, cls-3, cls-5, cls-7)
+    await db.prepare(`
+      INSERT OR IGNORE INTO teachers (id, name, email, subjects, classes)
+      VALUES ('t-5', 'Ust. Muhammad Ilyas Abdullah', 'ustadz.ilyas@isykarima.com', '["subjects-1786502401572"]', '["cls-1","cls-3","cls-5","cls-7"]');
+    `).run().catch(() => {});
+
+    await db.prepare(`
+      UPDATE teachers
+      SET name = 'Ust. Muhammad Ilyas Abdullah',
+          email = 'ustadz.ilyas@isykarima.com',
+          subjects = '["subjects-1786502401572"]',
+          classes = '["cls-1","cls-3","cls-5","cls-7"]'
+      WHERE id = 't-5';
+    `).run().catch(() => {});
+
+    // Akun Login Guru Ust. Muhammad Ilyas Abdullah (ustadz.ilyas)
+    await db.prepare(`DELETE FROM users WHERE email = 'ustadz.ilyas'`).run().catch(() => {});
+    await db.prepare(`
+      INSERT OR REPLACE INTO users (id, name, email, password_hash, role, teacher_id)
+      VALUES ('user-t-5-guru', 'Ust. Muhammad Ilyas Abdullah', 'ustadz.ilyas', 'guru123', 'Guru', 't-5')
+    `).run().catch(() => {});
+
+    // Pastikan Jadwal Tai Chi untuk Semua Kelas Putra
+    const boysClasses = ['cls-1', 'cls-3', 'cls-5', 'cls-7'];
+    for (const cId of boysClasses) {
+      await db.prepare(`
+        INSERT OR IGNORE INTO schedules (id, day, time, class_id, teacher_id, subject_id, academic_year_id, semester_id)
+        VALUES (?, 'Rabu', '07:00 - 09:00', ?, 't-5', 'subjects-1786502401572', 'ay-1', 'sem-1')
+      `).bind(`sch-taichi-${cId}`, cId).run().catch(() => {});
+    }
+  } catch (e) {
+    console.error('ensureDatabaseConsistency error:', e);
+  }
+}
+
+// --- EVALUASI PEMBELAJARAN (8 DIMENSI KURIKULUM MERDEKA: BULANAN, SEMESTER & TAHUNAN) ---
 async function ensureEvaluasiTable(db: D1Database) {
+  await ensureDatabaseConsistency(db);
   await db.prepare(`
     CREATE TABLE IF NOT EXISTS evaluasi_pembelajaran (
       id TEXT PRIMARY KEY,
+      jenis_evaluasi TEXT DEFAULT 'Bulanan',
       bulan INTEGER,
       tahun INTEGER,
       teacher_id TEXT,
@@ -1242,6 +1317,7 @@ async function ensureEvaluasiTable(db: D1Database) {
   `).run().catch(() => {});
 
   const columns = [
+    'jenis_evaluasi TEXT DEFAULT "Bulanan"',
     'bulan INTEGER',
     'tahun INTEGER',
     'teacher_id TEXT',
@@ -1300,6 +1376,7 @@ api.get('/evaluasi_pembelajaran', async (c) => {
 
       return {
         id: r.id,
+        jenisEvaluasi: r.jenis_evaluasi || r.jenisEvaluasi || 'Bulanan',
         bulan: Number(r.bulan) || 1,
         tahun: Number(r.tahun) || new Date().getFullYear(),
         teacherId: r.teacher_id || r.teacherId || '',
@@ -1345,17 +1422,19 @@ api.post('/evaluasi_pembelajaran', async (c) => {
     const rencana = Number(body.totalPertemuanRencana ?? body.total_pertemuan_rencana ?? 4);
     const terlaksana = Number(body.totalPertemuanTerlaksana ?? body.total_pertemuan_terlaksana ?? 4);
     const persentase = rencana > 0 ? Math.round((terlaksana / rencana) * 100) : 0;
+    const jenisEval = body.jenisEvaluasi || body.jenis_evaluasi || 'Bulanan';
 
     await c.env.DB.prepare(`
       INSERT INTO evaluasi_pembelajaran (
-        id, bulan, tahun, teacher_id, subject_id, class_id,
+        id, jenis_evaluasi, bulan, tahun, teacher_id, subject_id, class_id,
         academic_year_id, semester_id, total_pertemuan_rencana, total_pertemuan_terlaksana,
         persentase_terlaksana, tp_tercapai, tp_belum_tercapai, asesmen_formatif_hasil,
         asesmen_catatan, kendala, solusi, diferenciasi_dilakukan, rencana_bulan_depan,
         refleksi_guru, predikat_ketercapaian, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       id,
+      jenisEval,
       Number(body.bulan) || 1,
       Number(body.tahun) || new Date().getFullYear(),
       body.teacherId || body.teacher_id || '',
@@ -1383,6 +1462,7 @@ api.post('/evaluasi_pembelajaran', async (c) => {
     return c.json({
       ...body,
       id,
+      jenisEvaluasi: jenisEval,
       totalPertemuanRencana: rencana,
       totalPertemuanTerlaksana: terlaksana,
       persentaseTerlaksana: persentase,
@@ -1403,9 +1483,11 @@ api.put('/evaluasi_pembelajaran/:id', async (c) => {
     const rencana = Number(body.totalPertemuanRencana ?? body.total_pertemuan_rencana ?? 4);
     const terlaksana = Number(body.totalPertemuanTerlaksana ?? body.total_pertemuan_terlaksana ?? 4);
     const persentase = rencana > 0 ? Math.round((terlaksana / rencana) * 100) : 0;
+    const jenisEval = body.jenisEvaluasi || body.jenis_evaluasi || 'Bulanan';
 
     await c.env.DB.prepare(`
       UPDATE evaluasi_pembelajaran SET
+        jenis_evaluasi = ?,
         bulan = ?,
         tahun = ?,
         teacher_id = ?,
@@ -1429,6 +1511,7 @@ api.put('/evaluasi_pembelajaran/:id', async (c) => {
         updated_at = ?
       WHERE id = ?
     `).bind(
+      jenisEval,
       Number(body.bulan) || 1,
       Number(body.tahun) || new Date().getFullYear(),
       body.teacherId || body.teacher_id || '',
@@ -1456,6 +1539,7 @@ api.put('/evaluasi_pembelajaran/:id', async (c) => {
     return c.json({
       ...body,
       id,
+      jenisEvaluasi: jenisEval,
       totalPertemuanRencana: rencana,
       totalPertemuanTerlaksana: terlaksana,
       persentaseTerlaksana: persentase,

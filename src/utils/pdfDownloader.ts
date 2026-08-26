@@ -150,8 +150,20 @@ export function downloadEvaluasiGuruPdf(ev: EvaluasiPembelajaran, academicYears:
   const doc = new jsPDF('p', 'mm', 'a4');
   const ayObj = academicYears.find(a => a.id === ev.academicYearId);
   const semObj = semesters.find(s => s.id === ev.semesterId);
+  const jenis = ev.jenisEvaluasi || 'Bulanan';
+  const headerTitle = jenis === 'Tahunan'
+    ? 'Laporan Evaluasi Pembelajaran Tahunan Guru'
+    : jenis === 'Semester'
+    ? 'Laporan Evaluasi Pembelajaran Semester Guru'
+    : 'Laporan Evaluasi Pembelajaran Bulanan Guru';
 
-  let y = addMQBAHeader(doc, 'Laporan Evaluasi Pembelajaran Bulanan Guru');
+  const periodeStr = jenis === 'Tahunan'
+    ? `Tahun Ajaran ${ayObj?.name || '-'}`
+    : jenis === 'Semester'
+    ? `Semester ${semObj?.name || '-'} ${ev.tahun} · TA ${ayObj?.name || '-'}`
+    : `Bulan ${BULAN_NAMES[ev.bulan]} ${ev.tahun} · Semester ${semObj?.name || '-'} TA ${ayObj?.name || '-'}`;
+
+  let y = addMQBAHeader(doc, headerTitle);
 
   autoTable(doc, {
     startY: y,
@@ -162,7 +174,7 @@ export function downloadEvaluasiGuruPdf(ev: EvaluasiPembelajaran, academicYears:
       ['Nama Guru', ':', ev.teacher?.name || '-'],
       ['Mata Pelajaran', ':', ev.subject?.name || '-'],
       ['Kelas Bimbingan', ':', ev.class?.name || '-'],
-      ['Periode / TA', ':', `Bulan ${BULAN_NAMES[ev.bulan]} ${ev.tahun} · Semester ${semObj?.name || '-'} TA ${ayObj?.name || '-'}`],
+      ['Jenis & Periode', ':', `Evaluasi ${jenis} (${periodeStr})`],
       ['Keterlaksanaan KBM', ':', `${ev.totalPertemuanTerlaksana} dari ${ev.totalPertemuanRencana} Pertemuan (${ev.persentaseTerlaksana}%) - Predikat: ${ev.predikatKetercapaian}`]
     ]
   });
@@ -185,10 +197,12 @@ export function downloadEvaluasiGuruPdf(ev: EvaluasiPembelajaran, academicYears:
     y += (lines.length * 4.2) + 3;
   };
 
-  addSec('I. Ketercapaian Tujuan Pembelajaran (TP)', `TP Tercapai:\n${ev.tpTercapai || '-'}\n\nTP Belum Tercapai:\n${ev.tpBelumTercapai || '-'}`);
-  addSec('II. Hasil Asesmen Formatif & Catatan', `Hasil Asesmen:\n${ev.asesmenFormatifHasil || '-'}\n\nCatatan Hasil Asesmen:\n${ev.asesmenCatatan || '-'}`);
+  const rencanaTitle = jenis === 'Tahunan' ? 'Rencana Tahun Ajaran Berikutnya' : jenis === 'Semester' ? 'Rencana Semester Berikutnya' : 'Rencana Bulan Depan';
+
+  addSec('I. Ketercapaian Tujuan Pembelajaran (TP)', `TP Tercapai:\n${ev.tpTercapai || '-'}\n\nTP Belum Tercapai / Perlu Penguatan:\n${ev.tpBelumTercapai || '-'}`);
+  addSec('II. Hasil Asesmen & Catatan', `Hasil Asesmen:\n${ev.asesmenFormatifHasil || '-'}\n\nCatatan Hasil Asesmen:\n${ev.asesmenCatatan || '-'}`);
   addSec('III. Kendala Pembelajaran & Solusi', `Kendala yang Dihadapi:\n${ev.kendala || '-'}\n\nSolusi / Tindak Lanjut:\n${ev.solusi || '-'}`);
-  addSec('IV. Diferensiasi, Rencana & Refleksi Guru', `Diferensiasi Pembelajaran:\n${ev.diferenciasiDilakukan || '-'}\n\nRencana Bulan Depan:\n${ev.rencanaBulanDepan || '-'}\n\nRefleksi Guru:\n${ev.refleksiGuru || '-'}`);
+  addSec('IV. Diferensiasi, Rencana & Refleksi Guru', `Diferensiasi Pembelajaran:\n${ev.diferenciasiDilakukan || '-'}\n\n${rencanaTitle}:\n${ev.rencanaBulanDepan || '-'}\n\nRefleksi Guru:\n${ev.refleksiGuru || '-'}`);
 
   if (y > 240) { doc.addPage(); y = 20; } else { y += 5; }
   const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -204,7 +218,13 @@ export function downloadEvaluasiGuruPdf(ev: EvaluasiPembelajaran, academicYears:
   doc.text('( Ust. Aidil Aqli, S.Ag. )', 45, y + 24, { align: 'center' });
   doc.text(`( ${ev.teacher?.name || 'Guru'} )`, 155, y + 24, { align: 'center' });
 
-  savePdfBlob(doc, `Evaluasi_Guru_${(ev.teacher?.name || 'Guru').replace(/\s+/g, '_')}_${BULAN_NAMES[ev.bulan]}_${ev.tahun}.pdf`);
+  const filenameSuffix = jenis === 'Tahunan'
+    ? `TA_${(ayObj?.name || 'TA').replace(/[^a-zA-Z0-9]/g, '_')}`
+    : jenis === 'Semester'
+    ? `Sem_${(semObj?.name || 'Sem').replace(/[^a-zA-Z0-9]/g, '_')}_${ev.tahun}`
+    : `${BULAN_NAMES[ev.bulan]}_${ev.tahun}`;
+
+  savePdfBlob(doc, `Evaluasi_${jenis}_${(ev.teacher?.name || 'Guru').replace(/\s+/g, '_')}_${filenameSuffix}.pdf`);
 }
 
 // 3. DIRECT DOWNLOAD EVALUASI WALI KELAS AS PDF FILE

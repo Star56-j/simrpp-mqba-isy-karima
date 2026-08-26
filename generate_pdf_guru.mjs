@@ -9,7 +9,7 @@ const guruData = [
   { no: 3, name: 'Ust. Dzulfikar Tri Baskara, S.Ag, M.Pd', role: 'Guru', username: 'ustadz.dzulfikar', pass: 'guru123', info: 'Pengajar Mapel' },
   { no: 4, name: 'Ust. Nashiruddin Karim, Lc., Al-Hafizh', role: 'Guru', username: 'ustadz.karim', pass: 'guru123', info: 'Pengajar Mapel' },
   { no: 5, name: 'Ust. Fredy Susilo Supriyanto, S.Ag., Al Hafizh', role: 'Guru & Wali Kelas', username: 'ustadz.fredy / wali.fredy', pass: 'guru123 / wali123', info: 'Wali Kelas VIII Putra' },
-  { no: 6, name: 'Ust. Muhammad Ilyas Abdullah', role: 'Guru', username: 'ustadz.abdullah', pass: 'guru123', info: 'Pengajar Mapel' },
+  { no: 6, name: 'Ust. Muhammad Ilyas Abdullah', role: 'Guru', username: 'ustadz.ilyas', pass: 'guru123', info: 'Pengajar Tai Chi Semua Kelas Putra' },
   { no: 7, name: 'Usth. Aulia Anim Amanillah', role: 'Guru', username: 'ustadzah.anim', pass: 'guru123', info: 'Pengajar Mapel' },
   { no: 8, name: 'Usth. Iffah Luthfiyah', role: 'Guru', username: 'ustadzah.iffah', pass: 'guru123', info: 'Pengajar Mapel' },
   { no: 9, name: 'Ust. Yunan Hidayat, Al Hafizh', role: 'Guru', username: 'ustadz.yunan', pass: 'guru123', info: 'Pengajar Mapel' },

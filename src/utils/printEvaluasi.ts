@@ -8,13 +8,31 @@ export function printEvaluasi(
   const ayName = academicYears.find(a => a.id === ev.academicYearId)?.name || '';
   const semName = semesters.find(s => s.id === ev.semesterId)?.name || '';
   const bulanName = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][ev.bulan] || '';
+  const jenis = ev.jenisEvaluasi || 'Bulanan';
+  const headerTitle = jenis === 'Tahunan'
+    ? 'LAPORAN EVALUASI PEMBELAJARAN TAHUNAN'
+    : jenis === 'Semester'
+    ? 'LAPORAN EVALUASI PEMBELAJARAN SEMESTER'
+    : 'LAPORAN EVALUASI PEMBELAJARAN BULANAN';
+
+  const periodeLabel = jenis === 'Tahunan'
+    ? 'Periode Tahun Ajaran'
+    : jenis === 'Semester'
+    ? 'Periode Semester'
+    : 'Bulan Evaluasi';
+
+  const periodeValue = jenis === 'Tahunan'
+    ? `TA ${ayName}`
+    : jenis === 'Semester'
+    ? `Semester ${semName} ${ev.tahun}`
+    : `${bulanName} ${ev.tahun}`;
 
   const html = `
     <!DOCTYPE html>
     <html lang="id">
     <head>
       <meta charset="UTF-8">
-      <title>Laporan Evaluasi Pembelajaran - ${ev.teacher?.name || 'Guru'}</title>
+      <title>${headerTitle} - ${ev.teacher?.name || 'Guru'}</title>
       <style>
         body {
           font-family: 'Arial', sans-serif;
@@ -86,7 +104,7 @@ export function printEvaluasi(
         }
         .grid-2 {
           display: grid;
-          grid-template-cols: 1fr 1fr;
+          grid-template-columns: 1fr 1fr;
           gap: 15px;
         }
         .card-box {
@@ -147,17 +165,17 @@ export function printEvaluasi(
       </div>
 
       <div class="header">
-        <h1>LAPORAN EVALUASI PEMBELAJARAN BULANAN</h1>
+        <h1>${headerTitle}</h1>
         <h2>MARKAZ AL QUR'AN DAN BAHASA ARAB ISY KARIMA</h2>
-        <h3>Tahun Ajaran ${ayName} &bull; Semester ${semName}</h3>
+        <h3>Tahun Ajaran ${ayName} ${jenis !== 'Tahunan' ? `&bull; Semester ${semName}` : ''}</h3>
       </div>
 
       <table class="info-table">
         <tr>
           <td class="label">Nama Pengajar</td>
           <td class="value">: <strong>${ev.teacher?.name || '—'}</strong></td>
-          <td class="label">Bulan Evaluasi</td>
-          <td class="value">: <strong>${bulanName} ${ev.tahun}</strong></td>
+          <td class="label">${periodeLabel}</td>
+          <td class="value">: <strong>${periodeValue}</strong></td>
         </tr>
         <tr>
           <td class="label">Mata Pelajaran</td>
@@ -187,19 +205,19 @@ export function printEvaluasi(
           <div style="white-space: pre-wrap;">${ev.tpTercapai || '—'}</div>
         </div>
         <div class="card-box">
-          <div class="card-box-title" style="color: #dc2626;">TP Belum Tercapai / Perlu Tindak Lanjut</div>
+          <div class="card-box-title" style="color: #dc2626;">TP Belum Tercapai / Perlu Penguatan</div>
           <div style="white-space: pre-wrap;">${ev.tpBelumTercapai || '—'}</div>
         </div>
       </div>
 
-      <div class="section-title">C. Asesmen Formatif Bulanan</div>
+      <div class="section-title">C. Asesmen & Capaian Hasil Belajar</div>
       <div class="section-content grid-2">
         <div class="card-box">
-          <div class="card-box-title">Hasil Asesmen Formatif</div>
+          <div class="card-box-title">Hasil Asesmen</div>
           <div style="white-space: pre-wrap;">${ev.asesmenFormatifHasil || '—'}</div>
         </div>
         <div class="card-box">
-          <div class="card-box-title">Catatan Penting Asesmen</div>
+          <div class="card-box-title">Catatan Asesmen</div>
           <div style="white-space: pre-wrap;">${ev.asesmenCatatan || '—'}</div>
         </div>
       </div>
@@ -207,11 +225,11 @@ export function printEvaluasi(
       <div class="section-title">D. Kendala & Solusi Pembelajaran</div>
       <div class="section-content grid-2">
         <div class="card-box">
-          <div class="card-box-title" style="color: #d97706;">Kendala Yang Dihadapi</div>
+          <div class="card-box-title" style="color: #ea580c;">Kendala yang Dihadapi</div>
           <div style="white-space: pre-wrap;">${ev.kendala || '—'}</div>
         </div>
         <div class="card-box">
-          <div class="card-box-title" style="color: #2563eb;">Solusi / Tindak Lanjut</div>
+          <div class="card-box-title" style="color: #0284c7;">Solusi / Tindak Lanjut</div>
           <div style="white-space: pre-wrap;">${ev.solusi || '—'}</div>
         </div>
       </div>
@@ -223,7 +241,7 @@ export function printEvaluasi(
         </div>
       </div>
 
-      <div class="section-title">F. Rencana Bulan Berikutnya</div>
+      <div class="section-title">F. Rencana ${jenis === 'Tahunan' ? 'Tahun Ajaran Berikutnya' : jenis === 'Semester' ? 'Semester Berikutnya' : 'Bulan Berikutnya'}</div>
       <div class="section-content">
         <div class="card-box">
           <div style="white-space: pre-wrap;">${ev.rencanaBulanDepan || '—'}</div>

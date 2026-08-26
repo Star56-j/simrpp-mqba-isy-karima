@@ -21,5 +21,6 @@ data/*
 
 # Ignore temporary browser user data and build pdf files
 .edge-user-data/
+.wrangler/
 panduan.html
 panduan.pdf

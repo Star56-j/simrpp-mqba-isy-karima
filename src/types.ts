@@ -416,9 +416,11 @@ export interface TanyaAdmin {
 }
 
 export type PredikatKetercapaian = 'Sangat Baik' | 'Baik' | 'Cukup' | 'Perlu Perbaikan';
+export type JenisEvaluasi = 'Bulanan' | 'Semester' | 'Tahunan';
 
 export interface EvaluasiPembelajaran {
   id: string;
+  jenisEvaluasi?: JenisEvaluasi;
   bulan: number;
   tahun: number;
   teacherId: string;

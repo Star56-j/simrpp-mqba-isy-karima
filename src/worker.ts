@@ -680,7 +680,7 @@ api.get('/teachers', async (c) => {
 const tables = [
   'teachers', 'subjects', 'classes', 'academic_years', 'semesters', 
   'rpps', 'activity_logs', 'attendances', 
-  'santri_attendances', 'nilai', 'rapor_detail', 'pengumuman', 'tanya_admin', 'evaluasi_wali_kelas', 'tanya_wali_kelas'
+  'santri_attendances', 'nilai', 'rapor_detail', 'tanya_admin', 'tanya_wali_kelas'
 ];
 
 tables.forEach(table => {
@@ -1097,40 +1097,64 @@ api.delete('/activity_logs/clear_all', async (c) => {
 });
 
 // --- PENGUMUMAN & BROADCAST ---
-api.get('/pengumuman', async (c) => {
+async function ensurePengumumanSchema(db: D1Database) {
   try {
-    await c.env.DB.prepare(`
+    await db.prepare(`
       CREATE TABLE IF NOT EXISTS pengumuman (
         id TEXT PRIMARY KEY,
         title TEXT,
         content TEXT,
-        target_type TEXT,
-        target_id TEXT,
-        target_name TEXT,
-        image_url TEXT,
-        file_url TEXT,
-        file_name TEXT,
-        file_size TEXT,
+        target_type TEXT DEFAULT 'semua',
+        target_id TEXT DEFAULT '',
+        target_name TEXT DEFAULT '',
+        image_url TEXT DEFAULT '',
+        file_url TEXT DEFAULT '',
+        file_name TEXT DEFAULT '',
+        file_size TEXT DEFAULT '',
         created_at TEXT,
         updated_at TEXT,
-        author_id TEXT,
-        author_name TEXT
+        author_id TEXT DEFAULT '',
+        author_name TEXT DEFAULT 'Admin'
       )
     `).run().catch(() => {});
 
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN target_type TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN target_id TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN target_name TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN image_url TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN file_url TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN file_name TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN file_size TEXT`).run().catch(() => {});
+    const pragmaRes = await db.prepare('PRAGMA table_info(pengumuman)').all().catch(() => ({ results: [] }));
+    const existingCols = new Set((pragmaRes.results || []).map((c: any) => String(c.name).toLowerCase()));
 
-    const { results } = await c.env.DB.prepare('SELECT * FROM pengumuman ORDER BY created_at DESC').all();
+    const colsToAdd = [
+      { name: 'title', def: 'TEXT' },
+      { name: 'content', def: 'TEXT' },
+      { name: 'target_type', def: 'TEXT DEFAULT "semua"' },
+      { name: 'target_id', def: 'TEXT DEFAULT ""' },
+      { name: 'target_name', def: 'TEXT DEFAULT ""' },
+      { name: 'image_url', def: 'TEXT DEFAULT ""' },
+      { name: 'file_url', def: 'TEXT DEFAULT ""' },
+      { name: 'file_name', def: 'TEXT DEFAULT ""' },
+      { name: 'file_size', def: 'TEXT DEFAULT ""' },
+      { name: 'created_at', def: 'TEXT' },
+      { name: 'updated_at', def: 'TEXT' },
+      { name: 'author_id', def: 'TEXT DEFAULT ""' },
+      { name: 'author_name', def: 'TEXT DEFAULT "Admin"' }
+    ];
+
+    for (const col of colsToAdd) {
+      if (!existingCols.has(col.name.toLowerCase())) {
+        await db.prepare(`ALTER TABLE pengumuman ADD COLUMN ${col.name} ${col.def}`).run().catch(() => {});
+      }
+    }
+  } catch (err) {
+    console.error('Error in ensurePengumumanSchema:', err);
+  }
+}
+
+api.get('/pengumuman', async (c) => {
+  try {
+    await ensurePengumumanSchema(c.env.DB);
+    const { results } = await c.env.DB.prepare('SELECT * FROM pengumuman ORDER BY created_at DESC, rowid DESC').all();
     const mapped = (results || []).map((r: any) => ({
       id: r.id,
-      title: r.title,
-      content: r.content,
+      title: r.title || '',
+      content: r.content || '',
       targetType: r.target_type || r.targetType || 'semua',
       targetId: r.target_id || r.targetId || '',
       targetName: r.target_name || r.targetName || '',
@@ -1151,36 +1175,20 @@ api.get('/pengumuman', async (c) => {
 
 api.post('/pengumuman', async (c) => {
   try {
-    await c.env.DB.prepare(`
-      CREATE TABLE IF NOT EXISTS pengumuman (
-        id TEXT PRIMARY KEY,
-        title TEXT,
-        content TEXT,
-        target_type TEXT,
-        target_id TEXT,
-        target_name TEXT,
-        image_url TEXT,
-        file_url TEXT,
-        file_name TEXT,
-        file_size TEXT,
-        created_at TEXT,
-        updated_at TEXT,
-        author_id TEXT,
-        author_name TEXT
-      )
-    `).run().catch(() => {});
-
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN target_type TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN target_id TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN target_name TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN image_url TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN file_url TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN file_name TEXT`).run().catch(() => {});
-    await c.env.DB.prepare(`ALTER TABLE pengumuman ADD COLUMN file_size TEXT`).run().catch(() => {});
-
+    await ensurePengumumanSchema(c.env.DB);
     const body = await c.req.json();
     const id = body.id || `ann-${crypto.randomUUID()}`;
     const nowIso = new Date().toISOString();
+
+    const targetType = body.targetType || body.target_type || 'semua';
+    const targetId = body.targetId || body.target_id || '';
+    const targetName = body.targetName || body.target_name || '';
+    const imageUrl = body.imageUrl || body.image_url || '';
+    const fileUrl = body.fileUrl || body.file_url || '';
+    const fileName = body.fileName || body.file_name || '';
+    const fileSize = body.fileSize || body.file_size || '';
+    const authorId = body.authorId || body.author_id || '';
+    const authorName = body.authorName || body.author_name || 'Admin';
 
     await c.env.DB.prepare(`
       INSERT INTO pengumuman (
@@ -1192,20 +1200,84 @@ api.post('/pengumuman', async (c) => {
       id,
       body.title || '',
       body.content || '',
-      body.targetType || 'semua',
-      body.targetId || '',
-      body.targetName || '',
-      body.imageUrl || '',
-      body.fileUrl || '',
-      body.fileName || '',
-      body.fileSize || '',
+      targetType,
+      targetId,
+      targetName,
+      imageUrl,
+      fileUrl,
+      fileName,
+      fileSize,
       nowIso,
       nowIso,
-      body.authorId || '',
-      body.authorName || 'Admin'
+      authorId,
+      authorName
     ).run();
 
-    return c.json({ ...body, id, createdAt: nowIso, updatedAt: nowIso });
+    return c.json({
+      ...body,
+      id,
+      targetType,
+      targetId,
+      targetName,
+      imageUrl,
+      fileUrl,
+      fileName,
+      fileSize,
+      authorId,
+      authorName,
+      createdAt: nowIso,
+      updatedAt: nowIso
+    });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+api.put('/pengumuman/:id', async (c) => {
+  try {
+    await ensurePengumumanSchema(c.env.DB);
+    const id = c.req.param('id');
+    const body = await c.req.json();
+    const nowIso = new Date().toISOString();
+
+    await c.env.DB.prepare(`
+      UPDATE pengumuman SET
+        title = COALESCE(?, title),
+        content = COALESCE(?, content),
+        target_type = COALESCE(?, target_type),
+        target_id = COALESCE(?, target_id),
+        target_name = COALESCE(?, target_name),
+        image_url = COALESCE(?, image_url),
+        file_url = COALESCE(?, file_url),
+        file_name = COALESCE(?, file_name),
+        file_size = COALESCE(?, file_size),
+        updated_at = ?
+      WHERE id = ?
+    `).bind(
+      body.title ?? null,
+      body.content ?? null,
+      body.targetType ?? body.target_type ?? null,
+      body.targetId ?? body.target_id ?? null,
+      body.targetName ?? body.target_name ?? null,
+      body.imageUrl ?? body.image_url ?? null,
+      body.fileUrl ?? body.file_url ?? null,
+      body.fileName ?? body.file_name ?? null,
+      body.fileSize ?? body.file_size ?? null,
+      nowIso,
+      id
+    ).run();
+
+    return c.json({ ...body, id, updatedAt: nowIso });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+api.delete('/pengumuman/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    await c.env.DB.prepare('DELETE FROM pengumuman WHERE id = ?').bind(id).run();
+    return c.json({ success: true });
   } catch (e: any) {
     return c.json({ error: e.message }, 500);
   }
@@ -1279,6 +1351,9 @@ async function ensureDatabaseConsistency(db: D1Database) {
         VALUES (?, 'Rabu', '07:00 - 09:00', ?, 't-5', 'subjects-1786502401572', 'ay-1', 'sem-1')
       `).bind(`sch-taichi-${cId}`, cId).run().catch(() => {});
     }
+
+    // 3. Pastikan skema tabel pengumuman & broadcast selalu lengkap
+    await ensurePengumumanSchema(db);
   } catch (e) {
     console.error('ensureDatabaseConsistency error:', e);
   }

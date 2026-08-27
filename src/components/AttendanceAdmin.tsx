@@ -206,16 +206,12 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
           const tSubAttendances = attendances.filter(a => 
             a.teacherId === t.id && (a.subjectId === item.subjectId || (!a.subjectId && details.length === 1))
           );
-          
-          const targetRecords = (tSubAttendances.length > 0 || details.length === 1) 
-            ? tSubAttendances 
-            : attendances.filter(a => a.teacherId === t.id);
 
-          const hadir = targetRecords.filter(a => a.status === 'Hadir').length;
-          const izin = targetRecords.filter(a => a.status === 'Izin').length;
-          const sakit = targetRecords.filter(a => a.status === 'Sakit').length;
-          const alpha = targetRecords.filter(a => a.status === 'Alpha').length;
-          const total = targetRecords.length;
+          const hadir = tSubAttendances.filter(a => a.status === 'Hadir').length;
+          const izin = tSubAttendances.filter(a => a.status === 'Izin').length;
+          const sakit = tSubAttendances.filter(a => a.status === 'Sakit').length;
+          const alpha = tSubAttendances.filter(a => a.status === 'Alpha').length;
+          const total = tSubAttendances.length;
           const persentaseHadir = total > 0 ? Math.round((hadir / total) * 100) : 0;
 
           result.push({
@@ -275,16 +271,12 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
           const tSubAttendances = attendances.filter(a => 
             a.teacherId === t.id && (a.subjectId === item.subjectId || (!a.subjectId && classDetails.length === 1))
           );
-          
-          const targetRecords = (tSubAttendances.length > 0 || classDetails.length === 1) 
-            ? tSubAttendances 
-            : attendances.filter(a => a.teacherId === t.id);
 
-          const hadir = targetRecords.filter(a => a.status === 'Hadir').length;
-          const izin = targetRecords.filter(a => a.status === 'Izin').length;
-          const sakit = targetRecords.filter(a => a.status === 'Sakit').length;
-          const alpha = targetRecords.filter(a => a.status === 'Alpha').length;
-          const total = targetRecords.length;
+          const hadir = tSubAttendances.filter(a => a.status === 'Hadir').length;
+          const izin = tSubAttendances.filter(a => a.status === 'Izin').length;
+          const sakit = tSubAttendances.filter(a => a.status === 'Sakit').length;
+          const alpha = tSubAttendances.filter(a => a.status === 'Alpha').length;
+          const total = tSubAttendances.length;
           const persentaseHadir = total > 0 ? Math.round((hadir / total) * 100) : 0;
 
           result.push({
@@ -310,6 +302,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
   }, [teachers, attendances, getTeacherClassDetails]);
 
   // 3. Merged per Teacher list (Rekap Gabungan Per Guru)
+  // Menjumlahkan kehadiran dari seluruh mapel & kelas berbeda yang diampu oleh masing-masing Guru
   const teacherMergedSummaryList = React.useMemo(() => {
     const result: (AttendanceSummary & { classId?: string; className?: string; subjectId?: string; subjectName: string; subjectsTaught: string; classesList?: string[] })[] = [];
 
@@ -348,6 +341,26 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
     : rekapViewType === 'per-kelas' 
     ? classSummaryList 
     : teacherMergedSummaryList;
+
+  // Total Keseluruhan (Grand Total Akumulasi)
+  const grandTotal = React.useMemo(() => {
+    const totHadir = activeSummaryList.reduce((acc, r) => acc + (r.hadir || 0), 0);
+    const totSakit = activeSummaryList.reduce((acc, r) => acc + (r.sakit || 0), 0);
+    const totIzin  = activeSummaryList.reduce((acc, r) => acc + (r.izin || 0), 0);
+    const totAlpha = activeSummaryList.reduce((acc, r) => acc + (r.alpha || 0), 0);
+    const totJP    = activeSummaryList.reduce((acc, r) => acc + (r.total || 0), 0);
+    const totKehadiran = totHadir;
+    const overallPct = totJP > 0 ? Math.round((totHadir / totJP) * 100) : 0;
+    return {
+      hadir: totHadir,
+      sakit: totSakit,
+      izin: totIzin,
+      alpha: totAlpha,
+      totalJP: totJP,
+      totalKehadiran: totKehadiran,
+      persentaseHadir: overallPct
+    };
+  }, [activeSummaryList]);
 
   // Form state
   const [showForm, setShowForm] = React.useState(false);
@@ -1167,69 +1180,110 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
               </div>
             </div>
             {activeSummaryList.length === 0 ? (
-              <div className="p-10 text-center text-slate-400 text-sm">Belum ada data kehadiran untuk periode ini.</div>
+              <div className="p-12 text-center text-slate-400">
+                <ClipboardList className="w-10 h-10 mx-auto mb-2 text-slate-300 dark:text-slate-700"/>
+                <p className="text-sm font-medium">Belum ada data kehadiran untuk periode ini.</p>
+              </div>
             ) : (
-              <div className="overflow-x-auto relative">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-[#0f2942] text-white text-[11px] font-black uppercase tracking-wider">
-                    <tr>
-                      <th rowSpan={2} className="px-2.5 py-2.5 text-center border border-[#1e3a5f] w-10">No</th>
-                      <th rowSpan={2} className="px-3 py-2.5 border border-[#1e3a5f]">Nama Asatidz / Ustazah</th>
-                      <th rowSpan={2} className="px-3 py-2.5 border border-[#1e3a5f] bg-[#0d2847]">
+              <div className="overflow-x-auto relative shadow-inner">
+                <table className="w-full text-left border-collapse min-w-[900px]">
+                  <thead>
+                    {/* Primary Header Row */}
+                    <tr className="bg-slate-900 dark:bg-slate-950 text-white text-[11px] font-black uppercase tracking-wider border-b border-slate-800">
+                      <th rowSpan={2} className="px-3 py-3 text-center border-r border-slate-800 w-12 text-slate-400">No</th>
+                      <th rowSpan={2} className="px-4 py-3 border-r border-slate-800 min-w-[200px]">Nama Asatidz / Ustazah</th>
+                      <th rowSpan={2} className="px-4 py-3 border-r border-slate-800 min-w-[240px] bg-slate-850 dark:bg-slate-900">
                         {rekapViewType === 'per-kelas' ? 'Kelas & Mata Pelajaran' : 'Mata Pelajaran yang Diampu'}
                       </th>
-                      <th colSpan={4} className="px-2 py-1.5 text-center border border-[#1e3a5f] bg-[#0b2545]">Kehadiran</th>
-                      <th rowSpan={2} className="px-2.5 py-2.5 text-center border border-[#1e3a5f] w-20 bg-[#0d2847]">Total JP Wajib</th>
-                      <th rowSpan={2} className="px-2.5 py-2.5 text-center border border-[#1e3a5f] w-20 bg-[#0b2545]">Total Kehadiran</th>
-                      <th rowSpan={2} className="px-2.5 py-2.5 text-center border border-[#1e3a5f] w-16">% Hadir</th>
-                      <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-24 bg-[#1e1b4b] text-indigo-200 sticky right-0 z-20 shadow-md">Aksi</th>
+                      <th colSpan={4} className="px-2 py-2 text-center border-r border-slate-800 bg-slate-800/80">Kehadiran</th>
+                      <th rowSpan={2} className="px-3 py-3 text-center border-r border-slate-800 w-24 bg-slate-850 dark:bg-slate-900">Total JP Wajib</th>
+                      <th rowSpan={2} className="px-3 py-3 text-center border-r border-slate-800 w-24 bg-slate-800/80">Total Hadir</th>
+                      <th rowSpan={2} className="px-3 py-3 text-center border-r border-slate-800 w-20 bg-slate-900">% Hadir</th>
+                      <th rowSpan={2} className="px-3 py-3 text-center w-24 bg-indigo-950/80 text-indigo-200 sticky right-0 z-20 shadow-md">Aksi</th>
                     </tr>
-                    <tr>
-                      <th className="px-2 py-1 text-center border border-[#1e3a5f] w-10 bg-[#16365c]">H</th>
-                      <th className="px-2 py-1 text-center border border-[#1e3a5f] w-10 bg-[#16365c]">S</th>
-                      <th className="px-2 py-1 text-center border border-[#1e3a5f] w-10 bg-[#16365c]">I</th>
-                      <th className="px-2 py-1 text-center border border-[#1e3a5f] w-10 bg-[#16365c]">A</th>
+                    {/* Sub-header for H S I A */}
+                    <tr className="bg-slate-850 dark:bg-slate-900 text-slate-300 text-[10px] font-extrabold uppercase border-b border-slate-800">
+                      <th className="px-2 py-1.5 text-center border-r border-slate-800 w-10 text-emerald-400 bg-emerald-950/30" title="Hadir">H</th>
+                      <th className="px-2 py-1.5 text-center border-r border-slate-800 w-10 text-amber-400 bg-amber-950/30" title="Sakit">S</th>
+                      <th className="px-2 py-1.5 text-center border-r border-slate-800 w-10 text-blue-400 bg-blue-950/30" title="Izin">I</th>
+                      <th className="px-2 py-1.5 text-center border-r border-slate-800 w-10 text-rose-400 bg-rose-950/30" title="Alpha">A</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
                     {activeSummaryList.map((r, idx) => (
-                      <tr key={`${r.teacherId}-${r.classId || ''}-${r.subjectId || idx}`} className="hover:bg-indigo-50/40 dark:hover:bg-slate-800/50 transition-colors group">
-                        <td className="px-2.5 py-2.5 text-center text-slate-400 font-mono text-xs border-r border-slate-200 dark:border-slate-800">{idx + 1}</td>
-                        <td className="px-3 py-2.5 font-extrabold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap">{r.teacherName}</td>
-                        <td className="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">
+                      <tr 
+                        key={`${r.teacherId}-${r.classId || ''}-${r.subjectId || idx}`} 
+                        className="hover:bg-indigo-50/50 dark:hover:bg-slate-800/60 transition-colors group"
+                      >
+                        <td className="px-3 py-2.5 text-center text-slate-400 dark:text-slate-500 font-mono border-r border-slate-200 dark:border-slate-800">
+                          {idx + 1}
+                        </td>
+                        <td className="px-4 py-2.5 font-bold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          {r.teacherName}
+                        </td>
+                        <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">
                           {rekapViewType === 'per-kelas' ? (
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-black border border-emerald-200 dark:border-emerald-800">
-                                <School className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold border border-emerald-200/80 dark:border-emerald-800/80">
+                                <School className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                 <span>{r.className || 'Kelas'}</span>
                               </span>
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-200 dark:border-indigo-800">
-                                <BookOpen className="w-3 h-3 text-indigo-500 flex-shrink-0" />
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold border border-indigo-200/80 dark:border-indigo-800/80">
+                                <BookOpen className="w-3 h-3 text-indigo-500 shrink-0" />
                                 <span>{r.subjectName || r.subjectsTaught}</span>
+                              </span>
+                            </div>
+                          ) : rekapViewType === 'per-mapel' ? (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold border border-indigo-200/80 dark:border-indigo-800/80">
+                                <BookOpen className="w-3 h-3 text-indigo-500 shrink-0" />
+                                <span>{r.subjectsTaught || r.subjectName || 'Mata Pelajaran'}</span>
                               </span>
                             </div>
                           ) : (
                             <div className="flex flex-wrap items-center gap-1.5">
                               {(r.subjectsTaught || 'Pengajar MQBA').split(' • ').map((subj, sIdx) => (
-                                <span key={sIdx} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-200 dark:border-indigo-800">
-                                  <BookOpen className="w-3 h-3 text-indigo-500 flex-shrink-0" />
+                                <span key={sIdx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold border border-indigo-200/70 dark:border-indigo-800/70">
+                                  <BookOpen className="w-3 h-3 text-indigo-500 shrink-0" />
                                   <span>{subj}</span>
                                 </span>
                               ))}
                             </div>
                           )}
                         </td>
-                        <td className="px-2 py-2.5 text-center font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800">{r.hadir}</td>
-                        <td className="px-2 py-2.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{r.sakit}</td>
-                        <td className="px-2 py-2.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{r.izin}</td>
-                        <td className={`px-2 py-2.5 text-center font-mono border-r border-slate-200 dark:border-slate-800 ${r.alpha > 0 ? 'text-rose-600 font-black' : 'font-bold text-slate-700 dark:text-slate-300'}`}>{r.alpha}</td>
-                        <td className="px-2.5 py-2.5 text-center font-mono font-black text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/40 border-r border-slate-200 dark:border-slate-800">{r.total}</td>
-                        <td className="px-2.5 py-2.5 text-center font-mono font-black text-indigo-700 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20 border-r border-slate-200 dark:border-slate-800">{r.hadir}</td>
-                        <td className="px-2.5 py-2.5 text-center bg-[#0f2942] text-white font-extrabold">{r.persentaseHadir}%</td>
+                        <td className="px-2 py-2.5 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-slate-800">
+                          {r.hadir}
+                        </td>
+                        <td className="px-2 py-2.5 text-center font-mono font-bold text-amber-600 dark:text-amber-400 border-r border-slate-200 dark:border-slate-800">
+                          {r.sakit}
+                        </td>
+                        <td className="px-2 py-2.5 text-center font-mono font-bold text-blue-600 dark:text-blue-400 border-r border-slate-200 dark:border-slate-800">
+                          {r.izin}
+                        </td>
+                        <td className={`px-2 py-2.5 text-center font-mono border-r border-slate-200 dark:border-slate-800 ${r.alpha > 0 ? 'text-rose-600 dark:text-rose-400 font-black' : 'text-slate-400 dark:text-slate-500 font-bold'}`}>
+                          {r.alpha}
+                        </td>
+                        <td className="px-3 py-2.5 text-center font-mono font-bold text-slate-800 dark:text-slate-200 bg-slate-50/60 dark:bg-slate-850/40 border-r border-slate-200 dark:border-slate-800">
+                          {r.total}
+                        </td>
+                        <td className="px-3 py-2.5 text-center font-mono font-black text-indigo-700 dark:text-indigo-300 bg-indigo-50/40 dark:bg-indigo-950/20 border-r border-slate-200 dark:border-slate-800">
+                          {r.hadir}
+                        </td>
+                        <td className="px-3 py-2.5 text-center border-r border-slate-200 dark:border-slate-800">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full font-mono text-[11px] font-black ${
+                            r.persentaseHadir >= 90
+                              ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                              : r.persentaseHadir >= 75
+                              ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                              : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                          }`}>
+                            {r.persentaseHadir}%
+                          </span>
+                        </td>
                         <td className="px-3 py-2.5 text-center sticky right-0 z-10 bg-white group-hover:bg-indigo-50/80 dark:bg-slate-900 dark:group-hover:bg-slate-800 border-l border-slate-200 dark:border-slate-700 shadow-xs">
                           <button
                             onClick={() => openEditRekap(r)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider transition cursor-pointer shadow-xs"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer shadow-xs"
                             title="Edit Rekap Kehadiran Guru"
                           >
                             <Edit className="w-3.5 h-3.5"/>
@@ -1239,6 +1293,41 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
                       </tr>
                     ))}
                   </tbody>
+                  {/* Table Footer: Total Keseluruhan */}
+                  <tfoot className="bg-slate-900 dark:bg-slate-950 text-white font-black text-xs border-t-2 border-indigo-500 sticky bottom-0 z-20">
+                    <tr>
+                      <td colSpan={3} className="px-4 py-3 text-right uppercase tracking-wider text-[11px] text-indigo-200 border-r border-slate-800">
+                        <div className="flex items-center justify-end gap-2">
+                          <BarChart2 className="w-4 h-4 text-indigo-400" />
+                          <span>Total Keseluruhan ({activeSummaryList.length} Rincian):</span>
+                        </div>
+                      </td>
+                      <td className="px-2 py-3 text-center font-mono text-emerald-400 border-r border-slate-800 text-sm">
+                        {grandTotal.hadir}
+                      </td>
+                      <td className="px-2 py-3 text-center font-mono text-amber-400 border-r border-slate-800 text-sm">
+                        {grandTotal.sakit}
+                      </td>
+                      <td className="px-2 py-3 text-center font-mono text-blue-400 border-r border-slate-800 text-sm">
+                        {grandTotal.izin}
+                      </td>
+                      <td className="px-2 py-3 text-center font-mono text-rose-400 border-r border-slate-800 text-sm">
+                        {grandTotal.alpha}
+                      </td>
+                      <td className="px-3 py-3 text-center font-mono text-slate-200 bg-slate-800 border-r border-slate-800 text-sm">
+                        {grandTotal.totalJP}
+                      </td>
+                      <td className="px-3 py-3 text-center font-mono text-emerald-300 bg-indigo-950/80 border-r border-slate-800 text-sm">
+                        {grandTotal.totalKehadiran}
+                      </td>
+                      <td className="px-3 py-3 text-center font-mono bg-indigo-900 border-r border-slate-800 text-sm">
+                        <span className="px-2.5 py-0.5 rounded-full bg-indigo-800 text-white border border-indigo-400/30">
+                          {grandTotal.persentaseHadir}%
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 text-center sticky right-0 z-20 bg-slate-900 dark:bg-slate-950"></td>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             )}

@@ -364,7 +364,12 @@ api.get('/attendances', async (c) => {
       WHERE (subject_id IS NULL OR subject_id = '') AND notes LIKE '%Akhlaq%'
     `).run().catch(() => {});
 
-    // Auto-fix attendances semester_id according to month (7-12 = sem-1 Ganjil, 1-6 = sem-2 Genap)
+    // Auto-fix attendances academic_year_id and semester_id according to month (7-12 = sem-1 Ganjil, 1-6 = sem-2 Genap)
+    await c.env.DB.prepare(`
+      UPDATE attendances
+      SET academic_year_id = 'ay-1'
+      WHERE academic_year_id IS NULL OR academic_year_id = '' OR academic_year_id = 'academic_years-1786519227456'
+    `).run().catch(() => {});
     await c.env.DB.prepare(`
       UPDATE attendances
       SET semester_id = 'sem-1'
@@ -459,6 +464,19 @@ api.get('/santri_attendances', async (c) => {
   try {
     await c.env.DB.prepare('ALTER TABLE santri_attendances ADD COLUMN subject_id TEXT').run().catch(() => {});
     await c.env.DB.prepare('ALTER TABLE santri_attendances ADD COLUMN subject_name TEXT').run().catch(() => {});
+
+    // Auto-fix santri_attendances academic_year_id and semester_id
+    await c.env.DB.prepare(`
+      UPDATE santri_attendances
+      SET academic_year_id = 'ay-1'
+      WHERE academic_year_id IS NULL OR academic_year_id = '' OR academic_year_id = 'academic_years-1786519227456'
+    `).run().catch(() => {});
+    await c.env.DB.prepare(`
+      UPDATE santri_attendances
+      SET semester_id = 'sem-1'
+      WHERE (semester_id = 'sem-2' OR semester_id IS NULL OR semester_id = '') 
+        AND (date LIKE '%-07-%' OR date LIKE '%-08-%' OR date LIKE '%-09-%' OR date LIKE '%-10-%' OR date LIKE '%-11-%' OR date LIKE '%-12-%')
+    `).run().catch(() => {});
 
     const { results } = await c.env.DB.prepare(`
       SELECT sa.*, c.name as className, s.name as santriName, t.name as teacherName, subj.name as subjectName
@@ -712,7 +730,7 @@ tables.forEach(table => {
         return c.json(results);
       }
       if (table === 'academic_years') {
-        const { results } = await c.env.DB.prepare("SELECT * FROM academic_years ORDER BY id ASC").all();
+        const { results } = await c.env.DB.prepare("SELECT * FROM academic_years ORDER BY CASE WHEN id = 'ay-1' OR name LIKE '%2026%' THEN 1 ELSE 2 END ASC, name ASC").all();
         return c.json(results);
       }
       const { results } = await c.env.DB.prepare(`SELECT * FROM ${table} ORDER BY id DESC`).all();

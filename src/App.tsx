@@ -180,8 +180,12 @@ export default function App() {
 
       setTeachers(tch);
       setSubjects(sbj);
-      setClasses(cls);
-      setAcademicYears(ay);
+      const sortedAY = [...ay].sort((a: any, b: any) => {
+        if (a.id === 'ay-1' || a.name?.includes('2026')) return -1;
+        if (b.id === 'ay-1' || b.name?.includes('2026')) return 1;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+      setAcademicYears(sortedAY);
       const sortedSem = [...sem].sort((a: any, b: any) => {
         const aGanjil = (a.name || '').toLowerCase().includes('ganjil') || a.id === 'sem-1';
         const bGanjil = (b.name || '').toLowerCase().includes('ganjil') || b.id === 'sem-1';

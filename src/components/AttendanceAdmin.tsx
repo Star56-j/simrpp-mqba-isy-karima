@@ -581,11 +581,18 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
   const loadAttendances = React.useCallback(async () => {
     setLoading(true);
     try {
-      const params: Record<string, string> = { academicYearId: filterAY, semesterId: filterSem };
+      const params: Record<string, string> = {};
+      if (filterAY) params.academicYearId = filterAY;
       if (filterTeacher) params.teacherId = filterTeacher;
-      if (rekapMode === 'bulan') { params.year = filterYear; params.month = filterMonth; }
-      else if (rekapMode === 'semester') { params.year = filterYear; }
-      else { params.year = filterYear; }
+      if (rekapMode === 'bulan') { 
+        params.year = filterYear; 
+        params.month = filterMonth; 
+      } else if (rekapMode === 'semester') { 
+        params.year = filterYear; 
+        if (filterSem) params.semesterId = filterSem;
+      } else { 
+        params.year = filterYear; 
+      }
       const data = await api.getAttendances(params);
       setAttendances(data);
     } catch { setAttendances([]); } finally { setLoading(false); }
@@ -593,10 +600,17 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
 
   const loadSummary = React.useCallback(async () => {
     try {
-      const params: Record<string, string> = { academicYearId: filterAY, semesterId: filterSem };
-      if (rekapMode === 'bulan') { params.year = filterYear; params.month = filterMonth; }
-      else if (rekapMode === 'semester') params.year = filterYear;
-      else params.year = filterYear;
+      const params: Record<string, string> = {};
+      if (filterAY) params.academicYearId = filterAY;
+      if (rekapMode === 'bulan') { 
+        params.year = filterYear; 
+        params.month = filterMonth; 
+      } else if (rekapMode === 'semester') {
+        params.year = filterYear;
+        if (filterSem) params.semesterId = filterSem;
+      } else {
+        params.year = filterYear;
+      }
       const data = await api.getAttendanceSummary(params);
       setSummary(data);
     } catch { setSummary([]); }

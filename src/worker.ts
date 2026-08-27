@@ -357,11 +357,25 @@ api.get('/attendances', async (c) => {
       WHERE teacher_id = 'pengajar' OR teacher_id IS NULL OR teacher_id = '' OR teacher_id = 'undefined'
     `).run().catch(() => {});
 
-    // Also auto-fix if subject is Akhlaq and subject_id is missing -> assign s-7
+    // Auto-fix if subject is Akhlaq and subject_id is missing -> assign s-7
     await c.env.DB.prepare(`
       UPDATE attendances
       SET subject_id = 's-7'
       WHERE (subject_id IS NULL OR subject_id = '') AND notes LIKE '%Akhlaq%'
+    `).run().catch(() => {});
+
+    // Auto-fix attendances semester_id according to month (7-12 = sem-1 Ganjil, 1-6 = sem-2 Genap)
+    await c.env.DB.prepare(`
+      UPDATE attendances
+      SET semester_id = 'sem-1'
+      WHERE (semester_id = 'sem-2' OR semester_id IS NULL OR semester_id = '') 
+        AND (date LIKE '%-07-%' OR date LIKE '%-08-%' OR date LIKE '%-09-%' OR date LIKE '%-10-%' OR date LIKE '%-11-%' OR date LIKE '%-12-%')
+    `).run().catch(() => {});
+    await c.env.DB.prepare(`
+      UPDATE santri_attendances
+      SET semester_id = 'sem-1'
+      WHERE (semester_id = 'sem-2' OR semester_id IS NULL OR semester_id = '') 
+        AND (date LIKE '%-07-%' OR date LIKE '%-08-%' OR date LIKE '%-09-%' OR date LIKE '%-10-%' OR date LIKE '%-11-%' OR date LIKE '%-12-%')
     `).run().catch(() => {});
 
     const { results } = await c.env.DB.prepare(`

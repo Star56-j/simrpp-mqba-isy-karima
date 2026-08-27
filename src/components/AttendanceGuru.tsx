@@ -92,12 +92,15 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
 
   const buildParams = React.useCallback(() => {
     const p: Record<string, string> = { 
-      academicYearId: filterAY, 
-      semesterId: filterSem, 
       year: filterYear,
       teacherId: myTeacherId
     };
-    if (rekapMode === 'bulan') p.month = filterMonth;
+    if (filterAY) p.academicYearId = filterAY;
+    if (rekapMode === 'bulan') {
+      p.month = filterMonth;
+    } else if (rekapMode === 'semester') {
+      if (filterSem) p.semesterId = filterSem;
+    }
     if (filterSubject && filterSubject !== 'Semua') p.subjectId = filterSubject;
     return p;
   }, [filterAY, filterSem, filterYear, filterMonth, rekapMode, myTeacherId, filterSubject]);

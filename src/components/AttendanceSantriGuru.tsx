@@ -170,11 +170,14 @@ export default function AttendanceSantriGuru({
 
   const buildParams = React.useCallback(() => {
     const p: Record<string, string> = { 
-      academicYearId: filterAY, 
-      semesterId: filterSem, 
       year: filterYear 
     };
-    if (rekapMode === 'bulan') p.month = filterMonth;
+    if (filterAY) p.academicYearId = filterAY;
+    if (rekapMode === 'bulan') {
+      p.month = filterMonth;
+    } else if (rekapMode === 'semester') {
+      if (filterSem) p.semesterId = filterSem;
+    }
     if (filterClass !== 'Semua') p.classId = filterClass;
     if (filterSubject !== 'Semua') p.subjectId = filterSubject;
     return p;

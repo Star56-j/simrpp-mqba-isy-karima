@@ -81,8 +81,13 @@ export default function AttendanceSantriAdmin({ classes, academicYears, semester
   }, [fClass, schedules, subjects]);
 
   const buildParams = React.useCallback(() => {
-    const p: Record<string, string> = { academicYearId: filterAY, semesterId: filterSem, year: filterYear };
-    if (rekapMode === 'bulan') p.month = filterMonth;
+    const p: Record<string, string> = { year: filterYear };
+    if (filterAY) p.academicYearId = filterAY;
+    if (rekapMode === 'bulan') {
+      p.month = filterMonth;
+    } else if (rekapMode === 'semester') {
+      if (filterSem) p.semesterId = filterSem;
+    }
     if (filterClass) p.classId = filterClass;
     return p;
   }, [filterAY, filterSem, filterYear, filterMonth, filterClass, rekapMode]);

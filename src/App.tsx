@@ -182,7 +182,14 @@ export default function App() {
       setSubjects(sbj);
       setClasses(cls);
       setAcademicYears(ay);
-      setSemesters(sem);
+      const sortedSem = [...sem].sort((a: any, b: any) => {
+        const aGanjil = (a.name || '').toLowerCase().includes('ganjil') || a.id === 'sem-1';
+        const bGanjil = (b.name || '').toLowerCase().includes('ganjil') || b.id === 'sem-1';
+        if (aGanjil && !bGanjil) return -1;
+        if (!aGanjil && bGanjil) return 1;
+        return (a.id || '').localeCompare(b.id || '');
+      });
+      setSemesters(sortedSem);
       setSchedules(sch);
       
       const decoratedRpps = r.map((item: any) => {

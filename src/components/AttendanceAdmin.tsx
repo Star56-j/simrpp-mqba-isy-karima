@@ -804,6 +804,15 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
               </select>
             </div>
           )}
+          {rekapMode === 'semester' && (
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Semester</label>
+              <select value={filterSem} onChange={e=>setFilterSem(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                {semesters.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          )}
           <div>
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Tahun</label>
             <input type="number" value={filterYear} onChange={e=>setFilterYear(e.target.value)} min={2020} max={2035}
@@ -1190,27 +1199,27 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
       {/* MODAL EDIT REKAP (PER-GURU ATAU PER-MAPEL) */}
       {showEditRekapModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg border border-slate-100 dark:border-slate-800 shadow-2xl p-6 space-y-4 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md border border-slate-200 dark:border-slate-800 shadow-2xl p-4 sm:p-5 space-y-3 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
               <div>
-                <h3 className="font-black text-slate-900 dark:text-white text-base flex items-center gap-2">
-                  <Edit className="w-4 h-4 text-indigo-600"/>
+                <h3 className="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
+                  <Edit className="w-3.5 h-3.5 text-indigo-600"/>
                   <span>Edit Rekap Kehadiran Guru</span>
                 </h3>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">Periode: {rekapLabel}</p>
+                <p className="text-[10px] text-slate-500 font-medium">Periode: {rekapLabel}</p>
               </div>
-              <button onClick={() => setShowEditRekapModal(false)} className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
-                <X className="w-5 h-5"/>
+              <button onClick={() => setShowEditRekapModal(false)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                <X className="w-4 h-4"/>
               </button>
             </div>
 
-            {editRekapError && <div className="p-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 text-xs flex items-center space-x-2"><AlertCircle className="w-4 h-4 shrink-0"/><span>{editRekapError}</span></div>}
-            {editRekapSuccess && <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs flex items-center space-x-2"><CheckCircle className="w-4 h-4 shrink-0"/><span>{editRekapSuccess}</span></div>}
+            {editRekapError && <div className="p-2 rounded-lg bg-rose-50 border border-rose-100 text-rose-700 text-xs flex items-center space-x-1.5"><AlertCircle className="w-3.5 h-3.5 shrink-0"/><span>{editRekapError}</span></div>}
+            {editRekapSuccess && <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs flex items-center space-x-1.5"><CheckCircle className="w-3.5 h-3.5 shrink-0"/><span>{editRekapSuccess}</span></div>}
 
-            <form onSubmit={handleSaveEditRekap} className="space-y-4">
+            <form onSubmit={handleSaveEditRekap} className="space-y-3">
               {/* Guru Selector */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Guru / Pengajar</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Guru / Pengajar</label>
                 <select
                   required
                   value={editRekapTeacherId}
@@ -1226,7 +1235,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
                       setEditRekapSubjectName('Pengajar MQBA');
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   {teachers.map(t => (
                     <option key={t.id} value={t.id}>{t.name}</option>
@@ -1236,128 +1245,128 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
 
               {/* Mapel Info */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Mata Pelajaran yang Diampu</label>
-                <div className="p-3 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                  <span className="text-xs font-extrabold text-indigo-900 dark:text-indigo-200">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Mata Pelajaran yang Diampu</label>
+                <div className="px-2.5 py-1.5 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/70 dark:border-indigo-800/60 flex items-center gap-1.5 text-xs font-bold text-indigo-900 dark:text-indigo-200">
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="truncate">
                     {editRekapSubjectName || getTeacherSubjects(editRekapTeacherId)}
                   </span>
                 </div>
               </div>
 
               {/* Field Input TOTAL JP WAJIB (Bisa Diedit Langsung) */}
-              <div className="space-y-1 bg-indigo-50/70 dark:bg-indigo-950/40 p-4 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800">
+              <div className="bg-indigo-50/60 dark:bg-indigo-950/30 p-2.5 rounded-xl border border-indigo-200/80 dark:border-indigo-800/80 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-black text-indigo-900 dark:text-indigo-200 uppercase tracking-wider flex items-center gap-1.5">
-                    <CheckCircle className="w-4 h-4 text-indigo-600" />
+                  <label className="text-[10px] font-extrabold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                     <span>Total JP Wajib Mengajar (Target Masuk / Jam)</span>
                   </label>
-                  <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 px-2.5 py-0.5 rounded-full shadow-xs">
-                    ✏️ Dapat Diedit Bebas
+                  <span className="text-[9px] font-bold text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 px-1.5 py-0.5 rounded-full shadow-2xs">
+                    ✏️ Edit Bebas
                   </span>
                 </div>
-                <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-2.5">
                   <input
                     type="number"
                     min={0}
                     max={200}
                     value={editRekapJpWajib}
                     onChange={e => handleJpWajibChange(Number(e.target.value))}
-                    className="w-28 text-center font-mono font-black text-xl text-indigo-900 dark:text-white bg-white dark:bg-slate-900 rounded-xl py-2 border-2 border-indigo-400 dark:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-xs"
+                    className="w-16 text-center font-mono font-bold text-sm text-indigo-900 dark:text-white bg-white dark:bg-slate-900 rounded-lg py-1 border border-indigo-300 dark:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-2xs"
                   />
-                  <div className="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                    <span>Target total jam pelajaran / pertemuan wajib ustadz pada periode ini.</span>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                    <span>Target total jam pelajaran / pertemuan wajib ustadz periode ini.</span>
                   </div>
                 </div>
               </div>
 
               {/* Kehadiran Counts Input Grid */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Rincian Realisasi Kehadiran (H, S, I, A)</label>
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/40 text-center">
-                    <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 block uppercase">Hadir (H)</span>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Rincian Realisasi Kehadiran (H, S, I, A)</label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900/40 text-center">
+                    <span className="text-[9px] font-black text-indigo-700 dark:text-indigo-300 block uppercase">Hadir (H)</span>
                     <input
                       type="number"
                       min={0}
                       max={100}
                       value={editRekapHadir}
                       onChange={e => handleHadirChange(Number(e.target.value))}
-                      className="w-full text-center font-mono font-black text-base text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 rounded-lg py-1 border border-indigo-200 dark:border-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-1"
+                      className="w-full text-center font-mono font-bold text-xs text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 rounded-md py-0.5 border border-indigo-200 dark:border-indigo-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 mt-1"
                     />
                   </div>
-                  <div className="bg-blue-50/50 dark:bg-blue-950/20 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/40 text-center">
-                    <span className="text-[10px] font-black text-blue-700 dark:text-blue-300 block uppercase">Izin (I)</span>
+                  <div className="bg-blue-50/50 dark:bg-blue-950/20 p-1.5 rounded-lg border border-blue-100 dark:border-blue-900/40 text-center">
+                    <span className="text-[9px] font-black text-blue-700 dark:text-blue-300 block uppercase">Izin (I)</span>
                     <input
                       type="number"
                       min={0}
                       max={100}
                       value={editRekapIzin}
                       onChange={e => handleIzinChange(Number(e.target.value))}
-                      className="w-full text-center font-mono font-black text-base text-blue-700 dark:text-blue-300 bg-white dark:bg-slate-800 rounded-lg py-1 border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1"
+                      className="w-full text-center font-mono font-bold text-xs text-blue-700 dark:text-blue-300 bg-white dark:bg-slate-800 rounded-md py-0.5 border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-500 mt-1"
                     />
                   </div>
-                  <div className="bg-amber-50/50 dark:bg-amber-950/20 p-2.5 rounded-xl border border-amber-100 dark:border-amber-900/40 text-center">
-                    <span className="text-[10px] font-black text-amber-700 dark:text-amber-300 block uppercase">Sakit (S)</span>
+                  <div className="bg-amber-50/50 dark:bg-amber-950/20 p-1.5 rounded-lg border border-amber-100 dark:border-amber-900/40 text-center">
+                    <span className="text-[9px] font-black text-amber-700 dark:text-amber-300 block uppercase">Sakit (S)</span>
                     <input
                       type="number"
                       min={0}
                       max={100}
                       value={editRekapSakit}
                       onChange={e => handleSakitChange(Number(e.target.value))}
-                      className="w-full text-center font-mono font-black text-base text-amber-700 dark:text-amber-300 bg-white dark:bg-slate-800 rounded-lg py-1 border border-amber-200 dark:border-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 mt-1"
+                      className="w-full text-center font-mono font-bold text-xs text-amber-700 dark:text-amber-300 bg-white dark:bg-slate-800 rounded-md py-0.5 border border-amber-200 dark:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-500 mt-1"
                     />
                   </div>
-                  <div className="bg-rose-50/50 dark:bg-rose-950/20 p-2.5 rounded-xl border border-rose-100 dark:border-rose-900/40 text-center">
-                    <span className="text-[10px] font-black text-rose-700 dark:text-rose-300 block uppercase">Alpha (A)</span>
+                  <div className="bg-rose-50/50 dark:bg-rose-950/20 p-1.5 rounded-lg border border-rose-100 dark:border-rose-900/40 text-center">
+                    <span className="text-[9px] font-black text-rose-700 dark:text-rose-300 block uppercase">Alpha (A)</span>
                     <input
                       type="number"
                       min={0}
                       max={100}
                       value={editRekapAlpha}
                       onChange={e => handleAlphaChange(Number(e.target.value))}
-                      className="w-full text-center font-mono font-black text-base text-rose-700 dark:text-rose-300 bg-white dark:bg-slate-800 rounded-lg py-1 border border-rose-200 dark:border-rose-800 focus:outline-none focus:ring-2 focus:ring-rose-500 mt-1"
+                      className="w-full text-center font-mono font-bold text-xs text-rose-700 dark:text-rose-300 bg-white dark:bg-slate-800 rounded-md py-0.5 border border-rose-200 dark:border-rose-800 focus:outline-none focus:ring-1 focus:ring-rose-500 mt-1"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Total & % Hadir Summary Row */}
-              <div className="p-3.5 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-between text-xs font-bold border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-600 dark:text-slate-400">Total Kehadiran & Persentase:</span>
-                <span className="font-mono font-black text-slate-900 dark:text-white text-sm">
-                  {editRekapHadir} Hadir / {editRekapJpWajib} Total JP Wajib ({editRekapJpWajib > 0 ? Math.round((editRekapHadir / editRekapJpWajib) * 100) : 0}% Hadir)
+              <div className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-between text-xs font-bold border border-slate-200 dark:border-slate-700">
+                <span className="text-slate-600 dark:text-slate-400 text-[11px]">Total Hadir & Persentase:</span>
+                <span className="font-mono font-extrabold text-slate-900 dark:text-white text-xs">
+                  {editRekapHadir} Hadir / {editRekapJpWajib} JP ({editRekapJpWajib > 0 ? Math.round((editRekapHadir / editRekapJpWajib) * 100) : 0}%)
                 </span>
               </div>
 
               {/* Notes */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Keterangan (Opsional)</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Keterangan (Opsional)</label>
                 <input
                   type="text"
                   value={editRekapNotes}
                   onChange={e => setEditRekapNotes(e.target.value)}
                   placeholder="Contoh: Rekap kehadiran bulan ini"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
               {/* Buttons */}
-              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowEditRekapModal(false)}
-                  className="px-4 py-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold uppercase transition cursor-pointer"
+                  className="px-3 py-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-xs font-bold uppercase transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingRekap}
-                  className="px-6 py-2.5 bg-indigo-700 hover:bg-indigo-800 disabled:opacity-50 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-1.5 bg-indigo-700 hover:bg-indigo-800 disabled:opacity-50 text-white rounded-lg text-xs font-extrabold uppercase tracking-wider shadow-xs transition flex items-center gap-1.5 cursor-pointer"
                 >
-                  <CheckCircle className="w-4 h-4"/>
-                  <span>{isSavingRekap ? 'Menyimpan...' : 'Simpan Perubahan Rekap'}</span>
+                  <CheckCircle className="w-3.5 h-3.5"/>
+                  <span>{isSavingRekap ? 'Menyimpan...' : 'Simpan Rekap'}</span>
                 </button>
               </div>
             </form>

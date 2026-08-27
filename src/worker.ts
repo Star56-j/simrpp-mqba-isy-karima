@@ -38,6 +38,7 @@ api.get('/health', (c) => {
 api.post('/auth/login', async (c) => {
   const { email, password } = await c.req.json().catch(() => ({ email: '', password: '' }));
   try {
+    await ensureDatabaseConsistency(c.env.DB);
     const cleanEmail = (email || '').trim().toLowerCase();
     const emailWithDomain = cleanEmail.includes('@') ? cleanEmail : `${cleanEmail}@isykarima.com`;
     const emailPrefix = cleanEmail.split('@')[0];
@@ -50,11 +51,13 @@ api.post('/auth/login', async (c) => {
       const user: any = results[0];
       const isPassValid = 
         password === user.passwordHash ||
+        password === user.password_hash ||
         password === 'guru123' ||
         password === 'parabek123' ||
         password === 'admin123' ||
         password === 'wali123' ||
-        (user.passwordHash && user.passwordHash.toLowerCase() === password.toLowerCase());
+        (user.passwordHash && user.passwordHash.toLowerCase() === password.toLowerCase()) ||
+        (user.password_hash && user.password_hash.toLowerCase() === password.toLowerCase());
 
       if (isPassValid) {
         // Ensure activity_logs table exists
@@ -690,6 +693,14 @@ tables.forEach(table => {
       if (table === 'rpps') {
         await c.env.DB.prepare("UPDATE rpps SET teacher_id = 't-12' WHERE teacher_id IS NULL OR teacher_id = '' OR teacher_id = 'undefined'").run().catch(() => {});
       }
+      if (table === 'semesters') {
+        const { results } = await c.env.DB.prepare("SELECT * FROM semesters ORDER BY CASE WHEN LOWER(name) LIKE '%ganjil%' OR id = 'sem-1' THEN 1 ELSE 2 END ASC, id ASC").all();
+        return c.json(results);
+      }
+      if (table === 'academic_years') {
+        const { results } = await c.env.DB.prepare("SELECT * FROM academic_years ORDER BY id ASC").all();
+        return c.json(results);
+      }
       const { results } = await c.env.DB.prepare(`SELECT * FROM ${table} ORDER BY id DESC`).all();
       return c.json(results);
     } catch (e: any) {
@@ -1304,19 +1315,19 @@ async function ensureDatabaseConsistency(db: D1Database) {
     // Akun Login Guru Ust. Abdullah Kristianto, S.Sos. (ustadz.abdullah)
     await db.prepare(`DELETE FROM users WHERE email = 'ustadz.abdullah' AND teacher_id != 't-33'`).run().catch(() => {});
     await db.prepare(`
-      INSERT OR REPLACE INTO users (id, name, email, password_hash, role, teacher_id)
-      VALUES ('user-t-33-guru', 'Ust. Abdullah Kristianto, S.Sos.', 'ustadz.abdullah', 'guru123', 'Guru', 't-33')
+      INSERT OR REPLACE INTO users (id, name, email, passwordHash, role, teacher_id)
+      VALUES ('user-t-33-guru', 'Ust. Abdullah Kristianto, S.Sos.', 'ustadz.abdullah@isykarima.com', 'guru123', 'Guru', 't-33')
     `).run().catch(() => {});
 
     // Akun Login Wali Kelas Ust. Abdullah Kristianto, S.Sos. (wali.abdullah)
     await db.prepare(`
-      INSERT OR REPLACE INTO users (id, name, email, password_hash, role, teacher_id)
+      INSERT OR REPLACE INTO users (id, name, email, passwordHash, role, teacher_id)
       VALUES ('user-t-33-wali', 'Ust. Abdullah Kristianto, S.Sos.', 'wali.abdullah', 'wali123', 'WaliKelas', 't-33')
     `).run().catch(() => {});
 
     // Jadwal Mengajar ABY (s-4) di VII Putra (cls-3) dan I'dad Putra (cls-1) dialihkan ke t-33
     await db.prepare(`
-      UPDATE schedules
+      UPDATE teaching_schedules
       SET teacher_id = 't-33'
       WHERE subject_id = 's-4' AND (class_id = 'cls-1' OR class_id = 'cls-3')
     `).run().catch(() => {});
@@ -1337,17 +1348,26 @@ async function ensureDatabaseConsistency(db: D1Database) {
     `).run().catch(() => {});
 
     // Akun Login Guru Ust. Muhammad Ilyas Abdullah (ustadz.ilyas)
-    await db.prepare(`DELETE FROM users WHERE email = 'ustadz.ilyas'`).run().catch(() => {});
     await db.prepare(`
-      INSERT OR REPLACE INTO users (id, name, email, password_hash, role, teacher_id)
-      VALUES ('user-t-5-guru', 'Ust. Muhammad Ilyas Abdullah', 'ustadz.ilyas', 'guru123', 'Guru', 't-5')
+      UPDATE users
+      SET name = 'Ust. Muhammad Ilyas Abdullah',
+          email = 'ustadz.ilyas@isykarima.com',
+          passwordHash = 'guru123',
+          role = 'Guru',
+          teacher_id = 't-5'
+      WHERE id = 'user-t-5' OR (teacher_id = 't-5' AND role = 'Guru');
+    `).run().catch(() => {});
+
+    await db.prepare(`
+      INSERT OR REPLACE INTO users (id, name, email, passwordHash, role, teacher_id)
+      VALUES ('user-t-5-guru', 'Ust. Muhammad Ilyas Abdullah', 'ustadz.ilyas@isykarima.com', 'guru123', 'Guru', 't-5')
     `).run().catch(() => {});
 
     // Pastikan Jadwal Tai Chi untuk Semua Kelas Putra
     const boysClasses = ['cls-1', 'cls-3', 'cls-5', 'cls-7'];
     for (const cId of boysClasses) {
       await db.prepare(`
-        INSERT OR IGNORE INTO schedules (id, day, time, class_id, teacher_id, subject_id, academic_year_id, semester_id)
+        INSERT OR IGNORE INTO teaching_schedules (id, day, time, class_id, teacher_id, subject_id, academic_year_id, semester_id)
         VALUES (?, 'Rabu', '07:00 - 09:00', ?, 't-5', 'subjects-1786502401572', 'ay-1', 'sem-1')
       `).bind(`sch-taichi-${cId}`, cId).run().catch(() => {});
     }

@@ -612,6 +612,15 @@ export default function AttendanceGuru({ academicYears, semesters, subjects = []
               </select>
             </div>
           )}
+          {rekapMode === 'semester' && (
+            <div className="space-y-1 min-w-[120px]">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Semester</label>
+              <select value={filterSem} onChange={e => setFilterSem(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          )}
           <div className="space-y-1 min-w-[160px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mata Pelajaran</label>
             <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)}

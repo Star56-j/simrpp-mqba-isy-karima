@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   ClipboardList, Plus, Search, Filter, Edit, Trash2, X,
-  CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download, Printer, BookOpen, FileText
+  CheckCircle, AlertCircle, BarChart2, Calendar, Users, Download, Printer, BookOpen, FileText,
+  School, GraduationCap
 } from 'lucide-react';
 import { Attendance, AttendanceSummary, Teacher, AcademicYear, Semester, TeachingSchedule, Subject, SchoolClass } from '../types';
 import { api } from '../api';
@@ -38,7 +39,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
   const currentMonth = (new Date().getMonth() + 1).toString();
 
   const [activeTab, setActiveTab] = React.useState<'input' | 'rekap'>('input');
-  const [rekapViewType, setRekapViewType] = React.useState<'gabungan' | 'per-mapel'>('gabungan');
+  const [rekapViewType, setRekapViewType] = React.useState<'gabungan' | 'per-mapel' | 'per-kelas'>('gabungan');
 
   // Filter state
   const [filterTeacher, setFilterTeacher] = React.useState('');
@@ -127,9 +128,51 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
     return details.length > 0 ? details.map(d => d.formatted).join(' • ') : 'Pengajar MQBA';
   }, [getTeacherTeachingDetails]);
 
+  // Helper: Dapatkan rincian per-kelas dan per-mapel yang diampu guru
+  const getTeacherClassDetails = React.useCallback((tId: string) => {
+    const teacherObj = teachers.find(t => t.id === tId);
+    const teacherName = teacherObj?.name || '';
+
+    const mySchedules = (schedules || []).filter(s => {
+      if (s.teacherId === tId || (s as any).teacher_id === tId || (s.teacher && s.teacher.id === tId)) return true;
+      if (s.teacher?.name && teacherName && (s.teacher.name.toLowerCase() === teacherName.toLowerCase() || teacherName.toLowerCase().includes(s.teacher.name.toLowerCase()))) return true;
+      return false;
+    });
+
+    const list: { classId: string; className: string; subjectId: string; subjectName: string; formatted: string }[] = [];
+    const seen = new Set<string>();
+
+    mySchedules.forEach(sch => {
+      const cId = sch.classId || (sch as any).class_id || (sch.class && sch.class.id);
+      const sId = sch.subjectId || (sch as any).subject_id || (sch.subject && sch.subject.id);
+      if (!cId || !sId) return;
+
+      const key = `${cId}_${sId}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+
+      const clsObj = (classes || []).find(c => c.id === cId) || sch.class;
+      const rawClsName = clsObj?.name || (cId ? String(cId).replace(/^cls-/, 'Kelas ') : '');
+      const clsName = rawClsName ? (rawClsName.toLowerCase().startsWith('kelas') ? rawClsName : `Kelas ${rawClsName}`) : 'Kelas';
+
+      const subjObj = (subjects || []).find(s => s.id === sId) || sch.subject;
+      const subjName = subjObj?.name || 'Mata Pelajaran';
+
+      list.push({
+        classId: cId,
+        className: clsName,
+        subjectId: sId,
+        subjectName: subjName,
+        formatted: `${clsName} — ${subjName}`
+      });
+    });
+
+    return list;
+  }, [teachers, schedules, subjects, classes]);
+
   // 1. Per-Teacher & Per-Subject Summary Array (Dipisah per mapel & kelas)
   const subjectSummaryList = React.useMemo(() => {
-    const result: (AttendanceSummary & { subjectId?: string; subjectName: string; subjectsTaught: string; classesList?: string[] })[] = [];
+    const result: (AttendanceSummary & { classId?: string; className?: string; subjectId?: string; subjectName: string; subjectsTaught: string; classesList?: string[] })[] = [];
 
     teachers.forEach(t => {
       const details = getTeacherTeachingDetails(t.id);
@@ -196,9 +239,79 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
     return result;
   }, [teachers, attendances, getTeacherTeachingDetails]);
 
-  // 2. Merged per Teacher list (Rekap Gabungan Per Guru)
+  // 2. Per-Teacher & Per-Class Summary Array (Rincian Per-Kelas yang diampu)
+  const classSummaryList = React.useMemo(() => {
+    const result: (AttendanceSummary & { classId?: string; className?: string; subjectId?: string; subjectName: string; subjectsTaught: string; classesList?: string[] })[] = [];
+
+    teachers.forEach(t => {
+      const classDetails = getTeacherClassDetails(t.id);
+
+      if (classDetails.length === 0) {
+        const tAttendances = attendances.filter(a => a.teacherId === t.id);
+        const hadir = tAttendances.filter(a => a.status === 'Hadir').length;
+        const izin = tAttendances.filter(a => a.status === 'Izin').length;
+        const sakit = tAttendances.filter(a => a.status === 'Sakit').length;
+        const alpha = tAttendances.filter(a => a.status === 'Alpha').length;
+        const total = tAttendances.length;
+        const persentaseHadir = total > 0 ? Math.round((hadir / total) * 100) : 0;
+
+        result.push({
+          teacherId: t.id,
+          teacherName: t.name,
+          classId: '',
+          className: 'Semua Kelas',
+          subjectId: '',
+          subjectName: 'Pengajar MQBA',
+          subjectsTaught: 'Pengajar MQBA',
+          hadir,
+          izin,
+          sakit,
+          alpha,
+          total,
+          persentaseHadir
+        });
+      } else {
+        classDetails.forEach(item => {
+          const tSubAttendances = attendances.filter(a => 
+            a.teacherId === t.id && (a.subjectId === item.subjectId || (!a.subjectId && classDetails.length === 1))
+          );
+          
+          const targetRecords = (tSubAttendances.length > 0 || classDetails.length === 1) 
+            ? tSubAttendances 
+            : attendances.filter(a => a.teacherId === t.id);
+
+          const hadir = targetRecords.filter(a => a.status === 'Hadir').length;
+          const izin = targetRecords.filter(a => a.status === 'Izin').length;
+          const sakit = targetRecords.filter(a => a.status === 'Sakit').length;
+          const alpha = targetRecords.filter(a => a.status === 'Alpha').length;
+          const total = targetRecords.length;
+          const persentaseHadir = total > 0 ? Math.round((hadir / total) * 100) : 0;
+
+          result.push({
+            teacherId: t.id,
+            teacherName: t.name,
+            classId: item.classId,
+            className: item.className,
+            subjectId: item.subjectId,
+            subjectName: item.subjectName,
+            subjectsTaught: item.formatted,
+            hadir,
+            izin,
+            sakit,
+            alpha,
+            total,
+            persentaseHadir
+          });
+        });
+      }
+    });
+
+    return result;
+  }, [teachers, attendances, getTeacherClassDetails]);
+
+  // 3. Merged per Teacher list (Rekap Gabungan Per Guru)
   const teacherMergedSummaryList = React.useMemo(() => {
-    const result: (AttendanceSummary & { subjectId?: string; subjectName: string; subjectsTaught: string })[] = [];
+    const result: (AttendanceSummary & { classId?: string; className?: string; subjectId?: string; subjectName: string; subjectsTaught: string; classesList?: string[] })[] = [];
 
     teachers.forEach(t => {
       const details = getTeacherTeachingDetails(t.id);
@@ -230,7 +343,11 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
     return result;
   }, [teachers, attendances, getTeacherTeachingDetails]);
 
-  const activeSummaryList = rekapViewType === 'per-mapel' ? subjectSummaryList : teacherMergedSummaryList;
+  const activeSummaryList = rekapViewType === 'per-mapel' 
+    ? subjectSummaryList 
+    : rekapViewType === 'per-kelas' 
+    ? classSummaryList 
+    : teacherMergedSummaryList;
 
   // Form state
   const [showForm, setShowForm] = React.useState(false);
@@ -990,6 +1107,18 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Rincian Per-Mapel</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setRekapViewType('per-kelas')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5 ${
+                      rekapViewType === 'per-kelas'
+                        ? 'bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <School className="w-3.5 h-3.5" />
+                    <span>Rincian Per-Kelas</span>
+                  </button>
                 </div>
               </div>
 
@@ -1007,7 +1136,7 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
                 </button>
                 <button
                   onClick={() => {
-                    const exportFileName = `Rekap_Kehadiran_Guru_${rekapViewType === 'per-mapel' ? 'Per_Mapel_' : 'Gabungan_'}${rekapLabel.replace(/ /g, '_')}`;
+                    const exportFileName = `Rekap_Kehadiran_Guru_${rekapViewType === 'per-kelas' ? 'Per_Kelas_' : rekapViewType === 'per-mapel' ? 'Per_Mapel_' : 'Gabungan_'}${rekapLabel.replace(/ /g, '_')}`;
                     exportRekapGuruExcel(activeSummaryList, rekapLabel, exportFileName);
                   }}
                   className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
@@ -1046,7 +1175,9 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
                     <tr>
                       <th rowSpan={2} className="px-2.5 py-2.5 text-center border border-[#1e3a5f] w-10">No</th>
                       <th rowSpan={2} className="px-3 py-2.5 border border-[#1e3a5f]">Nama Asatidz / Ustazah</th>
-                      <th rowSpan={2} className="px-3 py-2.5 border border-[#1e3a5f] bg-[#0d2847]">Mata Pelajaran yang Diampu</th>
+                      <th rowSpan={2} className="px-3 py-2.5 border border-[#1e3a5f] bg-[#0d2847]">
+                        {rekapViewType === 'per-kelas' ? 'Kelas & Mata Pelajaran' : 'Mata Pelajaran yang Diampu'}
+                      </th>
                       <th colSpan={4} className="px-2 py-1.5 text-center border border-[#1e3a5f] bg-[#0b2545]">Kehadiran</th>
                       <th rowSpan={2} className="px-2.5 py-2.5 text-center border border-[#1e3a5f] w-20 bg-[#0d2847]">Total JP Wajib</th>
                       <th rowSpan={2} className="px-2.5 py-2.5 text-center border border-[#1e3a5f] w-20 bg-[#0b2545]">Total Kehadiran</th>
@@ -1062,18 +1193,31 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
                     {activeSummaryList.map((r, idx) => (
-                      <tr key={`${r.teacherId}-${r.subjectId || idx}`} className="hover:bg-indigo-50/40 dark:hover:bg-slate-800/50 transition-colors group">
+                      <tr key={`${r.teacherId}-${r.classId || ''}-${r.subjectId || idx}`} className="hover:bg-indigo-50/40 dark:hover:bg-slate-800/50 transition-colors group">
                         <td className="px-2.5 py-2.5 text-center text-slate-400 font-mono text-xs border-r border-slate-200 dark:border-slate-800">{idx + 1}</td>
                         <td className="px-3 py-2.5 font-extrabold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap">{r.teacherName}</td>
                         <td className="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            {(r.subjectsTaught || 'Pengajar MQBA').split(' • ').map((subj, sIdx) => (
-                              <span key={sIdx} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-200 dark:border-indigo-800">
-                                <BookOpen className="w-3 h-3 text-indigo-500 flex-shrink-0" />
-                                <span>{subj}</span>
+                          {rekapViewType === 'per-kelas' ? (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-black border border-emerald-200 dark:border-emerald-800">
+                                <School className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                                <span>{r.className || 'Kelas'}</span>
                               </span>
-                            ))}
-                          </div>
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-200 dark:border-indigo-800">
+                                <BookOpen className="w-3 h-3 text-indigo-500 flex-shrink-0" />
+                                <span>{r.subjectName || r.subjectsTaught}</span>
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {(r.subjectsTaught || 'Pengajar MQBA').split(' • ').map((subj, sIdx) => (
+                                <span key={sIdx} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold border border-indigo-200 dark:border-indigo-800">
+                                  <BookOpen className="w-3 h-3 text-indigo-500 flex-shrink-0" />
+                                  <span>{subj}</span>
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </td>
                         <td className="px-2 py-2.5 text-center font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800">{r.hadir}</td>
                         <td className="px-2 py-2.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{r.sakit}</td>

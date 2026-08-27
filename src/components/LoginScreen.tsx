@@ -10,7 +10,9 @@ import {
   X,
   BookOpen,
   Eye,
-  EyeOff
+  EyeOff,
+  FileText,
+  Download
 } from 'lucide-react';
 import { api } from '../api';
 
@@ -310,7 +312,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             </button>
           </form>
 
-          <div className="relative z-10 mt-5 pt-3 border-t border-white/10 text-center">
+          <div className="relative z-10 mt-4 text-center">
             <p className="text-[10px] font-normal text-sky-200/70 tracking-wide">
               © {new Date().getFullYear()} Akademik MQBA Isy Karima · Powered by <span className="text-white font-semibold">Active Node</span>
             </p>

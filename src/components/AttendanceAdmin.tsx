@@ -1056,32 +1056,32 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
       )}
 
       {/* TAB: REKAP */}
-      {activeTab === 'rekap' && (
+      {activeTab === 'rekap' && (() => {
+        const totHadir = subjectSummaryList.reduce((s,r)=>s+r.hadir,0);
+        const totIzin  = subjectSummaryList.reduce((s,r)=>s+r.izin,0);
+        const totSakit = subjectSummaryList.reduce((s,r)=>s+r.sakit,0);
+        const totAlpha = subjectSummaryList.reduce((s,r)=>s+r.alpha,0);
+        const totAll   = totHadir+totIzin+totSakit+totAlpha;
+        const summaryCards = [
+          {label:'Total Hadir',val:totHadir,cls:'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30 text-indigo-700 dark:text-indigo-400'},
+          {label:'Izin',val:totIzin,cls:'bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-700 dark:text-blue-400'},
+          {label:'Sakit',val:totSakit,cls:'bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400'},
+          {label:'Alpha',val:totAlpha,cls:'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-700 dark:text-rose-400'},
+        ];
+        return (
         <div className="space-y-4">
           {/* Summary cards */}
-          {subjectSummaryList.length > 0 && (() => {
-            const totHadir = subjectSummaryList.reduce((s,r)=>s+r.hadir,0);
-            const totIzin  = subjectSummaryList.reduce((s,r)=>s+r.izin,0);
-            const totSakit = subjectSummaryList.reduce((s,r)=>s+r.sakit,0);
-            const totAlpha = subjectSummaryList.reduce((s,r)=>s+r.alpha,0);
-            const totAll   = totHadir+totIzin+totSakit+totAlpha;
-            return (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  {label:'Total Hadir',val:totHadir,cls:'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30 text-indigo-700 dark:text-indigo-400'},
-                  {label:'Izin',val:totIzin,cls:'bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-700 dark:text-blue-400'},
-                  {label:'Sakit',val:totSakit,cls:'bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400'},
-                  {label:'Alpha',val:totAlpha,cls:'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30 text-rose-700 dark:text-rose-400'},
-                ].map(c=>(
-                  <div key={c.label} className={`p-4 rounded-2xl border ${c.cls}`}>
-                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">{c.label}</p>
-                    <p className="text-3xl font-black mt-1">{c.val}</p>
-                    <p className="text-[10px] mt-0.5 opacity-60">{totAll>0?Math.round(c.val/totAll*100):0}% dari total</p>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
+          {subjectSummaryList.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {summaryCards.map(c=>(
+                <div key={c.label} className={`p-4 rounded-2xl border ${c.cls}`}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">{c.label}</p>
+                  <p className="text-3xl font-black mt-1">{c.val}</p>
+                  <p className="text-[10px] mt-0.5 opacity-60">{totAll>0?Math.round(c.val/totAll*100):0}% dari total</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Per-teacher & Per-Subject table (Dipisah per-mapel satu per satu atau digabung) */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
@@ -1333,7 +1333,8 @@ export default function AttendanceAdmin({ teachers, academicYears, semesters, sc
             )}
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* FORM MODAL (CATAT / EDIT ABSENSI HARIAN) */}
       {showForm && (

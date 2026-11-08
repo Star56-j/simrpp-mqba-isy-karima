@@ -11,6 +11,12 @@ export default defineConfig({
     },
   },
   server: {
+    proxy: {
+      '/api': {
+        target: 'https://akademikmqbaisykarima.pages.dev',
+        changeOrigin: true,
+      },
+    },
     hmr: process.env.DISABLE_HMR !== 'true',
     watch: process.env.DISABLE_HMR === 'true' ? undefined : {},
     // Izinkan semua host agar Railway dan domain lainnya bisa diakses

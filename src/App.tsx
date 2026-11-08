@@ -180,6 +180,12 @@ export default function App() {
 
       setTeachers(tch);
       setSubjects(sbj);
+      const sortedCls = [...cls].sort((a: any, b: any) => {
+        const idA = a.id || '';
+        const idB = b.id || '';
+        return idA.localeCompare(idB, undefined, { numeric: true });
+      });
+      setClasses(sortedCls);
       const sortedAY = [...ay].sort((a: any, b: any) => {
         if (a.id === 'ay-1' || a.name?.includes('2026')) return -1;
         if (b.id === 'ay-1' || b.name?.includes('2026')) return 1;
@@ -418,6 +424,7 @@ export default function App() {
             subjects={subjects}
             classes={classes}
             academicYears={academicYears}
+            schedules={schedules}
             onRefresh={fetchData}
             initialStatusFilter={rppStatusFilter}
           />

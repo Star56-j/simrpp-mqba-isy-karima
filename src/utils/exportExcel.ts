@@ -113,35 +113,58 @@ export function exportRekapSantriExcel(summary: any[], periodTitle: string, file
     [`REKAPITULASI KEHADIRAN SANTRI - ${periodTitle.toUpperCase()}`],
     ['MARKAZ AL QUR\'AN DAN BAHASA ARAB ISY KARIMA'],
     [],
-    ['No', 'Nama Santri / Kelas', 'NIS / Kelas', 'Kehadiran', '', '', '', 'Total Hari', '% Hadir'],
-    ['', '', '', 'H', 'S', 'I', 'A', '', '']
+    ['No', 'Nama Santri / Kelas', 'NIS / Kelas', 'Kehadiran', '', '', '', 'Total Hari', '% Hadir', '% Absen'],
+    ['', '', '', 'H', 'S', 'I', 'A', '', '', '']
   ];
 
   summary.forEach((r, idx) => {
+    const hadir = r.hadir || 0;
+    const sakit = r.sakit || 0;
+    const izin = r.izin || 0;
+    const alpha = r.alpha || 0;
+    const total = r.total !== undefined ? r.total : (hadir + sakit + izin + alpha);
+    const persentaseHadir = r.persentaseHadir !== undefined ? r.persentaseHadir : (r.rataHadir !== undefined ? r.rataHadir : (total > 0 ? Math.round((hadir / total) * 100) : 0));
+    const persentaseAbsen = r.persentaseAbsen !== undefined ? r.persentaseAbsen : (total > 0 ? Math.round(((sakit + izin + alpha) / total) * 100) : 0);
+
     rows.push([
       idx + 1,
       r.santriName || r.className || r.name || 'Santri',
       r.nis || r.classId || '-',
-      r.hadir || 0,
-      r.sakit || 0,
-      r.izin || 0,
-      r.alpha || 0,
-      r.total || (r.hadir + r.sakit + r.izin + r.alpha) || 0,
-      `${r.persentaseHadir !== undefined ? r.persentaseHadir : (r.rataHadir !== undefined ? r.rataHadir : 0)}%`
+      hadir,
+      sakit,
+      izin,
+      alpha,
+      total,
+      `${persentaseHadir}%`,
+      `${persentaseAbsen}%`
     ]);
   });
 
   const worksheet = XLSX.utils.aoa_to_sheet(rows);
 
   worksheet['!merges'] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } },
     { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } },
     { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } },
     { s: { r: 3, c: 2 }, e: { r: 4, c: 2 } },
     { s: { r: 3, c: 3 }, e: { r: 3, c: 6 } },
     { s: { r: 3, c: 7 }, e: { r: 4, c: 7 } },
-    { s: { r: 3, c: 8 }, e: { r: 4, c: 8 } }
+    { s: { r: 3, c: 8 }, e: { r: 4, c: 8 } },
+    { s: { r: 3, c: 9 }, e: { r: 4, c: 9 } }
+  ];
+
+  worksheet['!cols'] = [
+    { wch: 6 },
+    { wch: 28 },
+    { wch: 16 },
+    { wch: 7 },
+    { wch: 7 },
+    { wch: 7 },
+    { wch: 7 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 12 }
   ];
 
   const workbook = XLSX.utils.book_new();

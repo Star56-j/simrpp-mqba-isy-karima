@@ -4,7 +4,7 @@ import {
   CheckCircle, Upload, CloudLightning, Send, Save,
   ChevronDown, ChevronUp, PlusCircle, Trash2, BookOpen, Download, Printer
 } from 'lucide-react';
-import { RPP, Subject, SchoolClass, AcademicYear, SyllabusItem } from '../types';
+import { RPP, Subject, SchoolClass, AcademicYear, SyllabusItem, TeachingSchedule } from '../types';
 import { api } from '../api';
 import { exportToExcel } from '../utils/exportExcel';
 import { parseExcelFile } from '../utils/importExcel';
@@ -16,6 +16,7 @@ interface MyRPPsProps {
   subjects: Subject[];
   classes: SchoolClass[];
   academicYears: AcademicYear[];
+  schedules: TeachingSchedule[];
   onRefresh: () => void;
   initialStatusFilter?: string;
 }
@@ -30,7 +31,7 @@ const STEPS = [
   { id: 6, label: 'Silabus',       desc: 'Rincian Per Pertemuan' },
 ];
 
-export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefresh, initialStatusFilter }: MyRPPsProps) {
+export default function MyRPPs({ rpps, subjects, classes, academicYears, schedules, onRefresh, initialStatusFilter }: MyRPPsProps) {
   const [activeTab, setActiveTab] = React.useState<'history' | 'create'>('history');
   const [searchQuery, setSearchQuery] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<string>(initialStatusFilter || 'Semua');
@@ -38,7 +39,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const myUser = JSON.parse(localStorage.getItem('simrpp_user') || '{}');
-  const activeTeacherId = myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || 't-12';
+  const activeTeacherId = myUser.teacherId || myUser.teacher_id || (myUser.teacher && myUser.teacher.id) || myUser.id || '';
   const teacherIds = [
     myUser.teacherId,
     myUser.teacher_id,
@@ -50,6 +51,23 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
     myUser.name,
     myUser.teacher?.name
   ].filter(Boolean).map((n: string) => n.trim().toLowerCase());
+
+  // === JADWAL USTADZ: filter kelas & mapel berdasarkan jadwal mengajar ===
+  const mySchedules = React.useMemo(() => {
+    if (myUser.role === 'Admin') return schedules;
+    return schedules.filter(s => {
+      const sTid = s.teacherId || (s as any).teacher_id;
+      return teacherIds.includes(sTid);
+    });
+  }, [schedules, teacherIds.join(','), myUser.role]);
+
+  // Kelas yang diampu ustadz ini (unik)
+  const myClasses = React.useMemo(() => {
+    if (myUser.role === 'Admin') return classes;
+    const myClassIds = [...new Set(mySchedules.map(s => s.classId || (s as any).class_id).filter(Boolean))];
+    return classes.filter(c => myClassIds.includes(c.id));
+  }, [mySchedules, classes, myUser.role]);
+
 
   const myRpps = rpps.filter(r => {
     if (myUser.role === 'Admin') return true;
@@ -77,6 +95,25 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
   const [academicYearId, setAcademicYearId] = React.useState('');
   const [profilPelajar, setProfilPelajar]   = React.useState('');
   const [sarana, setSarana]                 = React.useState('');
+
+  // Mapel yang tersedia untuk kelas yang dipilih (berdasarkan jadwal)
+  // NOTE: harus di sini, setelah classId useState didefinisikan
+  const availableSubjects = React.useMemo(() => {
+    if (myUser.role === 'Admin') return subjects;
+    if (!classId) {
+      // Belum pilih kelas: tampilkan semua mapel yang pernah diampu
+      const mySubjectIds = [...new Set(mySchedules.map(s => s.subjectId || (s as any).subject_id).filter(Boolean))];
+      return subjects.filter(s => mySubjectIds.includes(s.id));
+    }
+    // Sudah pilih kelas: filter mapel sesuai jadwal di kelas tersebut
+    const subjectIdsForClass = [...new Set(
+      mySchedules
+        .filter(s => (s.classId || (s as any).class_id) === classId)
+        .map(s => s.subjectId || (s as any).subject_id)
+        .filter(Boolean)
+    )];
+    return subjects.filter(s => subjectIdsForClass.includes(s.id));
+  }, [mySchedules, subjects, classId, myUser.role]);
 
   // Step 2: Capaian & TP
   const [capaiPembelajaran, setCapaiPembelajaran]     = React.useState('');
@@ -118,7 +155,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
   const [successMessage, setSuccessMessage] = React.useState('');
 
   const buildPayload = (status: 'Draft' | 'Menunggu Persetujuan') => ({
-    teacherId: activeTeacherId || myUser.teacherId || myUser.teacher_id || 't-12',
+    teacherId: activeTeacherId || myUser.teacherId || myUser.teacher_id || '',
     subjectId, classId, academicYearId,
     profilPelajar, sarana,
     capaiPembelajaran, tujuanPembelajaran, alurTP,
@@ -133,7 +170,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
 
   // Autosave draft
   React.useEffect(() => {
-    if (activeTab !== 'create' || !subjectId || !classId || !academicYearId) return;
+    if (activeTab !== 'create' || !subjectId || !classId || !academicYearId || !activeTeacherId) return;
     const timer = setTimeout(async () => {
       setIsAutosaving(true);
       try {
@@ -206,6 +243,10 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
     setErrorMessage(''); setSuccessMessage('');
     if (!subjectId || !classId || !academicYearId) {
       setErrorMessage('Mata pelajaran, kelas, dan tahun ajaran wajib dipilih.'); return;
+    }
+    // Validasi teacherId — pastikan bukan kosong sebelum menyimpan
+    if (!activeTeacherId) {
+      setErrorMessage('Sesi login tidak valid: ID pengajar tidak ditemukan. Silakan logout dan login kembali.'); return;
     }
     if (targetStatus === 'Menunggu Persetujuan') {
       if (!capaiPembelajaran.trim() || !tujuanPembelajaran.trim()) {
@@ -280,7 +321,7 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
         
         if (!subj || !cls) return null;
         return {
-          teacherId: activeTeacherId || myUser.teacherId || myUser.teacher_id || 't-12',
+          teacherId: activeTeacherId || myUser.teacherId || myUser.teacher_id || '',
           subjectId: subj.id,
           classId: cls.id,
           academicYearId: ay?.id,
@@ -514,17 +555,50 @@ export default function MyRPPs({ rpps, subjects, classes, academicYears, onRefre
             {/* STEP 1: Identitas */}
             {currentStep === 1 && (
               <div className="space-y-4">
+                {/* Info: filter berdasarkan jadwal */}
+                {myUser.role !== 'Admin' && mySchedules.length > 0 && (
+                  <div className="flex items-start gap-2 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-xs text-indigo-700 dark:text-indigo-300">
+                    <span className="text-indigo-500 flex-shrink-0 mt-0.5">📋</span>
+                    <span>
+                      Kelas dan mata pelajaran di bawah sudah difilter sesuai <strong>jadwal mengajar</strong> Anda.
+                      Pilih kelas terlebih dahulu agar mata pelajaran menyesuaikan otomatis.
+                    </span>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div><label className={labelCls}>Mata Pelajaran</label>
-                    <select value={subjectId} onChange={e => setSubjectId(e.target.value)} disabled={!!editingRppId} className={inputCls}>
-                      <option value="" disabled>Pilih mata pelajaran...</option>
-                      {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  {/* 1. Kelas dulu */}
+                  <div>
+                    <label className={labelCls}>Kelas</label>
+                    <select
+                      value={classId}
+                      onChange={e => { setClassId(e.target.value); setSubjectId(''); }}
+                      disabled={!!editingRppId}
+                      className={inputCls}
+                    >
+                      <option value="" disabled>Pilih kelas...</option>
+                      {myClasses.map(c => <option key={c.id} value={c.id}>Kelas {c.name} ({c.level})</option>)}
                     </select>
                   </div>
-                  <div><label className={labelCls}>Kelas</label>
-                    <select value={classId} onChange={e => setClassId(e.target.value)} disabled={!!editingRppId} className={inputCls}>
-                      <option value="" disabled>Pilih kelas...</option>
-                      {classes.map(c => <option key={c.id} value={c.id}>Kelas {c.name} ({c.level})</option>)}
+                  {/* 2. Mata Pelajaran (terfilter sesuai kelas & jadwal) */}
+                  <div>
+                    <label className={labelCls}>
+                      Mata Pelajaran
+                      {classId && myUser.role !== 'Admin' && (
+                        <span className="ml-1.5 text-[10px] font-medium text-indigo-500 normal-case">
+                          (Jam sesi di kelas ini)
+                        </span>
+                      )}
+                    </label>
+                    <select
+                      value={subjectId}
+                      onChange={e => setSubjectId(e.target.value)}
+                      disabled={!!editingRppId || (!classId && myUser.role !== 'Admin')}
+                      className={inputCls}
+                    >
+                      <option value="" disabled>
+                        {!classId && myUser.role !== 'Admin' ? 'Pilih kelas dulu...' : 'Pilih mata pelajaran...'}
+                      </option>
+                      {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
                   <div><label className={labelCls}>Tahun Ajaran</label>

@@ -58,9 +58,10 @@ export default function BulkMonthlySantriModal({
     return santriList.filter(s => s.classId === selectedClass);
   }, [santriList, selectedClass]);
 
-  // Initialize bulkData when class or bulkEffDays changes
+  // Initialize bulkData when class or bulkEffDays changes, or pre-load existing month data
   React.useEffect(() => {
     if (isOpen && selectedClass) {
+      let isCancelled = false;
       const initial: Record<string, { hadir: number; izin: number; sakit: number; alpha: number; notes: string }> = {};
       classSantris.forEach(s => {
         initial[s.id] = {
@@ -71,11 +72,45 @@ export default function BulkMonthlySantriModal({
           notes: ''
         };
       });
-      setBulkData(initial);
+
+      api.getSantriAttendances({ classId: selectedClass, year: bulkYear, month: bulkMonth })
+        .then(existing => {
+          if (isCancelled) return;
+          if (existing && existing.length > 0) {
+            const loaded: Record<string, { hadir: number; izin: number; sakit: number; alpha: number; notes: string }> = {};
+            let hasLoadedAny = false;
+            classSantris.forEach(s => {
+              const myAtts = existing.filter((a: any) => (a.santriId || a.santri_id) === s.id);
+              if (myAtts.length > 0) {
+                hasLoadedAny = true;
+                loaded[s.id] = {
+                  hadir: myAtts.filter(a => a.status === 'Hadir').length,
+                  izin: myAtts.filter(a => a.status === 'Izin').length,
+                  sakit: myAtts.filter(a => a.status === 'Sakit').length,
+                  alpha: myAtts.filter(a => a.status === 'Alpha').length,
+                  notes: myAtts[0]?.notes || ''
+                };
+              } else {
+                loaded[s.id] = { hadir: bulkEffDays, izin: 0, sakit: 0, alpha: 0, notes: '' };
+              }
+            });
+            if (hasLoadedAny) {
+              setBulkData(loaded);
+              return;
+            }
+          }
+          setBulkData(initial);
+        })
+        .catch(() => {
+          if (!isCancelled) setBulkData(initial);
+        });
+
       setSuccessMsg('');
       setErrorMsg('');
+
+      return () => { isCancelled = true; };
     }
-  }, [isOpen, selectedClass, classSantris.length]);
+  }, [isOpen, selectedClass, bulkYear, bulkMonth, classSantris.length, bulkEffDays]);
 
   if (!isOpen) return null;
 
@@ -134,6 +169,7 @@ export default function BulkMonthlySantriModal({
         for (let idx = 0; idx < h; idx++) {
           const dayStr = String(dayCounter).padStart(2, '0');
           recordsToCreate.push({
+            id: `sa-${crypto.randomUUID()}`,
             classId: selectedClass,
             santriId: s.id,
             date: `${yStr}-${mStr}-${dayStr}`,
@@ -148,6 +184,7 @@ export default function BulkMonthlySantriModal({
         for (let idx = 0; idx < i; idx++) {
           const dayStr = String(dayCounter).padStart(2, '0');
           recordsToCreate.push({
+            id: `sa-${crypto.randomUUID()}`,
             classId: selectedClass,
             santriId: s.id,
             date: `${yStr}-${mStr}-${dayStr}`,
@@ -162,6 +199,7 @@ export default function BulkMonthlySantriModal({
         for (let idx = 0; idx < sk; idx++) {
           const dayStr = String(dayCounter).padStart(2, '0');
           recordsToCreate.push({
+            id: `sa-${crypto.randomUUID()}`,
             classId: selectedClass,
             santriId: s.id,
             date: `${yStr}-${mStr}-${dayStr}`,
@@ -176,6 +214,7 @@ export default function BulkMonthlySantriModal({
         for (let idx = 0; idx < a; idx++) {
           const dayStr = String(dayCounter).padStart(2, '0');
           recordsToCreate.push({
+            id: `sa-${crypto.randomUUID()}`,
             classId: selectedClass,
             santriId: s.id,
             date: `${yStr}-${mStr}-${dayStr}`,

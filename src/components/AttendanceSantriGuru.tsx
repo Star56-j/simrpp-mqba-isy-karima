@@ -236,6 +236,7 @@ export default function AttendanceSantriGuru({
 
       const total = hadir + izin + sakit + alpha;
       const persentaseHadir = total > 0 ? Math.round((hadir / total) * 100) : 0;
+      const persentaseAbsen = total > 0 ? Math.round(((izin + sakit + alpha) / total) * 100) : 0;
 
       return {
         santriId: s.id,
@@ -248,7 +249,8 @@ export default function AttendanceSantriGuru({
         sakit,
         alpha,
         total,
-        persentaseHadir
+        persentaseHadir,
+        persentaseAbsen
       };
     });
   }, [santriList, filterClass, availableClasses, classes, attendances]);
@@ -334,7 +336,7 @@ export default function AttendanceSantriGuru({
       if (rekapSubTab === 'santri') {
         const title = `Rekap Kehadiran Santri Individu - ${rekapLabel}`;
         const subtitle = `Tahun Pelajaran: ${academicYears.find(a => a.id === filterAY)?.name || '-'}`;
-        const headers = ['No', 'NIS', 'Nama Santri', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Total', '% Hadir'];
+        const headers = ['No', 'NIS', 'Nama Santri', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Total', '% Hadir', '% Absen'];
         const dataRows = perSantriSummary.map((s, idx) => [
           idx + 1,
           s.nis || '-',
@@ -345,7 +347,8 @@ export default function AttendanceSantriGuru({
           s.sakit,
           s.alpha,
           s.total,
-          `${s.persentaseHadir}%`
+          `${s.persentaseHadir}%`,
+          `${s.persentaseAbsen}%`
         ]);
         downloadRekapSantriPdf(title, subtitle, headers, dataRows, `Rekap_Absensi_Santri_Individu_${rekapLabel.replace(/\s+/g, '_')}.pdf`);
       } else {
@@ -1096,8 +1099,9 @@ export default function AttendanceSantriGuru({
                         <th rowSpan={2} className="px-4 py-2.5 border border-[#1e3a5f]">Nama Santri</th>
                         <th rowSpan={2} className="px-4 py-2.5 border border-[#1e3a5f] bg-[#0d2847]">NIS / Kelas</th>
                         <th colSpan={4} className="px-3 py-1.5 text-center border border-[#1e3a5f] bg-[#0b2545]">Status Kehadiran</th>
-                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-28 bg-[#0d2847]">Total Hari</th>
-                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-28">% Hadir Santri</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-24 bg-[#0d2847]">Total Hari</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-24">% Hadir</th>
+                        <th rowSpan={2} className="px-3 py-2.5 text-center border border-[#1e3a5f] w-24 bg-[#7f1d1d] text-white">% Absen</th>
                       </tr>
                       <tr>
                         <th className="px-3 py-1 text-center border border-[#1e3a5f] w-12 bg-[#16365c]">H</th>
@@ -1117,18 +1121,24 @@ export default function AttendanceSantriGuru({
                               <span className="block text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">{s.className}</span>
                             </div>
                           </td>
-                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800">{s.hadir}</td>
-                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{s.sakit}</td>
-                          <td className="px-3 py-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">{s.izin}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400 border-r border-slate-200 dark:border-slate-800">{s.hadir}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-amber-600 dark:text-amber-400 border-r border-slate-200 dark:border-slate-800">{s.sakit}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-blue-600 dark:text-blue-400 border-r border-slate-200 dark:border-slate-800">{s.izin}</td>
                           <td className={`px-3 py-3 text-center font-mono border-r border-slate-200 dark:border-slate-800 ${s.alpha > 0 ? 'text-rose-600 font-black' : 'font-bold text-slate-700 dark:text-slate-300'}`}>{s.alpha}</td>
                           <td className="px-3 py-3 text-center font-mono font-black text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/40 border-r border-slate-200 dark:border-slate-800">{s.total}</td>
-                          <td className="px-3 py-3 text-center bg-[#0f2942] text-white font-extrabold">
-                            <div className="flex items-center justify-center space-x-1.5">
-                              <div className="w-12 bg-slate-700 rounded-full h-1.5 overflow-hidden hidden sm:block">
-                                <div className="bg-emerald-400 h-full rounded-full" style={{width:`${s.persentaseHadir}%`}}/>
-                              </div>
-                              <span>{s.persentaseHadir}%</span>
-                            </div>
+                          <td className="px-3 py-3 text-center bg-[#0f2942] text-white font-extrabold border-r border-slate-200 dark:border-slate-800">
+                            <span className="font-mono">{s.persentaseHadir}%</span>
+                          </td>
+                          <td className="px-3 py-3 text-center font-extrabold">
+                            <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-mono font-bold ${
+                              s.persentaseAbsen > 15
+                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40'
+                                : s.persentaseAbsen > 0
+                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40'
+                                : 'bg-slate-100 text-slate-500 dark:bg-slate-800'
+                            }`}>
+                              {s.persentaseAbsen}%
+                            </span>
                           </td>
                         </tr>
                       ))}

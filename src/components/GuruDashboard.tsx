@@ -420,6 +420,31 @@ export default function GuruDashboard({
                   <p className="text-sky-300/60 text-[10px] mt-1 font-semibold">— {hadith.src}</p>
                 </div>
               </div>
+
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                <a
+                  href="/buku_panduan_pengenalan_fitur_pengajar_dan_wali_kelas_mqba.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download="buku_panduan_pengenalan_fitur_pengajar_dan_wali_kelas_mqba.pdf"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition border border-white/25 backdrop-blur-md shadow-sm cursor-pointer"
+                  title="Download Buku Panduan Lengkap PDF"
+                >
+                  <BookOpen className="w-4 h-4 text-sky-200" />
+                  <span>Buku Panduan PDF</span>
+                </a>
+                <a
+                  href="/daftar_akun_pengajar_dan_wali_kelas_mqba.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download="daftar_akun_pengajar_dan_wali_kelas_mqba.pdf"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sky-100 hover:text-white text-xs font-bold transition border border-white/15 backdrop-blur-md shadow-sm cursor-pointer"
+                  title="Download Daftar Akun & Kredensial PDF"
+                >
+                  <FileText className="w-4 h-4 text-sky-200" />
+                  <span>Daftar Akun PDF</span>
+                </a>
+              </div>
             </div>
 
             <div className="flex-shrink-0">

@@ -723,7 +723,34 @@ tables.forEach(table => {
   api.get(`/${table}`, async (c) => {
     try {
       if (table === 'rpps') {
-        await c.env.DB.prepare("UPDATE rpps SET teacher_id = 't-12' WHERE teacher_id IS NULL OR teacher_id = '' OR teacher_id = 'undefined'").run().catch(() => {});
+        // JOIN ke tabel terkait agar nama guru/mapel/kelas tersedia di response
+        // TIDAK lagi melakukan auto-UPDATE teacher_id = 't-12' yang destruktif
+        const { results } = await c.env.DB.prepare(`
+          SELECT r.*,
+            t.name as teacher_name,
+            s.name as subject_name,
+            cl.name as class_name,
+            ay.name as academic_year_name
+          FROM rpps r
+          LEFT JOIN teachers t ON r.teacher_id = t.id
+          LEFT JOIN subjects s ON r.subject_id = s.id
+          LEFT JOIN classes cl ON r.class_id = cl.id
+          LEFT JOIN academic_years ay ON r.academic_year_id = ay.id
+          ORDER BY r.id DESC
+        `).all();
+
+        const mapped = (results || []).map((r: any) => ({
+          ...r,
+          teacherId: r.teacher_id || '',
+          subjectId: r.subject_id || '',
+          classId: r.class_id || '',
+          academicYearId: r.academic_year_id || '',
+          teacher: r.teacher_name ? { id: r.teacher_id, name: r.teacher_name } : undefined,
+          subject: r.subject_name ? { id: r.subject_id, name: r.subject_name } : undefined,
+          class: r.class_name ? { id: r.class_id, name: r.class_name } : undefined,
+          academicYear: r.academic_year_name ? { id: r.academic_year_id, name: r.academic_year_name } : undefined,
+        }));
+        return c.json(mapped);
       }
       if (table === 'semesters') {
         const { results } = await c.env.DB.prepare("SELECT * FROM semesters ORDER BY CASE WHEN LOWER(name) LIKE '%ganjil%' OR id = 'sem-1' THEN 1 ELSE 2 END ASC, id ASC").all();
@@ -753,9 +780,19 @@ tables.forEach(table => {
         await c.env.DB.prepare('ALTER TABLE rpps ADD COLUMN attachment_name TEXT').run().catch(() => {});
         await c.env.DB.prepare('ALTER TABLE rpps ADD COLUMN alur_t_p TEXT').run().catch(() => {});
         await c.env.DB.prepare('ALTER TABLE rpps ADD COLUMN alur_tp TEXT').run().catch(() => {});
+        // Tolak permintaan jika teacherId tidak diisi — jangan default ke 't-12'
         if (!body.teacherId && !body.teacher_id) {
-          body.teacherId = 't-12';
+          return c.json({ error: 'teacherId wajib diisi saat membuat RPP.' }, 400);
         }
+        // Hapus computed fields dari JOIN agar tidak tersimpan sebagai kolom
+        delete body.teacher_name;
+        delete body.subject_name;
+        delete body.class_name;
+        delete body.academic_year_name;
+        delete body.teacher;
+        delete body.subject;
+        delete body.class;
+        delete body.academicYear;
       }
       
       const filteredKeys: string[] = [];
@@ -804,9 +841,17 @@ tables.forEach(table => {
         await c.env.DB.prepare('ALTER TABLE rpps ADD COLUMN attachment_name TEXT').run().catch(() => {});
         await c.env.DB.prepare('ALTER TABLE rpps ADD COLUMN alur_t_p TEXT').run().catch(() => {});
         await c.env.DB.prepare('ALTER TABLE rpps ADD COLUMN alur_tp TEXT').run().catch(() => {});
-        if (!body.teacherId && !body.teacher_id && body.status !== 'Disetujui' && body.status !== 'Revisi') {
-          body.teacherId = 't-12';
-        }
+        // Hapus computed fields dari JOIN agar tidak masuk sebagai kolom UPDATE
+        delete body.teacher_name;
+        delete body.subject_name;
+        delete body.class_name;
+        delete body.academic_year_name;
+        delete body.teacher;
+        delete body.subject;
+        delete body.class;
+        delete body.academicYear;
+        // Untuk PUT partial update (misal: admin ubah status saja),
+        // tidak perlu validasi teacherId karena existing data di DB sudah ada
       }
       
       const filteredKeys: string[] = [];

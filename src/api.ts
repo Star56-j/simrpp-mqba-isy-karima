@@ -142,14 +142,23 @@ export const api = {
       if (typeof syllabusItems === 'string') {
         try { syllabusItems = JSON.parse(syllabusItems); } catch { syllabusItems = []; }
       }
+      // Gunakan nested objects dari JOIN di server jika tersedia
+      const teacher = r.teacher || (r.teacher_name ? { id: r.teacher_id || r.teacherId, name: r.teacher_name } : undefined);
+      const subject = r.subject || (r.subject_name ? { id: r.subject_id || r.subjectId, name: r.subject_name } : undefined);
+      const schoolClass = r.class || (r.class_name ? { id: r.class_id || r.classId, name: r.class_name } : undefined);
+      const academicYear = r.academicYear || (r.academic_year_name ? { id: r.academic_year_id || r.academicYearId, name: r.academic_year_name } : undefined);
       return {
         ...r,
         teacherId: r.teacherId || r.teacher_id || '',
         subjectId: r.subjectId || r.subject_id || '',
         classId: r.classId || r.class_id || '',
         academicYearId: r.academicYearId || r.academic_year_id || '',
+        teacher,
+        subject,
+        class: schoolClass,
+        academicYear,
         profilPelajar: r.profilPelajar || r.profil_pelajar || '',
-        sarana: r.sarana || r.sarana || '',
+        sarana: r.sarana || '',
         capaiPembelajaran: r.capaiPembelajaran || r.capai_pembelajaran || r.capaian_pembelajaran || '',
         tujuanPembelajaran: r.tujuanPembelajaran || r.tujuan_pembelajaran || '',
         alurTP: r.alurTP || r.alur_tp || r.alur_t_p || '',
@@ -298,9 +307,22 @@ export const api = {
     if (params?.subjectId) res = res.filter(a => a.subjectId === params.subjectId);
     if (params?.teacherId) res = res.filter(a => a.teacherId === params.teacherId);
     if (params?.date) res = res.filter(a => a.date === params.date);
-    if (params?.academicYearId) res = res.filter(a => a.academicYearId === params.academicYearId);
-    if (params?.semesterId) res = res.filter(a => a.semesterId === params.semesterId);
-    if (params?.year && !params?.month) res = res.filter(a => a.date?.startsWith(params.year));
+    if (params?.academicYearId) {
+      res = res.filter(a => !a.academicYearId || a.academicYearId === params.academicYearId);
+    }
+    if (params?.semesterId) {
+      res = res.filter(a => {
+        if (a.semesterId) return a.semesterId === params.semesterId;
+        if (a.date) {
+          const monthNum = parseInt(a.date.split('-')[1], 10);
+          const isGanjil = monthNum >= 7 && monthNum <= 12;
+          const wantGanjil = params.semesterId === 'sem-1' || String(params.semesterId).toLowerCase().includes('ganjil');
+          return wantGanjil ? isGanjil : !isGanjil;
+        }
+        return true;
+      });
+    }
+    if (params?.year && !params?.month && !params?.semesterId) res = res.filter(a => a.date?.startsWith(params.year));
     if (params?.year && params?.month) {
       const mStr = String(params.month).padStart(2, '0');
       res = res.filter(a => a.date?.startsWith(`${params.year}-${mStr}`));

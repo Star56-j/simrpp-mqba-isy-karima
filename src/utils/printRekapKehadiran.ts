@@ -363,8 +363,9 @@ export function printRekapKehadiranSantri(
             <th rowspan="2">NAMA SANTRI / KELAS</th>
             <th rowspan="2" style="width: 140px; background-color: #0d2847;">NIS / KELAS</th>
             <th colspan="4" class="th-sub">KEHADIRAN</th>
-            <th rowspan="2" style="width: 110px; background-color: #0d2847;">TOTAL HARI</th>
+            <th rowspan="2" style="width: 100px; background-color: #0d2847;">TOTAL HARI</th>
             <th rowspan="2" style="width: 80px;">% HADIR</th>
+            <th rowspan="2" style="width: 80px; background-color: #881337;">% ABSEN</th>
           </tr>
           <tr>
             <th class="th-sub" style="width: 40px;">H</th>
@@ -376,21 +377,28 @@ export function printRekapKehadiranSantri(
         <tbody>
           ${summary.length === 0 ? `
             <tr>
-              <td colspan="9" class="text-center" style="padding: 20px; color: #94a3b8;">Belum ada data kehadiran santri untuk periode ini.</td>
+              <td colspan="10" class="text-center" style="padding: 20px; color: #94a3b8;">Belum ada data kehadiran santri untuk periode ini.</td>
             </tr>
           ` : summary.map((r, idx) => {
-            const pct = r.persentaseHadir !== undefined ? r.persentaseHadir : (r.rataHadir !== undefined ? r.rataHadir : 0);
+            const hadir = r.hadir || 0;
+            const sakit = r.sakit || 0;
+            const izin = r.izin || 0;
+            const alpha = r.alpha || 0;
+            const total = r.total !== undefined ? r.total : (hadir + sakit + izin + alpha);
+            const pctHadir = r.persentaseHadir !== undefined ? r.persentaseHadir : (r.rataHadir !== undefined ? r.rataHadir : (total > 0 ? Math.round((hadir / total) * 100) : 0));
+            const pctAbsen = r.persentaseAbsen !== undefined ? r.persentaseAbsen : (total > 0 ? Math.round(((sakit + izin + alpha) / total) * 100) : 0);
             return `
             <tr>
               <td class="text-center" style="color: #64748b; font-family: monospace;">${idx + 1}</td>
               <td style="font-weight: 700; color: #0f172a; padding-left: 10px;">${r.santriName || r.className || r.name || 'Santri'}</td>
               <td style="font-weight: 600; color: #334155; padding-left: 10px;">${r.nis || (r.className ? 'Kelas ' + r.className : '-')}</td>
-              <td class="text-center font-bold" style="color: #0f2942;">${r.hadir || '0'}</td>
-              <td class="text-center">${r.sakit || '0'}</td>
-              <td class="text-center">${r.izin || '0'}</td>
-              <td class="text-center" style="${r.alpha > 0 ? 'color: #e11d48; font-weight: 700;' : ''}">${r.alpha || '0'}</td>
-              <td class="text-center font-bold">${r.total || (r.hadir + r.sakit + r.izin + r.alpha) || '0'}</td>
-              <td class="percentage-cell">${pct}%</td>
+              <td class="text-center font-bold" style="color: #0f2942;">${hadir}</td>
+              <td class="text-center">${sakit}</td>
+              <td class="text-center">${izin}</td>
+              <td class="text-center" style="${alpha > 0 ? 'color: #e11d48; font-weight: 700;' : ''}">${alpha}</td>
+              <td class="text-center font-bold">${total}</td>
+              <td class="percentage-cell">${pctHadir}%</td>
+              <td class="percentage-cell" style="background-color: ${pctAbsen > 0 ? '#991b1b' : '#334155'};">${pctAbsen}%</td>
             </tr>
           `;
           }).join('')}

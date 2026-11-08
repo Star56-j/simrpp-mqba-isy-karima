@@ -142,7 +142,7 @@ export default function EvaluasiPembelajaranPage({
   }, [error, showForm]);
 
   const uniqueMySubjectClassPairs = React.useMemo(() => {
-    const myScheds = myTeacherId ? schedules.filter(s => s.teacherId === myTeacherId || s.teacher_id === myTeacherId) : schedules;
+    const myScheds = myTeacherId ? schedules.filter(s => s.teacherId === myTeacherId || (s as any).teacher_id === myTeacherId) : schedules;
     const seen = new Set<string>();
     return myScheds.filter(s => {
       const key = `${s.subjectId || (s as any).subject_id}-${s.classId || (s as any).class_id}`;
